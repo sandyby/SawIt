@@ -4,6 +4,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.sawit.fragments.CompletedActivitiesFragment
 import com.example.sawit.fragments.PlannedActivitiesFragment
 import kotlin.jvm.Throws
+import androidx.fragment.app.Fragment
 
 class ActivitiesPagerAdapter(
     fragment: Fragment
