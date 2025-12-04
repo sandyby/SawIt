@@ -20,8 +20,7 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Edit Profile"
+        supportActionBar?.hide()
 
         val tietFullName = findViewById<TextInputEditText>(R.id.tiet_full_name_field)
         val tietEmailAddress = findViewById<TextInputEditText>(R.id.tiet_email_address_field)

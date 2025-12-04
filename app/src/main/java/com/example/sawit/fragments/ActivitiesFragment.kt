@@ -44,6 +44,7 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
     private fun setupViewPager() {
         val adapter = ActivitiesPagerAdapter(this)
         binding.vpActivities.adapter = adapter
+        binding.vpActivities.isSaveEnabled = false
 
         TabLayoutMediator(binding.tlActivities, binding.vpActivities) { tab, position ->
             tab.text = when (position) {
@@ -58,10 +59,10 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
         // todo
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//    }
 
 //    override fun onCreateView(
 //        inflater: LayoutInflater, container: ViewGroup?,
