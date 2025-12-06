@@ -90,10 +90,11 @@ class ProfileFragment : Fragment() {
     }
 
     private fun clearUserSession() {
-        val sharedPref = requireActivity().getSharedPreferences("AUTH_PREFS", Context.MODE_PRIVATE)
+        val sharedPref = requireActivity().getSharedPreferences("UserSession", Context.MODE_PRIVATE)
         with (sharedPref.edit()) {
-            remove("USER_TOKEN")
-            remove("USER_ID")
+            remove("email")
+            remove("fullName")
+            remove("uid")
             apply()
         }
         Toast.makeText(requireContext(), "Successfully logged out!", Toast.LENGTH_SHORT).show()

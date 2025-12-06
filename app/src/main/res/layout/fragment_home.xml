@@ -46,9 +46,10 @@
 
                 <TextView
                     android:layout_width="wrap_content"
+                    android:id="@+id/tv_fullName"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/lato_black"
-                    android:text="John Doe"
+                    android:text="User"
                     android:textColor="@color/text_primary_900"
                     android:textSize="24sp" />
 

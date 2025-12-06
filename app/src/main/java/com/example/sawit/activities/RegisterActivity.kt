@@ -263,7 +263,6 @@ class RegisterActivity : AppCompatActivity() {
         val hashedPassword = hashSHA256String(password)
         val user = User(fullName, email, hashedPassword, currentTime)
 
-
         /*
         * kondisi saat loading menunggu status register, dijalankan menggunakan coroutinescope, untuk
         * memanfaatkan fitur async dan juga lifecycle managementnya

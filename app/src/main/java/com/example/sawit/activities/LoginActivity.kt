@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -41,6 +42,7 @@ import com.example.sawit.ui.theme.BgSecondaryOverlay2
 import com.example.sawit.ui.theme.Text600
 import com.example.sawit.ui.theme.TextPrimary500
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.database.FirebaseDatabase
@@ -58,6 +60,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var tilPassword: TextInputLayout
     private lateinit var mBtnLogin: MaterialButton
     private lateinit var tvLoginErrorMsg: TextView
+    private lateinit var smRememberMe: SwitchMaterial
     private lateinit var tvSwitchRegister: TextView
 
     /*
@@ -129,6 +132,7 @@ class LoginActivity : AppCompatActivity() {
             Log.d("LoginActivity", "$email $password")
             userLogin(email, password)
         }
+        smRememberMe = findViewById<SwitchMaterial>(R.id.sm_rememberMe)
         tvLoginErrorMsg = findViewById<TextView>(R.id.tv_login_error_msg)
     }
 
@@ -231,13 +235,15 @@ class LoginActivity : AppCompatActivity() {
                         * aplikasi secara lokal
                         * */
                         if (storedPassword == hashedPassword) {
+                            val fullName = data.child("fullName").getValue(String::class.java)
                             val sharedPrefs = getSharedPreferences("UserSession", MODE_PRIVATE)
-                            sharedPrefs.edit().apply {
-                                putString("email", email)
-                                putString("uid", data.key)
-                                apply()
+                            val prefsEditor = sharedPrefs.edit()
+                            if (smRememberMe.isChecked) {
+                                prefsEditor.putString("email", email)
+                                prefsEditor.putString("uid", data.key)
                             }
-
+                            prefsEditor.putString("fullName", fullName)
+                            prefsEditor.apply()
                             Log.d("LoginActivity", "tes1")
                             Toast.makeText(this, "Successfully logged in!", Toast.LENGTH_SHORT)
                                 .show()

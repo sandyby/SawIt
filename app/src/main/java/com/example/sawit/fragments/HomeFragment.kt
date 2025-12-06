@@ -1,5 +1,6 @@
 package com.example.sawit.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -27,6 +28,7 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val fieldViewModel: FieldViewModel by viewModels()
+    private lateinit var fullName: String
     private val notificationViewModel: NotificationViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -50,6 +52,10 @@ class HomeFragment : Fragment() {
                 }
             )
         }
+
+        val sharedPrefs = requireContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        fullName = sharedPrefs.getString("fullName", "User") ?: "User"
+
         return binding.root
     }
 
@@ -59,6 +65,8 @@ class HomeFragment : Fragment() {
         val adapter = FieldsDashboardAdapter { field ->
             Toast.makeText(context, "clicked: ${field.fieldName}", Toast.LENGTH_SHORT).show()
         }
+
+        binding.tvFullName.text = fullName
 
         binding.rvFieldsOverview.apply {
             this.adapter = adapter
