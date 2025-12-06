@@ -23,11 +23,15 @@ import com.example.sawit.activities.EditProfileActivity
 import com.example.sawit.activities.LoginActivity
 import com.google.android.material.button.MaterialButton
 
+
 class ProfileFragment : Fragment() {
 
     private lateinit var tvUserName: TextView
     private lateinit var tvUserEmail: TextView
-
+    private lateinit var ivProfilePic: ImageView
+    private lateinit var fullName: String
+    private lateinit var email: String
+    private lateinit var profilePicUri: String
 
     // Launcher untuk Edit Profile
     private val editProfileResultLauncher =
@@ -41,17 +45,25 @@ class ProfileFragment : Fragment() {
                 if (newName != null && newEmail != null) {
                     tvUserName.text = newName
                     tvUserEmail.text = newEmail
-                    Toast.makeText(requireContext(), "(temporary) update nama berhasil", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "(temporary) update nama berhasil",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val sharedPrefs = requireContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        fullName = sharedPrefs.getString("fullName", "User") ?: "User"
+        email = sharedPrefs.getString("email", "user@gmail.com") ?: "user@gmail.com"
+//        TODO:
+//        val profilePicUri = sharedPrefs.getString("PROFILE_PIC_URI", null) ?: "nanti ganti ke path placeholder"
+
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 
@@ -60,17 +72,15 @@ class ProfileFragment : Fragment() {
 
         tvUserName = view.findViewById(R.id.tv_user_name)
         tvUserEmail = view.findViewById(R.id.tv_user_email)
+        ivProfilePic = view.findViewById(R.id.iv_profilePic)
 
-
-        tvUserName.text = "John Doe"
-        tvUserEmail.text = "john.doe@gmail.com"
+        tvUserName.text = fullName
+        tvUserEmail.text = email
 
         val itemEditProfile = view.findViewById<ConstraintLayout>(R.id.item_edit_profile)
         val itemEditPassword = view.findViewById<ConstraintLayout>(R.id.item_edit_password)
         val mBtnLogOut = view.findViewById<MaterialButton>(R.id.mBtn_logout)
         val btnEditPic = view.findViewById<ImageButton>(R.id.btn_edit_profile_pic)
-
-
 
         // Edit Profile
         itemEditProfile.setOnClickListener {
@@ -86,8 +96,6 @@ class ProfileFragment : Fragment() {
             startActivity(intent)
         }
 
-
-
         // Logout
         mBtnLogOut.setOnClickListener {
             clearUserSession()
@@ -98,7 +106,6 @@ class ProfileFragment : Fragment() {
             requireActivity().finish()
         }
     }
-
 
 
     private fun clearUserSession() {
