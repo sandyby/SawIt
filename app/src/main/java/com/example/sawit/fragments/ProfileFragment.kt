@@ -1,23 +1,26 @@
 package com.example.sawit.fragments
 
 import android.app.Activity
-import android.content.Intent
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.LinearLayout
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.example.sawit.R
-import com.example.sawit.activities.LoginActivity
-import com.example.sawit.activities.EditProfileActivity
 import com.example.sawit.activities.EditPasswordActivity
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import com.example.sawit.activities.EditProfileActivity
+import com.example.sawit.activities.LoginActivity
 import com.google.android.material.button.MaterialButton
 
 class ProfileFragment : Fragment() {
@@ -25,20 +28,25 @@ class ProfileFragment : Fragment() {
     private lateinit var tvUserName: TextView
     private lateinit var tvUserEmail: TextView
 
-    private val editProfileResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data: Intent? = result.data
 
-            val newName = data?.getStringExtra("EXTRA_NEW_NAME")
-            val newEmail = data?.getStringExtra("EXTRA_NEW_EMAIL")
+    // Launcher untuk Edit Profile
+    private val editProfileResultLauncher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
 
-            if (newName != null && newEmail != null) {
-                tvUserName.text = newName
-                tvUserEmail.text = newEmail
-                Toast.makeText(requireContext(), "(temporary) update nama berhasil", Toast.LENGTH_SHORT).show()
+                val newName = data?.getStringExtra("EXTRA_NEW_NAME")
+                val newEmail = data?.getStringExtra("EXTRA_NEW_EMAIL")
+
+                if (newName != null && newEmail != null) {
+                    tvUserName.text = newName
+                    tvUserEmail.text = newEmail
+                    Toast.makeText(requireContext(), "(temporary) update nama berhasil", Toast.LENGTH_SHORT).show()
+                }
             }
         }
-    }
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,6 +61,7 @@ class ProfileFragment : Fragment() {
         tvUserName = view.findViewById(R.id.tv_user_name)
         tvUserEmail = view.findViewById(R.id.tv_user_email)
 
+
         tvUserName.text = "John Doe"
         tvUserEmail.text = "john.doe@gmail.com"
 
@@ -61,24 +70,25 @@ class ProfileFragment : Fragment() {
         val mBtnLogOut = view.findViewById<MaterialButton>(R.id.mBtn_logout)
         val btnEditPic = view.findViewById<ImageButton>(R.id.btn_edit_profile_pic)
 
+
+
+        // Edit Profile
         itemEditProfile.setOnClickListener {
             val intent = Intent(requireContext(), EditProfileActivity::class.java)
-
             intent.putExtra("EXTRA_INITIAL_NAME", tvUserName.text.toString())
             intent.putExtra("EXTRA_INITIAL_EMAIL", tvUserEmail.text.toString())
-
             editProfileResultLauncher.launch(intent)
         }
 
+        // Edit Password
         itemEditPassword.setOnClickListener {
             val intent = Intent(requireContext(), EditPasswordActivity::class.java)
             startActivity(intent)
         }
 
-        btnEditPic.setOnClickListener {
-            Toast.makeText(requireContext(), "(placeholder untuk gallery/image picker)", Toast.LENGTH_SHORT).show()
-        }
 
+
+        // Logout
         mBtnLogOut.setOnClickListener {
             clearUserSession()
 
@@ -89,9 +99,11 @@ class ProfileFragment : Fragment() {
         }
     }
 
+
+
     private fun clearUserSession() {
         val sharedPref = requireActivity().getSharedPreferences("AUTH_PREFS", Context.MODE_PRIVATE)
-        with (sharedPref.edit()) {
+        with(sharedPref.edit()) {
             remove("USER_TOKEN")
             remove("USER_ID")
             apply()
