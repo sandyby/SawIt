@@ -5,8 +5,12 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,6 +18,8 @@ import com.example.sawit.R
 import com.example.sawit.databinding.ActivityCreateEditBinding
 import com.example.sawit.models.Activity
 import com.example.sawit.viewmodels.FieldViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -35,16 +41,24 @@ class CreateEditActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityCreateEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         if (intent.hasExtra(EXTRA_ACTIVITY)) {
-            currentActivity = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra(EXTRA_ACTIVITY, Activity::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                intent.getParcelableExtra(EXTRA_ACTIVITY)
-            }
+            currentActivity =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(EXTRA_ACTIVITY, Activity::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra(EXTRA_ACTIVITY)
+                }
             isEditMode = currentActivity != null
         }
 
@@ -132,23 +146,33 @@ class CreateEditActivity : AppCompatActivity() {
     }
 
     private fun observeFields() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                fieldViewModel.fieldsData.collect { fields ->
-                    if (fields.isNotEmpty()) {
-                        val fieldNames = fields.map { it.fieldName }
-                        val adapter = ArrayAdapter(
-                            this@CreateEditActivity,
-                            android.R.layout.simple_dropdown_item_1line,
-                            fieldNames
-                        )
-                        binding.autoCompleteField.setAdapter(adapter)
-                    }
-                }
+        fieldViewModel.fieldsData.onEach { fields ->
+            if (fields.isNotEmpty()) {
+                val fieldNames = fields.map { it.fieldName }
+                val adapter = ArrayAdapter(
+                    this,
+                    android.R.layout.simple_dropdown_item_1line,
+                    fieldNames
+                )
+                binding.autoCompleteField.setAdapter(adapter)
             }
         }
     }
-
+    //        lifecycleScope.launch {
+//            repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                fieldViewModel.fieldsData.collect { fields ->
+//                    if (fields.isNotEmpty()) {
+//                        val fieldNames = fields.map { it.fieldName }
+//                        val adapter = ArrayAdapter(
+//                            ,
+//                            android.R.layout.simple_dropdown_item_1line,
+//                            fieldNames
+//                        )
+//                        binding.autoCompleteField.setAdapter(adapter)
+//                    }
+//                }
+//            }
+//        }
 
     private fun showDatePicker() {
         val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->

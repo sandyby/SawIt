@@ -37,14 +37,14 @@ val AppTypography = Typography(
     ),
     bodyLarge = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+        fontSize = 18.sp,
         fontFamily = FontFamily(Font(R.font.lato_regular))
     ),
     labelMedium = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        fontFamily = FontFamily(Font(R.font.lato_regular))
-    )
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
+        fontFamily = FontFamily(Font(R.font.lato_bold))
+    ),
 )
 
 @Composable

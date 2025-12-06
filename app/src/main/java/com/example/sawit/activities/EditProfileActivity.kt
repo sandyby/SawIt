@@ -7,7 +7,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.sawit.R
 import com.google.android.material.textfield.TextInputEditText
 
@@ -18,9 +22,11 @@ class EditProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_edit_profile)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
 
-        supportActionBar?.hide()
+//        supportActionBar?.hide()
 
         val tietFullName = findViewById<TextInputEditText>(R.id.tiet_full_name_field)
         val tietEmailAddress = findViewById<TextInputEditText>(R.id.tiet_email_address_field)
