@@ -1,25 +1,35 @@
 package com.example.sawit.fragments
 
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import com.example.sawit.R
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 
-class PrediksiFormFragment : Fragment(R.layout.fragment_prediksi_form) {
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
+
+/**
+ * A simple [Fragment] subclass.
+ * Use the [PredictionKondisiTanaman.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_tanaman) {
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_prediksi_form, container, false)
+        val view = inflater.inflate(R.layout.fragment_prediction_kondisi_tanaman, container, false)
 
         val inputLahan: AutoCompleteTextView = view.findViewById(R.id.input_lahan)
 
