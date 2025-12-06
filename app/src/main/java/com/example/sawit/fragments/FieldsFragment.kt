@@ -1,5 +1,6 @@
 package com.example.sawit.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sawit.R
+import com.example.sawit.activities.CreateFieldActivity
 import com.example.sawit.adapters.FieldsFieldsAdapter
 import com.example.sawit.databinding.FragmentFieldsBinding
 import com.example.sawit.utils.VerticalSpaceItemDecoration
@@ -31,6 +33,7 @@ class FieldsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentFieldsBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -60,6 +63,11 @@ class FieldsFragment : Fragment() {
             }
         )
 
+        binding.efabFields.setOnClickListener { _ ->
+            val intent = Intent(requireContext(), CreateFieldActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.rvFieldsFields.apply {
             this.adapter = adapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -73,6 +81,7 @@ class FieldsFragment : Fragment() {
                 adapter.submitList(fields)
             }
         }
+
 
     }
 }

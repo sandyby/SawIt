@@ -48,7 +48,8 @@ fun InputText(
                 }
             ),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = BgPrimary500,
                 unfocusedBorderColor = if (isError) TextError900 else BgSecondaryOverlay2,

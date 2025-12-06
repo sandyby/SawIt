@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.example.sawit.R
+import com.example.sawit.activities.CreateEditActivity
 import com.example.sawit.adapters.ActivitiesAdapter
 import com.example.sawit.adapters.ActivitiesPagerAdapter
 import com.example.sawit.databinding.FragmentActivitiesBinding
@@ -56,7 +57,10 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
     }
 
     private fun setupFab() {
-        // todo
+        binding.fabAddActivity.setOnClickListener {
+            val intent = Intent(requireActivity(), CreateEditActivity::class.java)
+            startActivity(intent)
+        }
     }
 
 //    override fun onDestroyView() {

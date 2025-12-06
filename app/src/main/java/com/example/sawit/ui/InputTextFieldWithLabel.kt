@@ -17,6 +17,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sawit.ui.theme.BgPrimary500
@@ -35,7 +36,7 @@ fun InputTextWithLabel(
     isError: Boolean = false,
     errorMsg: String? = null,
     placeholderStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(
-        fontSize = 12.sp,
+//        fontSize = 12.sp,
         color = Text600
     ),
     modifier: Modifier = Modifier,
@@ -45,12 +46,9 @@ fun InputTextWithLabel(
     Column(
         modifier = modifier
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            textAlign = TextAlign.Start,
-            color = TextPrimary500,
-            modifier = Modifier.fillMaxWidth()
+        InputTextLabel(
+            label = label,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
@@ -93,4 +91,18 @@ fun InputTextWithLabel(
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InputTextWithLabelPreview() {
+    InputTextWithLabel(
+        label = "Current Password",
+        value = "",
+        onValueChange = { },
+        placeholder = "********",
+        type = "textPassword",
+        isError = false,
+        errorMsg = null,
+    )
 }

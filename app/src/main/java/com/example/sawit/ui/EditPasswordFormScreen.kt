@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -59,15 +60,19 @@ fun EditPasswordScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(onClick = onBack) {
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier.size(32.dp),
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_filled_keyboard_backspace_24_text_primary_900),
                     contentDescription = "Back Button",
-                    tint = TextPrimary900
+                    tint = TextPrimary900,
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
             Text(
-                text = "Edit Profile",
+                text = "Edit Password",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.lato_bold)),
@@ -121,7 +126,9 @@ fun EditPasswordScreen(
                     oldPassword.isEmpty() -> oldError = "Please fill in your current password!"
                     newPassword.isEmpty() -> newError = "Please fill in your new password!"
                     confirmPassword.isEmpty() -> confirmError = "Please confirm your new password!"
-                    newPassword.length < 8 -> newError = "Password must be at least 8 characters long!"
+                    newPassword.length < 8 -> newError =
+                        "Password must be at least 8 characters long!"
+
                     newPassword != confirmPassword -> confirmError = "Password do not match!"
                     else -> {
                         onPasswordChanged(oldPassword, newPassword)

@@ -38,10 +38,11 @@ fun AddFieldDataForm(
             isError = false,
             errorMsg = null,
             placeholderStyle = MaterialTheme.typography.bodyMedium.copy(
-                fontSize = 12.sp,
+//                fontSize = 12.sp,
                 color = Text600
             ),
-            modifier = Modifier.height(60.dp),
+            modifier = Modifier,
+//                .height(60.dp),
             inputTextFieldModifier = Modifier.height(IntrinsicSize.Min)
         )
         Row(

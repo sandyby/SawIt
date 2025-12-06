@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.compose.compiler)
     id("kotlin-parcelize")
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -23,6 +25,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    secrets {
+        propertiesFileName = "secrets.properties"
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -36,6 +42,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.12"
+    }
+
     kotlinOptions {
         jvmTarget = "11"
     }
@@ -51,6 +62,7 @@ composeCompiler {
 }
 
 dependencies {
+    implementation(libs.play.services.maps)
     val composeBom = platform("androidx.compose:compose-bom:2025.10.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -70,8 +82,11 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.8.9")
     implementation("com.google.android.material:material:1.13.0")
     implementation("com.google.gms:google-services:4.4.4")
-    implementation("nl.joery.animatedbottombar:library:1.1.0")
+    implementation("nl.joery.animatedbottombar:library:1.1.0"){
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
+    }
     implementation("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("io.github.ehsannarmani:compose-charts:0.2.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -85,6 +100,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("androidx.activity:activity-ktx:1.9.0")
     debugImplementation(libs.androidx.ui.tooling)
 }
