@@ -73,7 +73,7 @@
         <ImageButton
             android:id="@+id/btn_edit_profile_pic"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:contentDescription="Edit Profile Picture Button"
             android:padding="12dp"

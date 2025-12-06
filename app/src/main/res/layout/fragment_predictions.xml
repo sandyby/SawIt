@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_secondary_900"
-    tools:context=".fragments.PredictionsFragment">
+    tools:context=".fragments.PredictFragment">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tl_predictions"
