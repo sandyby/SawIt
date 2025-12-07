@@ -15,18 +15,7 @@ import com.example.sawit.databinding.FragmentPredictionTotalPanenBinding
 import com.example.sawit.viewmodels.FieldViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlin.getValue
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [PredictionTotalPanen.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) {
 
     private var _binding: FragmentPredictionTotalPanenBinding? = null
@@ -45,6 +34,7 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Load dropdown field names
         viewLifecycleOwner.lifecycleScope.launch {
             fieldViewModel.fieldsData.collectLatest { fields ->
                 val fieldNames = fields.map { it.fieldName }
@@ -58,28 +48,30 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
         }
 
         binding.btnPredict.setOnClickListener {
-            Log.d("PredictionsFragment", "Tes")
+            Log.d("PredictionsFragment", "Predict clicked")
 
             val selectedField = binding.inputFieldName.text.toString()
             val fieldArea = binding.inputFieldArea.text.toString()
-            val palmAge = binding.inputPalmAge.text.toString()
             val rainfall = binding.inputRainfall.text.toString()
-            val temperature = binding.inputTemperature.text.toString()
+            val tmin = binding.inputTmin.text.toString()
+            val tmax = binding.inputTmax.text.toString()
 
+            // Validasi
             if (selectedField.isEmpty() || fieldArea.isEmpty() ||
-                palmAge.isEmpty() || rainfall.isEmpty() || temperature.isEmpty()
+                rainfall.isEmpty() || tmin.isEmpty() || tmax.isEmpty()
             ) {
                 Toast.makeText(requireContext(), "Harap isi semua data!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
+            // Kirim ke ResultFragment
             val resultFragment = ResultFragment().apply {
                 arguments = Bundle().apply {
                     putString("selectedField", selectedField)
                     putString("fieldArea", fieldArea)
-                    putString("palmAge", palmAge)
                     putString("rainfall", rainfall)
-                    putString("temperature", temperature)
+                    putString("tmin", tmin)
+                    putString("tmax", tmax)
                 }
             }
 

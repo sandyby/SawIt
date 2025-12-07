@@ -102,18 +102,45 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Label for Palm Age -->
+
+        <!-- Palm Age (Palm Age) -->
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:boxCornerRadiusBottomEnd="8dp"-->
+<!--            app:boxCornerRadiusBottomStart="8dp"-->
+<!--            app:boxCornerRadiusTopEnd="8dp"-->
+<!--            app:boxCornerRadiusTopStart="8dp"-->
+<!--            app:hintEnabled="false">-->
+
+<!--            <com.google.android.material.textfield.TextInputEditText-->
+<!--                android:id="@+id/input_palm_age"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:fontFamily="@font/lato_regular"-->
+<!--                android:hint="26"-->
+<!--                android:inputType="number"-->
+<!--                android:paddingStart="16dp"-->
+<!--                android:paddingTop="12dp"-->
+<!--                android:paddingEnd="16dp"-->
+<!--                android:paddingBottom="12dp"-->
+<!--                android:textColor="@color/text_primary_900"-->
+<!--                android:textSize="13sp" />-->
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
+
+        <!-- Rainfall (single column) -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="4dp"
             android:fontFamily="@font/lato_bold"
-            android:text="Palm Age (mo)"
+            android:text="Rainfall (mm)"
             android:textColor="@color/text_primary_900"
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <!-- Palm Age (Palm Age) -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -125,12 +152,12 @@
             app:hintEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/input_palm_age"
+                android:id="@+id/input_rainfall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/lato_regular"
-                android:hint="26"
-                android:inputType="number"
+                android:hint="62"
+                android:inputType="numberDecimal"
                 android:paddingStart="16dp"
                 android:paddingTop="12dp"
                 android:paddingEnd="16dp"
@@ -139,7 +166,8 @@
                 android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Rainfall & Temperature Row -->
+
+        <!-- Temperature Row: Tmin & Tmax -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -147,7 +175,9 @@
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <!-- Rainfall Column -->
+
+
+            <!-- Tmin Column -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -155,34 +185,28 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Label for Rainfall -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
                     android:fontFamily="@font/lato_bold"
-                    android:text="Rainfall (mm)"
+                    android:text="Tmin (°C)"
                     android:textColor="@color/text_primary_900"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <!-- Rainfall (Rainfall) -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:boxCornerRadiusBottomEnd="8dp"
-                    app:boxCornerRadiusBottomStart="8dp"
-                    app:boxCornerRadiusTopEnd="8dp"
-                    app:boxCornerRadiusTopStart="8dp"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/input_rainfall"
+                        android:id="@+id/input_tmin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/lato_regular"
-                        android:hint="62"
+                        android:hint="25"
                         android:inputType="numberDecimal"
                         android:paddingStart="16dp"
                         android:paddingTop="12dp"
@@ -193,7 +217,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- Temperature Column -->
+            <!-- Tmax Column -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -206,28 +230,23 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
                     android:fontFamily="@font/lato_bold"
-                    android:text="Temperature (°C)"
+                    android:text="Tmax (°C)"
                     android:textColor="@color/text_primary_900"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <!-- Temperature (Temperature) -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:boxCornerRadiusBottomEnd="8dp"
-                    app:boxCornerRadiusBottomStart="8dp"
-                    app:boxCornerRadiusTopEnd="8dp"
-                    app:boxCornerRadiusTopStart="8dp"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/input_temperature"
+                        android:id="@+id/input_tmax"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/lato_regular"
-                        android:hint="30"
+                        android:hint="32"
                         android:inputType="numberDecimal"
                         android:paddingStart="16dp"
                         android:paddingTop="12dp"
@@ -237,7 +256,9 @@
                         android:textSize="13sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
+
         </LinearLayout>
+
 
         <!-- Predict Button -->
         <com.google.android.material.button.MaterialButton

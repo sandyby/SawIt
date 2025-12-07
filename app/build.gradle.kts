@@ -92,6 +92,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("io.github.ehsannarmani:compose-charts:0.2.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
