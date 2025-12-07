@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class FieldViewModel : ViewModel() {
+class   FieldViewModel : ViewModel() {
     //    private val fieldsData = mutableListOf<Field>()
     private val _fieldsData = MutableStateFlow<List<Field>>(emptyList())
     val fieldsData: StateFlow<List<Field>> = _fieldsData.asStateFlow()

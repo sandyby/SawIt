@@ -1,3 +1,4 @@
+// File: com/example/sawit/fragments/PredictionTotalPanen.kt
 package com.example.sawit.fragments
 
 import android.os.Bundle
@@ -12,8 +13,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.sawit.R
 import com.example.sawit.databinding.FragmentPredictionTotalPanenBinding
-import com.example.sawit.viewmodels.FieldViewModel
-import com.example.sawit.ml.PredictionUtils // Import fungsi prediksi
+import com.example.sawit.viewmodels.FieldViewModel // Asumsi ini ada
+import com.example.sawit.viewmodels.PredictionViewModel // <-- Import ViewModel Prediksi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -22,8 +23,17 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
     private var _binding: FragmentPredictionTotalPanenBinding? = null
     private val binding get() = _binding!!
 
-    // Menggunakan viewModels untuk FieldViewModel
-    private val fieldViewModel: FieldViewModel by viewModels()
+    private val fieldViewModel: FieldViewModel by viewModels() // Asumsi ini ada
+    private val predictionViewModel: PredictionViewModel by viewModels() // <-- Inisialisasi PredictionViewModel
+
+    // Kunci argumen untuk navigasi
+    companion object {
+        const val ARG_PREDICTED_YIELD = "predicted_yield"
+        const val ARG_TMIN = "tmin"
+        const val ARG_TMAX = "tmax"
+        const val ARG_RAINFALL = "rainfall"
+        const val ARG_AREA = "area"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,40 +46,32 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ==========================
-        // LOGIKA DROPDOWN (FIELD NAMES)
-        // ==========================
+        // Load dropdown field names (Logika yang sudah ada)
         viewLifecycleOwner.lifecycleScope.launch {
             fieldViewModel.fieldsData.collectLatest { fields ->
                 val fieldNames = fields.map { it.fieldName }
-                val adapter = ArrayAdapter(
-                    requireContext(),
-                    R.layout.dropdown_item,
-                    fieldNames
-                )
+                val adapter = ArrayAdapter(requireContext(), R.layout.dropdown_item, fieldNames)
                 binding.inputFieldName.setAdapter(adapter)
             }
         }
 
         binding.btnPredict.setOnClickListener {
-            Log.d("PredictionsFragment", "Predict clicked")
-
-            val selectedField = binding.inputFieldName.text.toString()
-            val fieldAreaStr = binding.inputFieldArea.text.toString()
-            val rainfallStr = binding.inputRainfall.text.toString()
-            val tminStr = binding.inputTmin.text.toString()
-            val tmaxStr = binding.inputTmax.text.toString()
+            val selectedField = binding.inputFieldName.text.toString().trim()
+            val areaStr = binding.inputFieldArea.text.toString().trim()
+            val rainfallStr = binding.inputRainfall.text.toString().trim()
+            val tminStr = binding.inputTmin.text.toString().trim()
+            val tmaxStr = binding.inputTmax.text.toString().trim()
 
             // Validasi Input Kosong
-            if (selectedField.isEmpty() || fieldAreaStr.isEmpty() ||
-                rainfallStr.isEmpty() || tminStr.isEmpty() || tmaxStr.isEmpty()
+            if (selectedField.isEmpty() || areaStr.isEmpty() || rainfallStr.isEmpty() ||
+                tminStr.isEmpty() || tmaxStr.isEmpty()
             ) {
                 Toast.makeText(requireContext(), "Harap isi semua data!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             // Konversi ke Float dan Validasi Angka
-            val area = fieldAreaStr.toFloatOrNull()
+            val area = areaStr.toFloatOrNull()
             val rainfall = rainfallStr.toFloatOrNull()
             val tmin = tminStr.toFloatOrNull()
             val tmax = tmaxStr.toFloatOrNull()
@@ -79,29 +81,35 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
                 return@setOnClickListener
             }
 
-            try {
-                // Lakukan Prediksi Yield menggunakan ONNX
-                val predictedYield = PredictionUtils.predictYield(
-                    requireContext(),
-                    tmin,
-                    tmax,
-                    rainfall,
-                    area
-                )
+            // Panggil ViewModel untuk Prediksi dan Simpan Data
+            predictionViewModel.predictAndSaveTotalPanen(
+                fieldName = selectedField,
+                tmin = tmin,
+                tmax = tmax,
+                rainfall = rainfall,
+                area = area,
+                onSuccess = { predictedYield ->
+                    // 3. Navigasi ke ResultTotalPanen Fragment
+                    val resultFragment = ResultTotalPanen().apply {
+                        arguments = Bundle().apply {
+                            putFloat(ARG_PREDICTED_YIELD, predictedYield)
+                            putFloat(ARG_TMIN, tmin)
+                            putFloat(ARG_TMAX, tmax)
+                            putFloat(ARG_RAINFALL, rainfall)
+                            putFloat(ARG_AREA, area)
+                        }
+                    }
 
-                // Tampilkan Hasil Prediksi dalam Toast
-                Toast.makeText(
-                    requireContext(),
-                    "Prediksi Hasil Panen: ${"%.2f".format(predictedYield)}",
-                    Toast.LENGTH_LONG
-                ).show()
-
-            } catch (e: Exception) {
-                Log.e("PredictionsFragment", "Error during ONNX inference", e)
-                Toast.makeText(requireContext(), "Gagal melakukan prediksi: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-
-            // Logika navigasi ke ResultFragment (dihapus/dikomentari untuk fokus pada Toast)
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fl_scroll_view_content, resultFragment)
+                        .addToBackStack(null)
+                        .commit()
+                },
+                onError = { message ->
+                    Log.e("PredictionsFragment", "Error: $message")
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                }
+            )
         }
     }
 
