@@ -13,6 +13,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -34,8 +35,11 @@ class ProfileFragment : Fragment() {
     private lateinit var profilePicUri: String
 
     // Launcher untuk Edit Profile
-    private val editProfileResultLauncher =
-        registerForActivityResult(StartActivityForResult()) { result ->
+    private lateinit var editProfileResultLauncher: ActivityResultLauncher<Intent>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        editProfileResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val data: Intent? = result.data
 
@@ -53,6 +57,7 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
