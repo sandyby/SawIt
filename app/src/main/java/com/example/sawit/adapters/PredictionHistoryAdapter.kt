@@ -8,17 +8,19 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sawit.models.Prediction
-import com.example.sawit.databinding.ItemHistoryBinding // Ganti dengan nama layout item Anda
+// VVVV KOREKSI UTAMA: Menggunakan nama binding baru VVVV
+import com.example.sawit.databinding.FragmentCardPredictionHistoryBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class PredictionHistoryAdapter : ListAdapter<Prediction, PredictionHistoryAdapter.HistoryViewHolder>(HistoryDiffCallback()) { // <--- Penamaan Baru
+class PredictionHistoryAdapter : ListAdapter<Prediction, PredictionHistoryAdapter.HistoryViewHolder>(HistoryDiffCallback()) {
 
     var onItemClicked: ((Prediction) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
-        val binding = ItemHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        // Menggunakan kelas binding yang baru
+        val binding = FragmentCardPredictionHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return HistoryViewHolder(binding)
     }
 
@@ -26,7 +28,8 @@ class PredictionHistoryAdapter : ListAdapter<Prediction, PredictionHistoryAdapte
         holder.bind(getItem(position), onItemClicked)
     }
 
-    class HistoryViewHolder(private val binding: ItemHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
+    // Menggunakan kelas binding yang baru di ViewHolder
+    class HistoryViewHolder(private val binding: FragmentCardPredictionHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(history: Prediction, clickListener: ((Prediction) -> Unit)?) {
             val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
 

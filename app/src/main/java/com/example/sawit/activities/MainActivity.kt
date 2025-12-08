@@ -16,6 +16,7 @@ import com.example.sawit.fragments.ActivitiesFragment
 import com.example.sawit.fragments.FieldsFragment
 import com.example.sawit.fragments.HomeFragment
 import com.example.sawit.fragments.PredictFragment
+import com.example.sawit.fragments.PredictionHistoryFragment
 import com.example.sawit.fragments.ProfileFragment
 import com.example.sawit.fragments.TopHeaderFragment
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var homeFragment: HomeFragment
     private lateinit var fieldsFragment: FieldsFragment
     private lateinit var activitiesFragmment: ActivitiesFragment
-    private lateinit var predictionsFragment: PredictFragment
+    private lateinit var predictionsFragment: PredictionHistoryFragment
     private lateinit var profileFragment: ProfileFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         homeFragment = HomeFragment()
         fieldsFragment = FieldsFragment()
         activitiesFragmment = ActivitiesFragment()
-        predictionsFragment = PredictFragment()
+        predictionsFragment= PredictionHistoryFragment()
         profileFragment = ProfileFragment()
 
         show(homeFragment)
@@ -117,7 +118,7 @@ class MainActivity : AppCompatActivity() {
 
                     R.id.tab_predict -> {
                         show(predictionsFragment)
-                        topHeaderFragment.setTopHeaderFragmentTitle("Predictions")
+                        topHeaderFragment.setTopHeaderFragmentTitle("Prediction")
                     }
 
                     R.id.tab_profile -> {
