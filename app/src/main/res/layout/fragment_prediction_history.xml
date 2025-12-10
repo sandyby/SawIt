@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:background="@color/bg_secondary_900"
     tools:context=".fragments.PredictionHistoryFragment">
 
     <LinearLayout
@@ -16,7 +17,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Riwayat Prediksi"
+            android:text="Prediction History"
             android:textSize="20sp"
             android:textStyle="bold"
             android:paddingBottom="16dp"/>
@@ -33,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="Belum ada riwayat prediksi yang tersimpan."
+            android:text="There are no saved prediction history."
             android:visibility="gone"
             android:textSize="16sp"/>
 
@@ -45,8 +46,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        app:srcCompat="@drawable/ic_filled_add_24_bg_primary_500"
+        app:srcCompat="@drawable/ic_filled_add_24_text_primary_900"
+        app:backgroundTint="@color/bg_primary_500"
         app:tint="@color/white"
-        android:contentDescription="Mulai Prediksi Baru" />
+        android:contentDescription="Start New Prediction" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

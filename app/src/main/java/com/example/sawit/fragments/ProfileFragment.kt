@@ -34,7 +34,6 @@ class ProfileFragment : Fragment() {
     private lateinit var email: String
     private lateinit var profilePicUri: String
 
-    // Launcher untuk Edit Profile
     private lateinit var editProfileResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {

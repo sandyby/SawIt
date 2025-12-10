@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Title -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,7 +23,6 @@
             android:textSize="22sp"
             android:textStyle="bold" />
 
-        <!-- Label for Field -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +33,6 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <!-- Dropdown Field Name (Field) -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -63,7 +60,6 @@
                 android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Label for Field Area -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,7 +71,6 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <!-- Field Area (Field Area) -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -100,8 +95,6 @@
                 android:textColor="@color/text_primary_900"
                 android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Label for Palm Age -->
 
         <!-- Palm Age (Palm Age) -->
 <!--        <com.google.android.material.textfield.TextInputLayout-->
@@ -129,7 +122,6 @@
 <!--                android:textSize="13sp" />-->
 <!--        </com.google.android.material.textfield.TextInputLayout>-->
 
-        <!-- Rainfall (single column) -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -166,8 +158,6 @@
                 android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-
-        <!-- Temperature Row: Tmin & Tmax -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -175,9 +165,6 @@
             android:orientation="horizontal"
             android:weightSum="2">
 
-
-
-            <!-- Tmin Column -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -217,7 +204,6 @@
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- Tmax Column -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -259,8 +245,6 @@
 
         </LinearLayout>
 
-
-        <!-- Predict Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_predict"
             style="@style/Widget.MaterialComponents.Button"
