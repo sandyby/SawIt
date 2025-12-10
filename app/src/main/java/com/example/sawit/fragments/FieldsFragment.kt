@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 class FieldsFragment : Fragment() {
     private var _binding: FragmentFieldsBinding? = null
     private val binding get() = _binding!!
-    private val fieldViewModel: FieldViewModel by viewModels()
+    private val fieldViewModel: FieldViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +54,7 @@ class FieldsFragment : Fragment() {
                     .setTitle("Delete Field")
                     .setMessage("Are you sure you want to delete '${field.fieldName}'?")
                     .setPositiveButton("Delete") { dialog, _ ->
+                        fieldViewModel.deleteField(field, requireContext())
                         dialog.dismiss()
                     }
                     .setNegativeButton("Cancel") { dialog, _ ->

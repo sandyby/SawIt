@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/bg_secondary_900"
     android:padding="16dp"
-    tools:context=".fragments.PrediksiFormFragment">
+    tools:context=".fragments.PredictionTotalPanen">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,22 +17,22 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="16dp"
             android:gravity="center"
             android:text="Harvest Prediction"
             android:textColor="@color/text_primary_900"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <!-- Label for Field -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/lato_bold"
             android:text="Field"
             android:textColor="@color/text_primary_900"
-            android:textSize="14sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <!-- Dropdown Field Name (Field) -->
@@ -60,19 +60,19 @@
                 android:paddingBottom="12dp"
                 android:textColor="@color/text_primary_900"
                 android:textColorHint="@color/text_500"
-                android:textSize="13sp" />
+                android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Label for Field Area -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/lato_bold"
             android:text="Harvest Area (Ha)"
             android:textColor="@color/text_primary_900"
-            android:textSize="14sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <!-- Field Area (Field Area) -->
@@ -98,19 +98,19 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="12dp"
                 android:textColor="@color/text_primary_900"
-                android:textSize="13sp" />
+                android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Label for Palm Age -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/lato_bold"
             android:text="Palm Age (mo)"
             android:textColor="@color/text_primary_900"
-            android:textSize="14sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <!-- Palm Age (Palm Age) -->
@@ -136,14 +136,14 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="12dp"
                 android:textColor="@color/text_primary_900"
-                android:textSize="13sp" />
+                android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Rainfall & Temperature Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -159,11 +159,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/lato_bold"
                     android:text="Rainfall (mm)"
                     android:textColor="@color/text_primary_900"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <!-- Rainfall (Rainfall) -->
@@ -189,7 +189,7 @@
                         android:paddingEnd="16dp"
                         android:paddingBottom="12dp"
                         android:textColor="@color/text_primary_900"
-                        android:textSize="13sp" />
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -204,11 +204,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/lato_bold"
                     android:text="Temperature (°C)"
                     android:textColor="@color/text_primary_900"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <!-- Temperature (Temperature) -->
@@ -234,7 +234,7 @@
                         android:paddingEnd="16dp"
                         android:paddingBottom="12dp"
                         android:textColor="@color/text_primary_900"
-                        android:textSize="13sp" />
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
@@ -245,12 +245,13 @@
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="32dp"
             android:backgroundTint="@color/bg_primary_500"
             android:paddingVertical="12dp"
             android:text="Predict"
+            android:textSize="18sp"
             android:textColor="@color/white"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="64dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

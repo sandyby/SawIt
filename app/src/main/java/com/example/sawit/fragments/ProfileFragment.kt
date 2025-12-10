@@ -3,9 +3,7 @@ package com.example.sawit.fragments
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +12,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import com.example.sawit.R
 import com.example.sawit.activities.EditPasswordActivity
@@ -63,11 +61,11 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val sharedPrefs = requireContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE)
-        fullName = sharedPrefs.getString("fullName", "User") ?: "User"
-        email = sharedPrefs.getString("email", "user@gmail.com") ?: "user@gmail.com"
+        val userSharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        fullName = userSharedPref.getString("fullName", "User") ?: "User"
+        email = userSharedPref.getString("email", "user@gmail.com") ?: "user@gmail.com"
 //        TODO:
-//        val profilePicUri = sharedPrefs.getString("PROFILE_PIC_URI", null) ?: "nanti ganti ke path placeholder"
+//        val profilePicUri = userSharedPref.getString("PROFILE_PIC_URI", null) ?: "nanti ganti ke path placeholder"
 
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
@@ -114,11 +112,18 @@ class ProfileFragment : Fragment() {
 
 
     private fun clearUserSession() {
-        val sharedPref = requireActivity().getSharedPreferences("AUTH_PREFS", Context.MODE_PRIVATE)
-        with(sharedPref.edit()) {
-            remove("USER_TOKEN")
-            remove("USER_ID")
+        val authSharedPref =
+            requireActivity().getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
+        authSharedPref.edit {
+            remove("userId")
+            putBoolean("rememberMe", false)
             apply()
+        }
+        val userSharedPref =
+            requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        userSharedPref.edit {
+            remove("fullName")
+            remove("email")
         }
         Toast.makeText(requireContext(), "Successfully logged out!", Toast.LENGTH_SHORT).show()
     }

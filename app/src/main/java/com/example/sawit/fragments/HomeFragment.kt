@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val fieldViewModel: FieldViewModel by viewModels()
+    private val fieldViewModel: FieldViewModel by activityViewModels()
     private lateinit var fullName: String
     private val notificationViewModel: NotificationViewModel by activityViewModels()
 
@@ -53,8 +53,8 @@ class HomeFragment : Fragment() {
             )
         }
 
-        val sharedPrefs = requireContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE)
-        fullName = sharedPrefs.getString("fullName", "User") ?: "User"
+        val userSharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        fullName = userSharedPref.getString("fullName", "User") ?: "User"
 
         return binding.root
     }
@@ -77,7 +77,8 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             fieldViewModel.fieldsData.collectLatest { fields ->
-                adapter.submitList(fields)
+                val dashboardList = fields.take(2)
+                adapter.submitList(dashboardList)
             }
         }
     }

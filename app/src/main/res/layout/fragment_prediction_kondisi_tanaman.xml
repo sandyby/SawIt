@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_secondary_900"
+    android:id="@+id/nsv_conditionPredictionForm"
     android:padding="8dp"
-    tools:context=".fragments.PrediksiFormFragment">
+    tools:context=".fragments.PredictionKondisiTanaman">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,21 +19,21 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="16dp"
             android:gravity="center"
             android:text="Condition Prediction"
             android:textColor="@color/text_primary_900"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/lato_bold"
             android:text="Field"
             android:textColor="@color/text_primary_900"
-            android:textSize="14sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -59,19 +60,19 @@
                 android:paddingTop="12dp"
                 android:textColor="@color/text_primary_900"
                 android:textColorHint="@color/text_500"
-                android:textSize="13sp" />
+                android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Label for Luas Field -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/lato_bold"
             android:text="Harvest Area (Ha)"
             android:textColor="@color/text_primary_900"
-            android:textSize="14sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <!-- Luas Field (Area) -->
@@ -97,19 +98,19 @@
                 android:paddingStart="16dp"
                 android:paddingTop="12dp"
                 android:textColor="@color/text_primary_900"
-                android:textSize="13sp" />
+                android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Label for Jenis Bibit -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/lato_bold"
             android:text="Palm Type"
             android:textColor="@color/text_primary_900"
-            android:textSize="14sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <!-- Jenis Bibit -->
@@ -135,19 +136,19 @@
                 android:paddingStart="16dp"
                 android:paddingTop="12dp"
                 android:textColor="@color/text_primary_900"
-                android:textSize="13sp" />
+                android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Label for Jenis Pupuk -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/lato_bold"
             android:text="Fertilizer Type"
             android:textColor="@color/text_primary_900"
-            android:textSize="14sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <!-- Jenis Pupuk -->
@@ -173,14 +174,14 @@
                 android:paddingStart="16dp"
                 android:paddingTop="12dp"
                 android:textColor="@color/text_primary_900"
-                android:textSize="13sp" />
+                android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- TON & TAHUN (Row Layout) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -196,11 +197,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/lato_bold"
                     android:text="Total Harvested (ton)"
                     android:textColor="@color/text_primary_900"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -225,7 +226,7 @@
                         android:paddingStart="16dp"
                         android:paddingTop="12dp"
                         android:textColor="@color/text_primary_900"
-                        android:textSize="13sp" />
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -240,11 +241,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/lato_bold"
                     android:text="Year Harvested"
                     android:textColor="@color/text_primary_900"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -270,7 +271,7 @@
                         android:paddingStart="16dp"
                         android:paddingTop="12dp"
                         android:textColor="@color/text_primary_900"
-                        android:textSize="13sp" />
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
@@ -279,7 +280,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -295,11 +296,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/lato_bold"
                     android:text="Palm Age (months)"
                     android:textColor="@color/text_primary_900"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -324,7 +325,7 @@
                         android:paddingStart="16dp"
                         android:paddingTop="12dp"
                         android:textColor="@color/text_primary_900"
-                        android:textSize="13sp" />
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -340,11 +341,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/lato_bold"
                     android:text="Rainfall (mm)"
                     android:textColor="@color/text_primary_900"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -369,7 +370,7 @@
                         android:paddingStart="16dp"
                         android:paddingTop="12dp"
                         android:textColor="@color/text_primary_900"
-                        android:textSize="13sp" />
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
@@ -380,13 +381,14 @@
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="32dp"
             android:backgroundTint="@color/bg_primary_500"
             android:paddingVertical="12dp"
             android:text="PREDICT"
+            android:textSize="18sp"
             android:fontFamily="@font/lato_bold"
             android:textColor="@color/white"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="64dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

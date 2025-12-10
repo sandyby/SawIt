@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F0EDD0"
-    android:id="@+id/main"
     tools:context=".activities.CreateEditActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -17,36 +17,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
+            android:id="@+id/ll_header"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <ImageButton
-                android:layout_width="24dp"
-                android:id="@+id/ib_backBtn"
-                android:layout_height="24dp"
-                android:scaleType="fitCenter"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_filled_keyboard_backspace_24_text_primary_900"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/white" />
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:clickable="true"
+                android:contentDescription="Back Button"
+                android:focusable="true"
+                android:src="@drawable/ic_filled_keyboard_backspace_24_white" />
 
             <TextView
-                android:id="@+id/textViewTitle"
+                android:id="@+id/tv_header_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:fontFamily="@font/lato_bold"
                 android:text="New Activity"
                 android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -64,89 +63,211 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Field/Lahan Dropdown -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textFieldLayoutField"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            <!-- 1. Field/Lahan Dropdown - NOW USES SPINNER -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Field">
+                android:orientation="vertical">
 
-                <AutoCompleteTextView
-                    android:id="@+id/autoCompleteField"
+                <!-- Label is now separate, as requested -->
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none" />
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/lato_bold"
+                    android:text="Field"
+                    android:textColor="@color/text_primary_900"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+                <!-- Uses ExposedDropdownMenu style -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textFieldLayoutField"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundColor="@color/white"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeColor="@color/box_stroke_color_selector"
+                    app:boxStrokeErrorColor="@color/text_error_900"
+                    app:hintEnabled="false">
 
-            <!-- Activity Type Dropdown -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textFieldLayoutActivityType"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    <!-- AutoCompleteTextView is used for exposed dropdown functionality -->
+                    <AutoCompleteTextView
+                        android:id="@+id/autoCompleteField"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:dropDownSelector="@drawable/autocomplete_background"
+                        android:inputType="none"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text_primary_900" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+
+            <!-- 2. Activity Type Dropdown - EXPOSED DROPDOWN MENU -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Activity Type">
+                android:orientation="vertical">
 
-                <AutoCompleteTextView
-                    android:id="@+id/autoCompleteActivityType"
+                <!-- Label is now separate, as requested -->
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none" />
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/lato_bold"
+                    android:text="Activity Type"
+                    android:textColor="@color/text_primary_900"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+                <!-- Uses ExposedDropdownMenu style -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textFieldLayoutActivityType"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundColor="@color/white"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeColor="@color/box_stroke_color_selector"
+                    app:boxStrokeErrorColor="@color/text_error_900"
+                    app:hintEnabled="false">
 
-            <!-- Activity Date Picker -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textFieldLayoutDate"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    <!-- AutoCompleteTextView is used for exposed dropdown functionality -->
+                    <AutoCompleteTextView
+                        android:id="@+id/autoCompleteActivityType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:dropDownSelector="@drawable/autocomplete_background"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text_primary_900" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- 3. Activity Date Picker - NEW LAYOUT -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Activity Date"
-                app:endIconDrawable="@drawable/outline_calendar_month_24"
-                app:endIconMode="custom">
+                android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextDate"
+                <!-- Label (Similar to Field/Activity Type) -->
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="false" />
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/lato_bold"
+                    android:text="Activity Date"
+                    android:textColor="@color/text_primary_900"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textFieldLayoutDate"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundColor="@color/white"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeColor="@color/box_stroke_color_selector"
+                    app:boxStrokeErrorColor="@color/text_error_900"
+                    app:endIconDrawable="@drawable/outline_calendar_month_24"
+                    app:endIconMode="custom"
+                    app:hintEnabled="false">
 
-            <!-- Notes Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text_primary_900" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- 4. Notes Input - NEW LAYOUT -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Notes">
+                android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextNotes"
+                <!-- Label (Similar to Field/Activity Type) -->
+                <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:gravity="top"
-                    android:inputType="textMultiLine" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/lato_bold"
+                    android:text="Notes"
+                    android:textColor="@color/text_primary_900"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textFieldLayoutNotes"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundColor="@color/white"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeColor="@color/box_stroke_color_selector"
+                    app:boxStrokeErrorColor="@color/text_error_900"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="300"
+                    app:counterTextAppearance="@style/CustomCounterText"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextNotes"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:gravity="top"
+                        android:hint="Write some notes here.."
+                        android:inputType="textMultiLine"
+                        android:maxLength="300"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text_primary_900"
+                        android:textSize="16sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
             <Button
                 android:id="@+id/buttonSave"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="32dp"
-                android:fontFamily="@font/lato_bold"
                 android:backgroundTint="@color/bg_primary_500"
+                android:fontFamily="@font/lato_bold"
+                android:paddingVertical="12dp"
                 android:text="CREATE"
                 android:textColor="@android:color/white"
-                android:paddingVertical="12dp"/>
+                android:textSize="18sp" />
 
         </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

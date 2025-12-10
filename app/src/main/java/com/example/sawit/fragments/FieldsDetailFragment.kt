@@ -21,16 +21,16 @@ import kotlinx.coroutines.launch
 class FieldsDetailFragment : Fragment(R.layout.fragment_fields_detail) {
     private val fieldViewModel: FieldViewModel by viewModels()
     private var currentField: Field? = null
-    private var fieldId: Int = -1
+    private var fieldId: String? = null
     private lateinit var layoutDetails: View
     private lateinit var layoutStatistics: View
 
     companion object {
         private const val ARG_FIELD_ID = "fieldId"
 
-        fun newInstance(fieldId: Int) = FieldsDetailFragment().apply {
+        fun newInstance(fieldId: String?) = FieldsDetailFragment().apply {
             arguments = Bundle().apply {
-                putInt(ARG_FIELD_ID, fieldId)
+                putString(ARG_FIELD_ID, fieldId)
             }
         }
     }
@@ -104,5 +104,4 @@ class FieldsDetailFragment : Fragment(R.layout.fragment_fields_detail) {
                 .commit()
         }
     }
-
 }

@@ -1,5 +1,6 @@
 package com.example.sawit.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -46,6 +47,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.getValue
 import java.security.MessageDigest
 
 class LoginActivity : AppCompatActivity() {
@@ -87,18 +89,45 @@ class LoginActivity : AppCompatActivity() {
         * sudah login sebelumnya, agar tidak perlu melakukan login lagi. ini bisa dikembangkan lebih jauh lagi kedepannya jika kami
         * memutuskan untuk meningkatkan UX dari segi session control, dan juga keamanan seperti session timeout, dsb
         * */
-        val sharedPrefs = getSharedPreferences("UserSession", MODE_PRIVATE)
-        val email = sharedPrefs.getString("email", null)
-
-        if (email != null) {
+        val authSharedPref = getSharedPreferences("AuthSession", MODE_PRIVATE)
+        val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+        val isRememberMeOn = authSharedPref.getBoolean("rememberMe", false)
+        if (isRememberMeOn && authSharedPref.contains("userId")) {
             val intent = Intent(this, MainActivity::class.java)
+            Log.d("INFO", "Langsung login")
+            Log.d("INFO", userSharedPref.toString())
+            Log.d("INFO", "uid " + (userSharedPref.getString("uid", "tes1") ?: "tes1"))
+            Log.d("INFO", "email " + (userSharedPref.getString("email", "tes") ?: "tes"))
+            Log.d(
+                "INFO",
+                "fullName " + (userSharedPref.getString("fullName", "tes2") ?: "tes2")
+            )
             startActivity(intent)
             finish()
         }
 
+//        val email = userSharedPref.getString("email", null)
+//        val fullName = userSharedPref.getString("fullName", null)
+//        val uid = userSharedPref.getString("uid", null)
+//
+//        if (uid != null && email != null && fullName != null) {
+//            val intent = Intent(this, MainActivity::class.java)
+//            Log.d("INFO", "Langsung login")
+//            Log.d("INFO", userSharedPref.toString())
+//            Log.d("INFO", "uid " + (userSharedPref.getString("uid", "tes1") ?: "tes1"))
+//            Log.d("INFO", "email " + (userSharedPref.getString("email", "tes") ?: "tes"))
+//            Log.d(
+//                "INFO",
+//                "fullName " + (userSharedPref.getString("fullName", "tes2") ?: "tes2")
+//            )
+//            startActivity(intent)
+//            finish()
+//        }
+
         setContentView(R.layout.activity_login)
         WindowCompat.setDecorFitsSystemWindows(window, true)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main))
+        { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -120,12 +149,14 @@ class LoginActivity : AppCompatActivity() {
         tietEmail.addTextChangedListener(EmailWatcher())
         tietPassword.addTextChangedListener(PasswordWatcher())
         tvSwitchRegister = findViewById<TextView>(R.id.tv_switchRegister)
-        tvSwitchRegister.setOnClickListener {
+        tvSwitchRegister.setOnClickListener()
+        {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
         mBtnLogin = findViewById<MaterialButton>(R.id.mBtn_login)
-        mBtnLogin.setOnClickListener {
+        mBtnLogin.setOnClickListener()
+        {
             tvLoginErrorMsg.visibility = View.GONE
             val email = tietEmail.text.toString().trim()
             val password = tietPassword.text.toString().trim()
@@ -224,7 +255,6 @@ class LoginActivity : AppCompatActivity() {
             .addOnSuccessListener { snapshot ->
                 Log.d("LoginActivity", "snapshot: $snapshot")
                 if (snapshot.exists()) {
-
                     snapshot.children.forEach { data ->
                         val storedPassword = data.child("password").getValue(String::class.java)
 
@@ -235,15 +265,27 @@ class LoginActivity : AppCompatActivity() {
                         * aplikasi secara lokal
                         * */
                         if (storedPassword == hashedPassword) {
-                            val fullName = data.child("fullName").getValue(String::class.java)
-                            val sharedPrefs = getSharedPreferences("UserSession", MODE_PRIVATE)
-                            val prefsEditor = sharedPrefs.edit()
-                            if (smRememberMe.isChecked) {
-                                prefsEditor.putString("email", email)
-                                prefsEditor.putString("uid", data.key)
+                            val uid = data.key
+                            val authSharedPref =
+                                getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
+                            authSharedPref.edit {
+                                putString("userId", uid)
+                                if (smRememberMe.isChecked) {
+                                    putBoolean("rememberMe", true)
+                                } else {
+                                    putBoolean("rememberMe", false)
+                                }
+                                apply()
                             }
-                            prefsEditor.putString("fullName", fullName)
-                            prefsEditor.apply()
+
+                            val email = data.child("email").getValue(String::class.java)
+                            val fullName = data.child("fullName").getValue(String::class.java)
+                            val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+                            userSharedPref.edit {
+                                putString("fullName", fullName)
+                                putString("email", email)
+                                apply()
+                            }
                             Log.d("LoginActivity", "tes1")
                             Toast.makeText(this, "Successfully logged in!", Toast.LENGTH_SHORT)
                                 .show()

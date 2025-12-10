@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
+import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
 import com.example.sawit.R
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
@@ -23,7 +26,6 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_tanaman) {
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

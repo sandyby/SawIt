@@ -19,4 +19,7 @@
     <color name="text_error_900">#dd4336</color>
     <color name="text_fiery_red_sunset_600">#d00000</color>
     <color name="text_disabled">#CCCCCC</color>
+    <color name="text_item_selected">@color/white</color>
+    <color name="bg_item_selected">@color/bg_primary_500</color>
+
 </resources>

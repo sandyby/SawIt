@@ -45,6 +45,39 @@
         <item name="cardElevation">0dp</item>
     </style>
 
+    <!-- 💡 Custom Style for Outlined Text Fields and Dropdowns -->
+    <style name="CustomOutlinedInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <!-- 1. The inner background color of the box when it is filled/autocompleted -->
+        <item name="boxBackgroundColor">@color/white</item>
+
+        <!-- 2. The color of the border/stroke -->
+        <item name="boxStrokeColor">@color/box_stroke_color_selector</item>
+
+        <!-- 3. The color of the error border -->
+        <item name="boxStrokeErrorColor">@color/text_error_900</item>
+
+        <!-- 4. Text color of the hint/label when floating -->
+        <item name="android:textColorHint">@color/text_primary_900</item>
+
+        <!-- 5. Customize the corner radius -->
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+    </style>
+
+    <!-- Selector for boxStrokeColor to handle focus state -->
+    <style name="CustomOutlinedDropdownStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="boxBackgroundColor">@color/white</item>
+        <item name="boxStrokeColor">@color/box_stroke_color_selector</item>
+        <item name="boxStrokeErrorColor">@color/text_error_900</item>
+        <item name="android:textColorHint">@color/text_primary_900</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+    </style>
+
     <style name="form_card_custom_corners" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopRight">32dp</item>

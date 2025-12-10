@@ -12,5 +12,17 @@
         <item name="textAllCaps">false</item>
         <item name="android:fontFamily">@font/lato_bold</item>
     </style>
+    
+    <style name="CustomCounterText" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_primary_900</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
+    </style>
+
+    <style name="CustomErrorCounterText" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_error_900</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
+    </style>
 
 </resources>

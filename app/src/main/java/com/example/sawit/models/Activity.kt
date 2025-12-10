@@ -8,7 +8,8 @@ import java.util.Date
 @Parcelize
 data class Activity(
     @DocumentId
-    val id: String = "",
+    var id: String? = null,
+    val fieldId: String = "",
     val fieldName: String = "",
     val activityType: String = "",
     val date: Date = Date(),
