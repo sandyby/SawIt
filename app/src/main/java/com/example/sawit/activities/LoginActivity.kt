@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Column
@@ -36,18 +37,27 @@ import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.sawit.R
+import com.example.sawit.models.User
 import com.example.sawit.ui.theme.BgPrimary400
 import com.example.sawit.ui.theme.BgPrimary500
 import com.example.sawit.ui.theme.BgSecondaryOverlay2
 import com.example.sawit.ui.theme.Text600
 import com.example.sawit.ui.theme.TextPrimary500
+import com.example.sawit.viewmodels.UserViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.getValue
+import kotlinx.coroutines.launch
 import java.security.MessageDigest
 
 class LoginActivity : AppCompatActivity() {
@@ -68,6 +78,7 @@ class LoginActivity : AppCompatActivity() {
     /*
     * declaration untuk variable-variable logical untuk keperluan validation
     * */
+    private val userViewModel: UserViewModel by viewModels()
     private var isEmailValid = false
     private var isPasswordValid = false
 
@@ -80,6 +91,20 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        if (userViewModel.currentUser.value != null) {
+            startMainActivity()
+            return
+        }
+
+        setContentView(R.layout.activity_login)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main))
+        { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
         /*
         * deklarasi variable untuk menampung sharedpreferences, yakni segala informasi
         * yang berkaitan dengan user settings, preference tertentu, session atau status login,
@@ -89,22 +114,22 @@ class LoginActivity : AppCompatActivity() {
         * sudah login sebelumnya, agar tidak perlu melakukan login lagi. ini bisa dikembangkan lebih jauh lagi kedepannya jika kami
         * memutuskan untuk meningkatkan UX dari segi session control, dan juga keamanan seperti session timeout, dsb
         * */
-        val authSharedPref = getSharedPreferences("AuthSession", MODE_PRIVATE)
-        val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-        val isRememberMeOn = authSharedPref.getBoolean("rememberMe", false)
-        if (isRememberMeOn && authSharedPref.contains("userId")) {
-            val intent = Intent(this, MainActivity::class.java)
-            Log.d("INFO", "Langsung login")
-            Log.d("INFO", userSharedPref.toString())
-            Log.d("INFO", "uid " + (userSharedPref.getString("uid", "tes1") ?: "tes1"))
-            Log.d("INFO", "email " + (userSharedPref.getString("email", "tes") ?: "tes"))
-            Log.d(
-                "INFO",
-                "fullName " + (userSharedPref.getString("fullName", "tes2") ?: "tes2")
-            )
-            startActivity(intent)
-            finish()
-        }
+//        val authSharedPref = getSharedPreferences("AuthSession", MODE_PRIVATE)
+//        val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+//        val isRememberMeOn = authSharedPref.getBoolean("rememberMe", false)
+//        if (isRememberMeOn && authSharedPref.contains("userId")) {
+//            val intent = Intent(this, MainActivity::class.java)
+//            Log.d("INFO", "Langsung login")
+//            Log.d("INFO", userSharedPref.toString())
+//            Log.d("INFO", "uid " + (userSharedPref.getString("uid", "tes1") ?: "tes1"))
+//            Log.d("INFO", "email " + (userSharedPref.getString("email", "tes") ?: "tes"))
+//            Log.d(
+//                "INFO",
+//                "fullName " + (userSharedPref.getString("fullName", "tes2") ?: "tes2")
+//            )
+//            startActivity(intent)
+//            finish()
+//        }
 
 //        val email = userSharedPref.getString("email", null)
 //        val fullName = userSharedPref.getString("fullName", null)
@@ -123,15 +148,6 @@ class LoginActivity : AppCompatActivity() {
 //            startActivity(intent)
 //            finish()
 //        }
-
-        setContentView(R.layout.activity_login)
-        WindowCompat.setDecorFitsSystemWindows(window, true)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main))
-        { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
         /*
         * initialize komponen Ui berupa texteditinputtexts dan juga textinputlayouts dari layout xml activity_login, seperti yang diset
@@ -161,10 +177,11 @@ class LoginActivity : AppCompatActivity() {
             val email = tietEmail.text.toString().trim()
             val password = tietPassword.text.toString().trim()
             Log.d("LoginActivity", "$email $password")
-            userLogin(email, password)
+            userViewModel.loginUser(email, password)
         }
         smRememberMe = findViewById<SwitchMaterial>(R.id.sm_rememberMe)
         tvLoginErrorMsg = findViewById<TextView>(R.id.tv_login_error_msg)
+        observeViewModel()
     }
 
     /*
@@ -221,7 +238,7 @@ class LoginActivity : AppCompatActivity() {
     * logika state button login untuk meningkatkan UX
     * */
     private fun updateLoginButtonState() {
-        mBtnLogin.isEnabled = isEmailValid && isPasswordValid
+        mBtnLogin.isEnabled = isEmailValid && isPasswordValid && !userViewModel.isLoading.value
     }
 
     /*
@@ -239,75 +256,162 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun userLogin(email: String, password: String) {
-        mBtnLogin.isEnabled = false
-        val hashedPassword = hashSHA256String(password)
+//    private fun userLogin(email: String, password: String) {
+//        mBtnLogin.isEnabled = false
+//        tvLoginErrorMsg.visibility = View.GONE
+//
+//        auth.signInWithEmailAndPassword(email, password)
+//            .addOnSuccessListener { authResult ->
+//                val user = authResult.user
+//                val uid = user?.uid
+//
+//                if (uid != null) {
+//                    fetchAndStoreUserData(uid)
+//                } else {
+//                    Log.e("LoginActivity", "Login failed, user data isn't available!")
+//                    tvLoginErrorMsg.visibility = View.VISIBLE
+//                    mBtnLogin.isEnabled = true
+//                }
+//            }
+//            .addOnFailureListener { e ->
+//                Log.e("LoginActivity", ("Login failed: ${e.localizedMessage}") ?: "Login failed")
+//                tvLoginErrorMsg.visibility = View.VISIBLE
+//                mBtnLogin.isEnabled = true
+//            }
+//    }
 
-        /*
-        * retrieve instance dan referensi dengan realtime database dari firebase, sehingga menjalankan query dengan aman
-        *
-        * untuk url dari database itu sendiri awalnya kami ingin simpan ke dalam file yang aman, entah itu local.properties
-        * ataupun secrets, tetapi setelah membaca saran dari beberapa user di forum, seperti tidak terlalu bermasalah 'jika' memang
-        * terlanjur dipush secara publik
-        * */
-        FirebaseDatabase.getInstance(applicationContext.getString(R.string.firebase_database_reference_url))
-            .getReference("users").orderByChild("email").equalTo(email).get()
-            .addOnSuccessListener { snapshot ->
-                Log.d("LoginActivity", "snapshot: $snapshot")
-                if (snapshot.exists()) {
-                    snapshot.children.forEach { data ->
-                        val storedPassword = data.child("password").getValue(String::class.java)
+    private fun startMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
 
-                        /*
-                        * di bagian ini sharedpreferences disimpan setelah user berhasil login.
-                        *
-                        * session tersebut akan expired atau time out jika user menghapus cache atau data dari
-                        * aplikasi secara lokal
-                        * */
-                        if (storedPassword == hashedPassword) {
-                            val uid = data.key
-                            val authSharedPref =
-                                getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
-                            authSharedPref.edit {
-                                putString("userId", uid)
-                                if (smRememberMe.isChecked) {
-                                    putBoolean("rememberMe", true)
-                                } else {
-                                    putBoolean("rememberMe", false)
-                                }
-                                apply()
+    private fun storeUserPrefs(user: User) {
+        val authSharedPref = getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
+        authSharedPref.edit {
+            putString("userId", user.uid)
+            putBoolean("rememberMe", smRememberMe.isChecked)
+            apply()
+        }
+
+        val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+        userSharedPref.edit {
+            putString("uid", user.uid)
+            putString("fullName", user.fullName)
+            putString("email", user.email)
+            apply()
+        }
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    userViewModel.isLoading.collect { isLoading ->
+                        mBtnLogin.isEnabled = !isLoading && isEmailValid && isPasswordValid
+                    }
+                }
+
+                launch {
+                    userViewModel.authEvents.collect { event ->
+                        when (event) {
+                            is UserViewModel.AuthEvent.Success -> {
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "Successfully logged in!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                storeUserPrefs(
+                                    event.user
+                                )
+                                startMainActivity()
+                                userViewModel.consumeAuthEvent()
                             }
 
-                            val email = data.child("email").getValue(String::class.java)
-                            val fullName = data.child("fullName").getValue(String::class.java)
-                            val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-                            userSharedPref.edit {
-                                putString("fullName", fullName)
-                                putString("email", email)
-                                apply()
+                            is UserViewModel.AuthEvent.Error -> {
+                                tvLoginErrorMsg.text = event.message
+                                tvLoginErrorMsg.visibility = View.VISIBLE
+                                userViewModel.consumeAuthEvent()
                             }
-                            Log.d("LoginActivity", "tes1")
-                            Toast.makeText(this, "Successfully logged in!", Toast.LENGTH_SHORT)
-                                .show()
 
-                            val intent = Intent(this, MainActivity::class.java)
-                            startActivity(intent)
-                            Log.d("LoginActivity", "tes2")
-                            finish()
-                            return@addOnSuccessListener
+                            null -> {
+                                // Event consumed
+                            }
                         }
                     }
-                    Log.d("LoginActivity", "tes3")
-                    tvLoginErrorMsg.visibility = View.VISIBLE
-                    mBtnLogin.isEnabled = true
-                } else {
-                    Log.d("LoginActivity", "tes4")
-                    tvLoginErrorMsg.visibility = View.VISIBLE
-                    mBtnLogin.isEnabled = true
                 }
-            }.addOnFailureListener {
-                Log.d("LoginActivity", "Error")
-                mBtnLogin.isEnabled = true
             }
+        }
     }
+
+    //        val hashedPassword = hashSHA256String(password)
+
+    /*
+    * retrieve instance dan referensi dengan realtime database dari firebase, sehingga menjalankan query dengan aman
+    *
+    * untuk url dari database itu sendiri awalnya kami ingin simpan ke dalam file yang aman, entah itu local.properties
+    * ataupun secrets, tetapi setelah membaca saran dari beberapa user di forum, seperti tidak terlalu bermasalah 'jika' memang
+    * terlanjur dipush secara publik
+    * */
+//        FirebaseDatabase.getInstance(applicationContext.getString(R.string.firebase_database_reference_url))
+//            .getReference("users").orderByChild("email").equalTo(email).get()
+//            .addOnSuccessListener { snapshot ->
+//                Log.d("LoginActivity", "snapshot: $snapshot")
+//                if (snapshot.exists()) {
+//                    snapshot.children.forEach { data ->
+//                        val storedPassword = data.child("password").getValue(String::class.java)
+//
+//                        /*
+//                        * di bagian ini sharedpreferences disimpan setelah user berhasil login.
+//                        *
+//                        * session tersebut akan expired atau time out jika user menghapus cache atau data dari
+//                        * aplikasi secara lokal
+//                        * */
+//                        if (storedPassword == hashedPassword) {
+//                            val uid = data.key
+//                            val authSharedPref =
+//                                getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
+//                            authSharedPref.edit {
+//                                putString("userId", uid)
+//                                if (smRememberMe.isChecked) {
+//                                    putBoolean("rememberMe", true)
+//                                } else {
+//                                    putBoolean("rememberMe", false)
+//                                }
+//                                apply()
+//                            }
+//
+//                            val email = data.child("email").getValue(String::class.java)
+//                            val fullName = data.child("fullName").getValue(String::class.java)
+//                            val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+//                            userSharedPref.edit {
+//                                putString("fullName", fullName)
+//                                putString("email", email)
+//                                apply()
+//                            }
+//                            Log.d("LoginActivity", "tes1")
+//                            Toast.makeText(this, "Successfully logged in!", Toast.LENGTH_SHORT)
+//                                .show()
+//
+//                            val intent = Intent(this, MainActivity::class.java)
+//                            startActivity(intent)
+//                            Log.d("LoginActivity", "tes2")
+//                            finish()
+//                            return@addOnSuccessListener
+//                        }
+//                    }
+//                    Log.d("LoginActivity", "tes3")
+//                    tvLoginErrorMsg.visibility = View.VISIBLE
+//                    mBtnLogin.isEnabled = true
+//                } else {
+//                    Log.d("LoginActivity", "tes4")
+//                    tvLoginErrorMsg.visibility = View.VISIBLE
+//                    mBtnLogin.isEnabled = true
+//                }
+//            }.addOnFailureListener {
+//                Log.d("LoginActivity", "Error")
+//                mBtnLogin.isEnabled = true
+//            }
+//    }
 }

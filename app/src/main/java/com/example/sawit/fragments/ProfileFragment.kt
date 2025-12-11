@@ -2,6 +2,7 @@ package com.example.sawit.fragments
 
 import android.app.Activity
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,10 +17,12 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.sawit.R
 import com.example.sawit.activities.EditPasswordActivity
 import com.example.sawit.activities.EditProfileActivity
 import com.example.sawit.activities.LoginActivity
+import com.example.sawit.viewmodels.UserViewModel
 import com.google.android.material.button.MaterialButton
 
 
@@ -33,6 +36,7 @@ class ProfileFragment : Fragment() {
     private lateinit var profilePicUri: String
 
     // Launcher untuk Edit Profile
+    private val userViewModel: UserViewModel by viewModels()
     private lateinit var editProfileResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +65,8 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val userSharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val userSharedPref =
+            requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         fullName = userSharedPref.getString("fullName", "User") ?: "User"
         email = userSharedPref.getString("email", "user@gmail.com") ?: "user@gmail.com"
 //        TODO:
@@ -101,19 +106,40 @@ class ProfileFragment : Fragment() {
 
         // Logout
         mBtnLogOut.setOnClickListener {
-            clearUserSession()
+            userViewModel.logout()
+            clearUserSession(requireContext())
+
+            Toast.makeText(requireContext(), "Successfully logged out!", Toast.LENGTH_SHORT).show()
 
             val intent = Intent(requireContext(), LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             requireActivity().finish()
+
+//            val intent = Intent(requireContext(), LoginActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//            startActivity(intent)
+//            requireActivity().finish()
         }
     }
 
+//    fun userLogout() {
+//        userViewModel.logout()
+//
+//        val authSharedPref =
+//            requireActivity().getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
+//        authSharedPref.edit { clear(); apply() }
+//        requireActivity().getSharedPreferences("UserPrefs", MODE_PRIVATE).edit { clear(); apply() }
+//
+//        val intent = Intent(requireActivity(), LoginActivity::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//        startActivity(intent)
+//        finish()
+//    }
 
-    private fun clearUserSession() {
+    private fun clearUserSession(context: Context) {
         val authSharedPref =
-            requireActivity().getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
+            context.getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
         authSharedPref.edit {
             remove("userId")
             putBoolean("rememberMe", false)
@@ -125,6 +151,5 @@ class ProfileFragment : Fragment() {
             remove("fullName")
             remove("email")
         }
-        Toast.makeText(requireContext(), "Successfully logged out!", Toast.LENGTH_SHORT).show()
     }
 }

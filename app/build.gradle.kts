@@ -107,6 +107,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    implementation("com.google.firebase:firebase-appcheck-ktx")
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("androidx.activity:activity-ktx:1.9.0")
     debugImplementation(libs.androidx.ui.tooling)

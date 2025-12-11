@@ -9,16 +9,20 @@ import android.util.Patterns
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.sawit.R
 import com.example.sawit.models.User
+import com.example.sawit.viewmodels.UserViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +54,9 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var tilPassword: TextInputLayout
     private lateinit var tilConfirmPassword: TextInputLayout
     private lateinit var mBtnRegister: MaterialButton
-    private lateinit var database: DatabaseReference
+
+    //    private lateinit var database: DatabaseReference
+    private val userViewModel: UserViewModel by viewModels()
     private var isFullNameValid = false
     private var isEmailValid = false
     private var isPasswordValid = false
@@ -86,8 +92,8 @@ class RegisterActivity : AppCompatActivity() {
         tietPassword.addTextChangedListener(PasswordWatcher())
         tietConfirmPassword.addTextChangedListener(ConfirmPasswordWatcher())
 
-        database =
-            FirebaseDatabase.getInstance("https://sawit-6876f-default-rtdb.asia-southeast1.firebasedatabase.app/").reference
+//        database =
+//            FirebaseDatabase.getInstance("https://sawit-6876f-default-rtdb.asia-southeast1.firebasedatabase.app/").reference
 
 
         /*
@@ -101,11 +107,21 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         mBtnRegister.setOnClickListener {
-            val fullName = tietFullName.text.toString().trim()
-            val email = tietEmail.text.toString().trim()
-            val password = tietPassword.text.toString().trim()
-            validateFieldsAndRegister(fullName, email, password)
+            if (isFullNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid) {
+                mBtnRegister.isEnabled = false
+                val fullName = tietFullName.text.toString().trim()
+                val email = tietEmail.text.toString().trim()
+                val password = tietPassword.text.toString().trim()
+
+                // Call the ViewModel for the secure registration logic
+                userViewModel.registerUser(email, password, fullName)
+            }
+            //            val fullName = tietFullName.text.toString().trim()
+//            val email = tietEmail.text.toString().trim()
+//            val password = tietPassword.text.toString().trim()
+//            validateFieldsAndRegister(fullName, email, password)
         }
+        observeViewModel()
     }
 
     private inner class FullNameWatcher : TextWatcher {
@@ -217,80 +233,134 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun updateRegisterButtonState() {
         mBtnRegister.isEnabled =
-            isFullNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid
+            isFullNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid && !userViewModel.isLoading.value
     }
 
-    private fun validateFieldsAndRegister(fullName: String, email: String, password: String) {
-        mBtnRegister.isEnabled = false
+    private fun startLoginActivity() {
+        startActivity(Intent(this, LoginActivity::class.java))
+        finish()
+    }
 
-        database.child("users").orderByChild("email").equalTo(email)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    tilEmail.error = "E-mail is already registered"
-                    mBtnRegister.isEnabled = true
-                } else {
-                    tilEmail.error = null
-                    registerUser(fullName, email, password)
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    userViewModel.isLoading.collect { isLoading ->
+                        updateRegisterButtonState()
+                    }
                 }
-            }
-            .addOnFailureListener {
-                Log.d("RegisterActivity", "Error checking email: ${it.message}")
-                mBtnRegister.isEnabled = true
-            }
-    }
+                launch {
+                    userViewModel.authEvents.collect { event ->
+                        when (event) {
+                            is UserViewModel.AuthEvent.Success -> {
+                                Toast.makeText(
+                                    this@RegisterActivity,
+                                    "Registration Successful! Please log in.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                startLoginActivity()
+                                userViewModel.consumeAuthEvent()
+                            }
 
-    private fun hashSHA256String(input: String): String {
-        val HEX_CHARS = "0123456789ABCDEF"
-        val bytes = MessageDigest
-            .getInstance("SHA-256")
-            .digest(input.toByteArray())
-        return buildString {
-            bytes.forEach {
-                val i = it.toInt()
-                append(HEX_CHARS[i shr 4 and 0x0f])
-                append(HEX_CHARS[i and 0x0f])
+                            is UserViewModel.AuthEvent.Error -> {
+                                Log.e("RegisterActivity", event.message)
+                                Toast.makeText(
+                                    this@RegisterActivity,
+                                    event.message,
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                if (event.message.contains(
+                                        "email address is already in use",
+                                        ignoreCase = true
+                                    )
+                                ) {
+                                    tilEmail.error = "E-mail is already registered!"
+                                }
+
+                                userViewModel.consumeAuthEvent()
+                            }
+
+                            null -> {
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
-    private fun registerUser(fullName: String, email: String, password: String) {
-        val uid = database.child("users").push().key ?: return
-        val currentTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault()).format(
-            Date()
-        )
-
-        val hashedPassword = hashSHA256String(password)
-        val user = User(fullName, email, hashedPassword, currentTime)
-
-        /*
-        * kondisi saat loading menunggu status register, dijalankan menggunakan coroutinescope, untuk
-        * memanfaatkan fitur async dan juga lifecycle managementnya
-        * */
-        mBtnRegister.isEnabled = false
-        CoroutineScope(Dispatchers.IO).launch {
-            database.child("users").child(uid).setValue(user)
-                .addOnSuccessListener {
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@RegisterActivity,
-                            "Registration Successful!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
-                        finish()
-                    }
-                }
-                .addOnFailureListener {
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@RegisterActivity,
-                            "Error: ${it.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        mBtnRegister.isEnabled = true
-                    }
-                }
-        }
-    }
+//    private fun validateFieldsAndRegister(fullName: String, email: String, password: String) {
+//        mBtnRegister.isEnabled = false
+//
+//        database.child("users").orderByChild("email").equalTo(email)
+//            .get()
+//            .addOnSuccessListener { snapshot ->
+//                if (snapshot.exists()) {
+//                    tilEmail.error = "E-mail is already registered"
+//                    mBtnRegister.isEnabled = true
+//                } else {
+//                    tilEmail.error = null
+//                    registerUser(fullName, email, password)
+//                }
+//            }
+//            .addOnFailureListener {
+//                Log.d("RegisterActivity", "Error checking email: ${it.message}")
+//                mBtnRegister.isEnabled = true
+//            }
+//    }
+//
+//    private fun hashSHA256String(input: String): String {
+//        val HEX_CHARS = "0123456789ABCDEF"
+//        val bytes = MessageDigest
+//            .getInstance("SHA-256")
+//            .digest(input.toByteArray())
+//        return buildString {
+//            bytes.forEach {
+//                val i = it.toInt()
+//                append(HEX_CHARS[i shr 4 and 0x0f])
+//                append(HEX_CHARS[i and 0x0f])
+//            }
+//        }
+//    }
+//
+//    private fun registerUser(fullName: String, email: String, password: String) {
+//        val uid = database.child("users").push().key ?: return
+//        val currentTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault()).format(
+//            Date()
+//        )
+//
+//        val hashedPassword = hashSHA256String(password)
+//        val user = User(fullName, email, hashedPassword, currentTime)
+//
+//        /*
+//        * kondisi saat loading menunggu status register, dijalankan menggunakan coroutinescope, untuk
+//        * memanfaatkan fitur async dan juga lifecycle managementnya
+//        * */
+//        mBtnRegister.isEnabled = false
+//        CoroutineScope(Dispatchers.IO).launch {
+//            database.child("users").child(uid).setValue(user)
+//                .addOnSuccessListener {
+//                    runOnUiThread {
+//                        Toast.makeText(
+//                            this@RegisterActivity,
+//                            "Registration Successful!",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
+//                        finish()
+//                    }
+//                }
+//                .addOnFailureListener {
+//                    runOnUiThread {
+//                        Toast.makeText(
+//                            this@RegisterActivity,
+//                            "Error: ${it.message}",
+//                            Toast.LENGTH_LONG
+//                        ).show()
+//                        mBtnRegister.isEnabled = true
+//                    }
+//                }
+//        }
+//    }
 }
