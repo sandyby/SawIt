@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,12 +22,15 @@ class CompletedActivitiesFragment : Fragment(R.layout.fragment_activities_list) 
     private var _binding: FragmentActivitiesListBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: ActivityViewModel by viewModels({ requireParentFragment() })
+    private val viewModel: ActivityViewModel by activityViewModels()
     private lateinit var adapter: ActivitiesAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentActivitiesListBinding.bind(view)
+
+        binding.tvEmptyActivitiesTitle.text = "No Completed Activities Yet"
+        binding.tvEmptyActivitiesMessage.text = "Check your planned tasks to complete it"
 
         setupRecyclerView()
         observeActivities()
@@ -35,8 +39,9 @@ class CompletedActivitiesFragment : Fragment(R.layout.fragment_activities_list) 
     private fun setupRecyclerView() {
         adapter = ActivitiesAdapter(
             onCheckboxClicked = { activity, isChecked ->
-                val status = if (isChecked) "completed" else "planned"
-                viewModel.updateActivityStatus(activity.id, status)
+                val newStatus = if (isChecked) "completed" else "planned"
+                val updatedActivity = activity.copy(status = newStatus)
+                viewModel.updateActivity(updatedActivity)
             },
             onEditClicked = { activity ->
                 val intent = Intent(requireContext(), CreateEditActivity::class.java).apply {
@@ -48,6 +53,21 @@ class CompletedActivitiesFragment : Fragment(R.layout.fragment_activities_list) 
                 viewModel.deleteActivity(activity.id)
             }
         )
+        //        adapter = ActivitiesAdapter(
+//            onCheckboxClicked = { activity, isChecked ->
+//                val status = if (isChecked) "completed" else "planned"
+//                viewModel.updateActivityStatus(activity.id, status)
+//            },
+//            onEditClicked = { activity ->
+//                val intent = Intent(requireContext(), CreateEditActivity::class.java).apply {
+//                    putExtra(CreateEditActivity.EXTRA_ACTIVITY, activity)
+//                }
+//                startActivity(intent)
+//            },
+//            onDeleteClicked = { activity ->
+//                viewModel.deleteActivity(activity.id)
+//            }
+//        )
 
         binding.rvActivities.apply {
             this.adapter = this@CompletedActivitiesFragment.adapter
@@ -61,6 +81,14 @@ class CompletedActivitiesFragment : Fragment(R.layout.fragment_activities_list) 
                 viewModel.activities.collect { allActivities ->
                     val completed = allActivities.filter { it.status == "completed" }
                     adapter.submitList(completed)
+
+                    if (completed.isEmpty()) {
+                        binding.rvActivities.visibility = View.GONE
+                        binding.clEmptyStateActivities.visibility = View.VISIBLE
+                    } else {
+                        binding.rvActivities.visibility = View.VISIBLE
+                        binding.clEmptyStateActivities.visibility = View.GONE
+                    }
                 }
             }
         }

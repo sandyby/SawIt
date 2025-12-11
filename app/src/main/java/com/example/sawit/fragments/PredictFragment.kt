@@ -17,37 +17,6 @@ class PredictFragment : Fragment(R.layout.fragment_predictions) {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
 
-//    override fun onCreateView(
-//        inflater: LayoutInflater, container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View {
-//        val view = inflater.inflate(R.layout.fragment_predictions, container, false)
-//
-//        layoutHarvest = view.findViewById(R.id.layout_harvest)
-//        layoutCondition = view.findViewById(R.id.layout_condition)
-//        val ptvPredictions = view.findViewById<PredictionTabView>(R.id.ptvPredictions)
-//
-//        showHarvest()
-//
-//        ptvPredictions.onTabSelectedListener = { index ->
-//            when (index) {
-//                0 -> showHarvest()
-//                1 -> showCondition()
-//            }
-//        }
-//
-//        return view
-//    }
-
-//    private fun showHarvest() {
-//        layoutHarvest.visibility = View.VISIBLE
-//        layoutCondition.visibility = View.GONE
-//    }
-//
-//    private fun showCondition() {
-//        layoutHarvest.visibility = View.GONE
-//        layoutCondition.visibility = View.VISIBLE
-//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,7 +27,6 @@ class PredictFragment : Fragment(R.layout.fragment_predictions) {
         val adapter = PredictionsPagerAdapter(requireActivity())
         viewPager.adapter = adapter
 
-        // Link TabLayout with ViewPager2
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> "Harvest"

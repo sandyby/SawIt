@@ -132,7 +132,7 @@ class UserViewModel : ViewModel() {
                 _authEvents.value = AuthEvent.Success(userProfile)
                 _isLoading.value = false
             }
-            .addOnFailureListener { exception ->
+            .addOnFailureListener { e ->
                 val authUser = auth.currentUser
                 if (authUser != null && authUser.uid == uid) {
                     authUser.delete()
@@ -156,6 +156,12 @@ class UserViewModel : ViewModel() {
                     _isLoading.value = false
                 }
             }
+    }
+
+    fun signOutAfterRegistration() = viewModelScope.launch {
+        auth.signOut()
+        _currentUser.value = null
+        Log.d("UserViewModel", "User signed out immediately after registration!")
     }
 
     fun consumeAuthEvent() {

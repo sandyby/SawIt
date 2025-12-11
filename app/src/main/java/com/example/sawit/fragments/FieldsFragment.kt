@@ -2,6 +2,7 @@ package com.example.sawit.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sawit.R
 import com.example.sawit.activities.CreateFieldActivity
+import com.example.sawit.activities.LoginActivity
 import com.example.sawit.adapters.FieldsFieldsAdapter
 import com.example.sawit.databinding.FragmentFieldsBinding
 import com.example.sawit.utils.VerticalSpaceItemDecoration
 import com.example.sawit.viewmodels.FieldViewModel
+import com.example.sawit.viewmodels.UserViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -24,6 +27,7 @@ class FieldsFragment : Fragment() {
     private var _binding: FragmentFieldsBinding? = null
     private val binding get() = _binding!!
     private val fieldViewModel: FieldViewModel by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +44,18 @@ class FieldsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val currentUser = userViewModel.currentUser.value
+
+        if (currentUser != null) {
+            // Start listening for fields specific to the logged-in user's UID
+            fieldViewModel.listenForFieldsUpdates()
+        } else {
+            Log.e("FieldsFragment", "User not logged in, field data listener cannot be started!")
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
 
         val adapter = FieldsFieldsAdapter(
             onClick = { field ->
@@ -73,17 +89,28 @@ class FieldsFragment : Fragment() {
         binding.rvFieldsFields.apply {
             this.adapter = adapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            val spacingInPx = resources.getDimensionPixelSize(R.dimen.vertical_item_spacing)
+            addItemDecoration(VerticalSpaceItemDecoration(spacingInPx))
         }
-
-        val spacingInPx = resources.getDimensionPixelSize(R.dimen.vertical_item_spacing)
-        binding.rvFieldsFields.addItemDecoration(VerticalSpaceItemDecoration(spacingInPx))
 
         viewLifecycleOwner.lifecycleScope.launch {
             fieldViewModel.fieldsData.collectLatest { fields ->
                 adapter.submitList(fields)
+
+                if (fields.isEmpty()) {
+                    binding.clEmptyState.visibility = View.VISIBLE
+                    binding.rvFieldsFields.visibility = View.GONE
+                    binding.efabFields.extend()
+                } else {
+                    binding.clEmptyState.visibility = View.GONE
+                    binding.rvFieldsFields.visibility = View.VISIBLE
+                }
             }
         }
+    }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

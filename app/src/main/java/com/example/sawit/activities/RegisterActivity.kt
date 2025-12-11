@@ -258,6 +258,7 @@ class RegisterActivity : AppCompatActivity() {
                                     "Registration Successful! Please log in.",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                userViewModel.signOutAfterRegistration()
                                 startLoginActivity()
                                 userViewModel.consumeAuthEvent()
                             }

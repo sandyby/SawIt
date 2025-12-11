@@ -9,6 +9,7 @@ import java.util.Date
 data class Activity(
     @DocumentId
     var id: String? = null,
+    val userId: String = "",
     val fieldId: String = "",
     val fieldName: String = "",
     val activityType: String = "",

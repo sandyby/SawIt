@@ -40,6 +40,7 @@ class CreateEditActivity : AppCompatActivity() {
     private val activityViewModel: ActivityViewModel by viewModels()
     private var currentActivity: Activity? = null
     private var isEditMode = false
+    private var fieldIdMap: Map<String, String> = emptyMap()
 
     companion object {
         const val EXTRA_ACTIVITY = "EXTRA_ACTIVITY"
@@ -116,14 +117,15 @@ class CreateEditActivity : AppCompatActivity() {
     }
 
     private fun validateAndSave() {
-        val fieldId = ""
         val fieldName = binding.autoCompleteField.text.toString().trim()
         val activityType = binding.autoCompleteActivityType.text.toString().trim()
         val dateStr = binding.editTextDate.text.toString().trim()
         val notes = binding.editTextNotes.text.toString()
 
+        val fieldId = fieldIdMap[fieldName]
+
         var isValid = true
-        if (fieldName.isEmpty() || fieldName == FIELD_PLACEHOLDER) {
+        if (fieldName.isEmpty() || fieldName == FIELD_PLACEHOLDER || fieldId.isNullOrEmpty()) {
             binding.textFieldLayoutField.error = "Please select a field!"
             isValid = false
         } else {
@@ -158,7 +160,8 @@ class CreateEditActivity : AppCompatActivity() {
 
         val activityData = Activity(
             id = currentActivity?.id,
-            fieldId = fieldId,
+            userId = currentActivity?.userId ?: "",
+            fieldId = fieldId!!,
             fieldName = fieldName,
             activityType = activityType,
             date = activityDate,
@@ -172,7 +175,6 @@ class CreateEditActivity : AppCompatActivity() {
             activityViewModel.createNewActivity(activityData)
         }
     }
-
 
     private fun setupActivityTypeDropdown() {
         val activityTypes = resources.getStringArray(R.array.activity_types)
@@ -197,6 +199,7 @@ class CreateEditActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 fieldViewModel.fieldsData.collect { fields ->
+                    fieldIdMap = fields.associate { it.fieldName to it.fieldId }
                     val actualFieldNames = fields.map { it.fieldName }
 
                     // 1. Create the list with the placeholder

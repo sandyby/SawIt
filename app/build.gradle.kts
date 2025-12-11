@@ -89,7 +89,7 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.8.9")
     implementation("com.google.android.material:material:1.13.0")
     implementation("com.google.gms:google-services:4.4.4")
-    implementation("nl.joery.animatedbottombar:library:1.1.0"){
+    implementation("nl.joery.animatedbottombar:library:1.1.0") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
     }
     implementation("androidx.recyclerview:recyclerview:1.4.0")
@@ -111,4 +111,5 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("androidx.activity:activity-ktx:1.9.0")
     debugImplementation(libs.androidx.ui.tooling)
+    implementation("com.github.bumptech.glide:glide:5.0.5")
 }
