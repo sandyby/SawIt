@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:background="@color/bg_secondary_900"
     tools:context=".fragments.ResultTotalPanen">
 
     <LinearLayout
@@ -16,75 +17,110 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Hasil Prediksi Total Panen 🌴"
+            android:layout_marginBottom="24dp"
+            android:text="Total Yield Prediction Result"
+            android:textColor="@color/text_primary_500"
+            android:gravity="center"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="?attr/colorPrimary"
-            android:layout_marginBottom="24dp" />
+            android:textStyle="bold" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            android:layout_marginBottom="24dp">
+            app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:orientation="vertical"
-                android:padding="20dp"
-                android:gravity="center">
+                android:background="@color/bg_primary_400"
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Prediksi Yield (Kg/Ha)"
-                    android:textSize="18sp"
-                    android:textColor="@color/text_primary_900" />
+                    android:text="Predicted Yield (Kg/Ha)"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/tv_predicted_yield_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:text="84.500,00"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@android:color/white"
                     android:textSize="48sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/colorSecondary"
-                    android:layout_marginTop="8dp"/>
+                    tools:text="84,500.00" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Detail Parameter Input"
+            android:layout_marginBottom="12dp"
+            android:text="Input Parameter Details"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp"/>
+            android:textStyle="bold" />
 
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:stretchColumns="1"
             android:background="@drawable/table_border"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:stretchColumns="1">
 
             <TableRow android:paddingBottom="4dp">
-                <TextView android:text="Suhu Min (tmin)" android:textStyle="bold" />
-                <TextView android:id="@+id/tv_detail_tmin" android:gravity="end" tools:text="2.0 °C" />
+
+                <TextView
+                    android:text="Min Temperature (tmin)"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_detail_tmin"
+                    android:gravity="end"
+                    tools:text="2.0 °C" />
             </TableRow>
+
             <TableRow android:paddingBottom="4dp">
-                <TextView android:text="Suhu Max (tmax)" android:textStyle="bold" />
-                <TextView android:id="@+id/tv_detail_tmax" android:gravity="end" tools:text="3.2 °C" />
+
+                <TextView
+                    android:text="Max Temperature (tmax)"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_detail_tmax"
+                    android:gravity="end"
+                    tools:text="3.2 °C" />
             </TableRow>
+
             <TableRow android:paddingBottom="4dp">
-                <TextView android:text="Curah Hujan (prec)" android:textStyle="bold" />
-                <TextView android:id="@+id/tv_detail_rainfall" android:gravity="end" tools:text="250 mm" />
+
+                <TextView
+                    android:text="Rainfall (prec)"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_detail_rainfall"
+                    android:gravity="end"
+                    tools:text="250 mm" />
             </TableRow>
-            <TableRow>
-                <TextView android:text="Luas Area (ha)" android:textStyle="bold" />
-                <TextView android:id="@+id/tv_detail_area" android:gravity="end" tools:text="5.5 Ha" />
+
+            <TableRow android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Area (ha)"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_detail_area"
+                    android:gravity="end"
+                    tools:text="5.5 Ha" />
             </TableRow>
         </TableLayout>
 
