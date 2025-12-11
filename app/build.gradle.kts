@@ -62,6 +62,7 @@ composeCompiler {
 }
 
 dependencies {
+    implementation(libs.androidx.ui.graphics)
     implementation(libs.play.services.location)
     val room_version = "2.8.4"
     implementation("androidx.room:room-runtime:$room_version")
@@ -76,8 +77,6 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.11.0")
     implementation("androidx.compose.ui:ui-tooling-preview:1.9.4")
     implementation(libs.androidx.runtime.livedata)
-    implementation("com.github.bumptech.glide:glide:5.0.5")
-    ksp("com.github.bumptech.glide:compiler:5.0.5")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
@@ -95,6 +94,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("io.github.ehsannarmani:compose-charts:0.2.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -107,8 +107,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-appcheck-playintegrity")
-    implementation("com.google.firebase:firebase-appcheck-ktx")
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("androidx.activity:activity-ktx:1.9.0")
     debugImplementation(libs.androidx.ui.tooling)

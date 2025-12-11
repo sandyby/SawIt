@@ -1,3 +1,4 @@
+// File: com/example/sawit/fragments/PredictionTotalPanen.kt
 package com.example.sawit.fragments
 
 import android.os.Bundle
@@ -12,27 +13,27 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.sawit.R
 import com.example.sawit.databinding.FragmentPredictionTotalPanenBinding
-import com.example.sawit.viewmodels.FieldViewModel
+import com.example.sawit.viewmodels.FieldViewModel // Asumsi ini ada
+import com.example.sawit.viewmodels.PredictionViewModel // <-- Import ViewModel Prediksi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlin.getValue
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [PredictionTotalPanen.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) {
 
     private var _binding: FragmentPredictionTotalPanenBinding? = null
     private val binding get() = _binding!!
 
-    private val fieldViewModel: FieldViewModel by viewModels()
+    private val fieldViewModel: FieldViewModel by viewModels() // Asumsi ini ada
+    private val predictionViewModel: PredictionViewModel by viewModels() // <-- Inisialisasi PredictionViewModel
+
+    // Kunci argumen untuk navigasi
+    companion object {
+        const val ARG_PREDICTED_YIELD = "predicted_yield"
+        const val ARG_TMIN = "tmin"
+        const val ARG_TMAX = "tmax"
+        const val ARG_RAINFALL = "rainfall"
+        const val ARG_AREA = "area"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,48 +46,70 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Load dropdown field names (Logika yang sudah ada)
         viewLifecycleOwner.lifecycleScope.launch {
             fieldViewModel.fieldsData.collectLatest { fields ->
                 val fieldNames = fields.map { it.fieldName }
-                val adapter = ArrayAdapter(
-                    requireContext(),
-                    R.layout.dropdown_item,
-                    fieldNames
-                )
+                val adapter = ArrayAdapter(requireContext(), R.layout.dropdown_item, fieldNames)
                 binding.inputFieldName.setAdapter(adapter)
             }
         }
 
         binding.btnPredict.setOnClickListener {
-            Log.d("PredictionsFragment", "Tes")
+            val selectedField = binding.inputFieldName.text.toString().trim()
+            val areaStr = binding.inputFieldArea.text.toString().trim()
+            val rainfallStr = binding.inputRainfall.text.toString().trim()
+            val tminStr = binding.inputTmin.text.toString().trim()
+            val tmaxStr = binding.inputTmax.text.toString().trim()
 
-            val selectedField = binding.inputFieldName.text.toString()
-            val fieldArea = binding.inputFieldArea.text.toString()
-            val palmAge = binding.inputPalmAge.text.toString()
-            val rainfall = binding.inputRainfall.text.toString()
-            val temperature = binding.inputTemperature.text.toString()
-
-            if (selectedField.isEmpty() || fieldArea.isEmpty() ||
-                palmAge.isEmpty() || rainfall.isEmpty() || temperature.isEmpty()
+            // Validasi Input Kosong
+            if (selectedField.isEmpty() || areaStr.isEmpty() || rainfallStr.isEmpty() ||
+                tminStr.isEmpty() || tmaxStr.isEmpty()
             ) {
                 Toast.makeText(requireContext(), "Harap isi semua data!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val resultFragment = ResultFragment().apply {
-                arguments = Bundle().apply {
-                    putString("selectedField", selectedField)
-                    putString("fieldArea", fieldArea)
-                    putString("palmAge", palmAge)
-                    putString("rainfall", rainfall)
-                    putString("temperature", temperature)
-                }
+            // Konversi ke Float dan Validasi Angka
+            val area = areaStr.toFloatOrNull()
+            val rainfall = rainfallStr.toFloatOrNull()
+            val tmin = tminStr.toFloatOrNull()
+            val tmax = tmaxStr.toFloatOrNull()
+
+            if (area == null || rainfall == null || tmin == null || tmax == null) {
+                Toast.makeText(requireContext(), "Input harus berupa angka yang valid!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fl_scroll_view_content, resultFragment)
-                .addToBackStack(null)
-                .commit()
+            // Panggil ViewModel untuk Prediksi dan Simpan Data
+            predictionViewModel.predictAndSaveTotalPanen(
+                fieldName = selectedField,
+                tmin = tmin,
+                tmax = tmax,
+                rainfall = rainfall,
+                area = area,
+                onSuccess = { predictedYield ->
+                    // 3. Navigasi ke ResultTotalPanen Fragment
+                    val resultFragment = ResultTotalPanen().apply {
+                        arguments = Bundle().apply {
+                            putFloat(ARG_PREDICTED_YIELD, predictedYield)
+                            putFloat(ARG_TMIN, tmin)
+                            putFloat(ARG_TMAX, tmax)
+                            putFloat(ARG_RAINFALL, rainfall)
+                            putFloat(ARG_AREA, area)
+                        }
+                    }
+
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fl_scroll_view_content, resultFragment)
+                        .addToBackStack(null)
+                        .commit()
+                },
+                onError = { message ->
+                    Log.e("PredictionsFragment", "Error: $message")
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                }
+            )
         }
     }
 

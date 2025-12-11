@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_secondary_900"
-    android:id="@+id/nsv_conditionPredictionForm"
-    android:padding="8dp"
-    tools:context=".fragments.PredictionKondisiTanaman">
+    android:padding="12dp"
+    tools:context=".fragments.PredictFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,31 +19,27 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:gravity="center"
             android:text="Condition Prediction"
             android:textColor="@color/text_primary_900"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textSize="22sp" />
 
+        <!-- FIELD PICKER -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:fontFamily="@font/lato_bold"
             android:text="Field"
             android:textColor="@color/text_primary_900"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusTopStart="8dp"
             app:endIconMode="dropdown_menu"
             app:hintEnabled="false">
 
@@ -51,186 +47,141 @@
                 android:id="@+id/input_lahan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/bg_primary_500"
-                android:fontFamily="@font/lato_regular"
                 android:hint="Choose field"
-                android:paddingBottom="12dp"
-                android:paddingEnd="16dp"
-                android:paddingStart="16dp"
-                android:paddingTop="12dp"
                 android:textColor="@color/text_primary_900"
                 android:textColorHint="@color/text_500"
-                android:textSize="16sp" />
+                android:padding="12dp"
+                android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Label for Luas Field -->
+        <!-- HARVEST AREA -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:fontFamily="@font/lato_bold"
             android:text="Harvest Area (Ha)"
             android:textColor="@color/text_primary_900"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp" />
 
-        <!-- Luas Field (Area) -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusTopStart="8dp"
             app:hintEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etLuasField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/lato_regular"
                 android:hint="Total harvested area (Ha)"
                 android:inputType="numberDecimal"
-                android:paddingBottom="12dp"
-                android:paddingEnd="16dp"
-                android:paddingStart="16dp"
-                android:paddingTop="12dp"
                 android:textColor="@color/text_primary_900"
-                android:textSize="16sp" />
+                android:padding="12dp"
+                android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Label for Jenis Bibit -->
+        <!-- RAINFALL -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:fontFamily="@font/lato_bold"
-            android:text="Palm Type"
+            android:text="Rainfall (mm)"
             android:textColor="@color/text_primary_900"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp" />
 
-        <!-- Jenis Bibit -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusTopStart="8dp"
             app:hintEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etJenisBibit"
+                android:id="@+id/etCurahHujan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/lato_regular"
-                android:hint="Tenera"
-                android:inputType="text"
-                android:paddingBottom="12dp"
-                android:paddingEnd="16dp"
-                android:paddingStart="16dp"
-                android:paddingTop="12dp"
+                android:hint="55"
+                android:inputType="numberDecimal"
                 android:textColor="@color/text_primary_900"
-                android:textSize="16sp" />
+                android:padding="12dp"
+                android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Label for Jenis Pupuk -->
+        <!-- Total Harvest (Asli) -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:fontFamily="@font/lato_bold"
-            android:text="Fertilizer Type"
+            android:text="Total Harvest"
             android:textColor="@color/text_primary_900"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp" />
 
-        <!-- Jenis Pupuk -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusTopStart="8dp"
             app:hintEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etJenisPupuk"
+                android:id="@+id/etHasilPanen"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/lato_regular"
-                android:hint="NPK Fertilizer"
-                android:inputType="text"
-                android:paddingBottom="12dp"
-                android:paddingEnd="16dp"
-                android:paddingStart="16dp"
-                android:paddingTop="12dp"
+                android:hint="120"
+                android:inputType="numberDecimal"
                 android:textColor="@color/text_primary_900"
-                android:textSize="16sp" />
+                android:padding="12dp"
+                android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- TON & TAHUN (Row Layout) -->
+        <!-- TEMPERATURE INPUT -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:orientation="horizontal"
-            android:weightSum="2">
+            android:weightSum="2"
+            android:layout_marginTop="12dp">
 
-            <!-- Ton (Weight) -->
+            <!-- TMIN -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
                 android:layout_weight="1"
+                android:layout_marginEnd="6dp"
                 android:orientation="vertical">
 
-                <!-- Label for Ton -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:fontFamily="@font/lato_bold"
-                    android:text="Total Harvested (ton)"
+                    android:text="Min Temperature (°C)"
                     android:textColor="@color/text_primary_900"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:boxCornerRadiusBottomEnd="8dp"
-                    app:boxCornerRadiusBottomStart="8dp"
-                    app:boxCornerRadiusTopEnd="8dp"
-                    app:boxCornerRadiusTopStart="8dp"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etTon"
+                        android:id="@+id/etTmin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato_regular"
-                        android:hint="17.7"
+                        android:hint="23.2"
                         android:inputType="numberDecimal"
-                        android:paddingBottom="12dp"
-                        android:paddingEnd="16dp"
-                        android:paddingStart="16dp"
-                        android:paddingTop="12dp"
                         android:textColor="@color/text_primary_900"
-                        android:textSize="16sp" />
+                        android:padding="12dp"
+                        android:textSize="13sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- Tahun (Year) -->
+            <!-- TMAX -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -241,154 +192,45 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:fontFamily="@font/lato_bold"
-                    android:text="Year Harvested"
+                    android:text="Max Temperature (°C)"
                     android:textColor="@color/text_primary_900"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:boxCornerRadiusBottomEnd="8dp"
-                    app:boxCornerRadiusBottomStart="8dp"
-                    app:boxCornerRadiusTopEnd="8dp"
-                    app:boxCornerRadiusTopStart="8dp"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etTahun"
+                        android:id="@+id/etTmax"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato_regular"
-                        android:hint="2025"
-                        android:inputType="number"
-                        android:maxLength="4"
-                        android:paddingBottom="12dp"
-                        android:paddingEnd="16dp"
-                        android:paddingStart="16dp"
-                        android:paddingTop="12dp"
-                        android:textColor="@color/text_primary_900"
-                        android:textSize="16sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- UMUR SAWIT & CURAH HUJAN (Row Layout) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <!-- Umur Sawit (Palm Age) -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <!-- Label for Umur Sawit -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:fontFamily="@font/lato_bold"
-                    android:text="Palm Age (months)"
-                    android:textColor="@color/text_primary_900"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:boxCornerRadiusBottomEnd="8dp"
-                    app:boxCornerRadiusBottomStart="8dp"
-                    app:boxCornerRadiusTopEnd="8dp"
-                    app:boxCornerRadiusTopStart="8dp"
-                    app:hintEnabled="false">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etUmurSawit"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato_regular"
-                        android:hint="38"
-                        android:inputType="number"
-                        android:paddingBottom="12dp"
-                        android:paddingEnd="16dp"
-                        android:paddingStart="16dp"
-                        android:paddingTop="12dp"
-                        android:textColor="@color/text_primary_900"
-                        android:textSize="16sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
-            <!-- Curah Hujan (Rainfall) -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <!-- Label for Curah Hujan -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:fontFamily="@font/lato_bold"
-                    android:text="Rainfall (mm)"
-                    android:textColor="@color/text_primary_900"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:boxCornerRadiusBottomEnd="8dp"
-                    app:boxCornerRadiusBottomStart="8dp"
-                    app:boxCornerRadiusTopEnd="8dp"
-                    app:boxCornerRadiusTopStart="8dp"
-                    app:hintEnabled="false">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etCurahHujan"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato_regular"
-                        android:hint="55"
+                        android:hint="34.7"
                         android:inputType="numberDecimal"
-                        android:paddingBottom="12dp"
-                        android:paddingEnd="16dp"
-                        android:paddingStart="16dp"
-                        android:paddingTop="12dp"
                         android:textColor="@color/text_primary_900"
-                        android:textSize="16sp" />
+                        android:padding="12dp"
+                        android:textSize="13sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- TOMBOL PREDIKSI -->
+
+
+        <!-- BUTTON -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_predict"
-            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:backgroundTint="@color/bg_primary_500"
-            android:paddingVertical="12dp"
+            android:layout_marginTop="20dp"
             android:text="PREDICT"
-            android:textSize="18sp"
-            android:fontFamily="@font/lato_bold"
             android:textColor="@color/white"
-            app:cornerRadius="64dp" />
+            android:paddingVertical="12dp"
+            app:cornerRadius="16dp"
+            android:backgroundTint="@color/bg_primary_500" />
 
     </LinearLayout>
+
 </androidx.core.widget.NestedScrollView>
