@@ -1,9 +1,14 @@
 package com.example.sawit.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawit.models.Activity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,25 +24,87 @@ class ActivityViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-
     sealed class Event {
         data class ShowMessage(val message: String) : Event()
     }
 
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val currentUserId: String
+        get() = auth.currentUser?.uid ?: ""
     private val databaseRef =
-        FirebaseDatabase.getInstance("https://sawit-6876f-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("activities")
+        FirebaseDatabase.getInstance("https://sawit-6876f-default-rtdb.asia-southeast1.firebasedatabase.app/")
+            .getReference("activities")
+    private lateinit var activityListener: ValueEventListener
+    private var isListenerInitialized = false
 
 //    init {
 //        loadHardcodedActivities()
 //    }
 
+    fun listenForActivitiesUpdate() {
+        if (isListenerInitialized || currentUserId.isEmpty()) {
+            if (currentUserId.isEmpty()) {
+                Log.e("ActivityViewModel", "Cannot start listening: User ID is missing!")
+            }
+            return
+        }
+
+        val activitiesByUser = databaseRef.orderByChild("userId").equalTo(currentUserId)
+
+        activityListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val activitiesList = mutableListOf<Activity>()
+                for (activitySnapshot in snapshot.children) {
+                    try {
+                        val activity = activitySnapshot.getValue(Activity::class.java)
+                        activity?.let { activitiesList.add(it) }
+                    } catch (e: Exception) {
+                        Log.e("ActivityViewModel", "Parsing error in listener: ${e.message}")
+                    }
+                }
+
+                viewModelScope.launch {
+                    _activities.value = activitiesList // Update StateFlow with live data
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("ActivityViewModel", "Database listener cancelled: ${error.message}")
+                viewModelScope.launch {
+                    _eventChannel.send(Event.ShowMessage("Failed to fetch activities: ${error.message}"))
+                }
+            }
+        }
+
+        activitiesByUser.addValueEventListener(activityListener)
+        isListenerInitialized = true
+        Log.d(
+            "ActivityViewModel",
+            "Firebase listener for user ${currentUserId}'s activities was added"
+        )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (isListenerInitialized) {
+            val userSpecificQuery = databaseRef.orderByChild("userId").equalTo(currentUserId)
+            userSpecificQuery.removeEventListener(activityListener)
+            Log.d("ActivityViewModel", "Firebase listener for activities was removed.")
+        }
+    }
+
     fun createNewActivity(activity: Activity) {
+        if (currentUserId.isEmpty()) {
+            viewModelScope.launch { _eventChannel.send(Event.ShowMessage("Error: Must be logged in to create activity.")) }
+            return
+        }
+
         _isLoading.value = true
         val newKey = databaseRef.push().key
 
         if (newKey != null) {
-            activity.id = newKey
-            databaseRef.child(newKey).setValue(activity)
+            val activityToSave = activity.copy(id = newKey, userId = currentUserId)
+            databaseRef.child(newKey).setValue(activityToSave)
                 .addOnSuccessListener {
                     viewModelScope.launch {
                         _eventChannel.send(Event.ShowMessage("Successfully created new activity!"))
@@ -56,6 +123,11 @@ class ActivityViewModel : ViewModel() {
     }
 
     fun updateActivity(activity: Activity) {
+        if (currentUserId.isEmpty() || activity.userId != currentUserId) {
+            viewModelScope.launch { _eventChannel.send(Event.ShowMessage("Error: Cannot update activity you do not own.")) }
+            return
+        }
+
         _isLoading.value = true
         val activityId = activity.id
 
@@ -84,8 +156,16 @@ class ActivityViewModel : ViewModel() {
         }
     }
 
-    fun deleteActivity(id: String?) {
-        _activities.value = _activities.value.filter { it.id != id }
+    fun deleteActivity(activityId: String?) {
+        if (activityId == null || currentUserId.isEmpty()) return
+        databaseRef.child(activityId).removeValue()
+            .addOnSuccessListener {
+                viewModelScope.launch { _eventChannel.send(Event.ShowMessage("Activity deleted successfully!")) }
+            }
+            .addOnFailureListener { e ->
+                viewModelScope.launch { _eventChannel.send(Event.ShowMessage("Failed to delete activity.")) }
+            }
+//        _activities.value = _activities.value.filter { it.id != id }
     }
 
     fun loadHardcodedActivities() {

@@ -12,6 +12,7 @@ data class Field(
     @DocumentId
     @PrimaryKey
     var fieldId: String = "",
+    val userId: String = "",
     val fieldPhotoPath: String? = null,
     val fieldName: String = "",
     val fieldArea: Double? = null,

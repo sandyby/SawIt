@@ -1,4 +1,3 @@
-// File: com/example/sawit/fragments/PredictionKondisiTanaman.kt
 package com.example.sawit.fragments
 
 import android.os.Bundle
@@ -12,17 +11,15 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.sawit.R
 import com.example.sawit.databinding.FragmentPredictionKondisiTanamanBinding
-import com.example.sawit.viewmodels.PredictionViewModel // <-- Import ViewModel Prediksi
+import com.example.sawit.viewmodels.PredictionViewModel
 
 class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_tanaman) {
 
     private var _binding: FragmentPredictionKondisiTanamanBinding? = null
     private val binding get() = _binding!!
 
-    // Inisialisasi PredictionViewModel
     private val predictionViewModel: PredictionViewModel by viewModels()
 
-    // Kunci argumen untuk navigasi
     companion object {
         const val ARG_CONDITION_LABEL = "condition_label"
         const val ARG_PREDICTED_YIELD = "predicted_yield"

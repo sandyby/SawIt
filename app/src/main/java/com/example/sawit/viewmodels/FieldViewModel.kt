@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawit.models.Field
 import com.example.sawit.models.FieldLocation
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -25,6 +26,8 @@ class FieldViewModel : ViewModel() {
     val events = _eventChannel.receiveAsFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+    private val currentUserId: String
+        get() = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
     sealed class Event {
         data class ShowMessage(val message: String) : Event()
@@ -36,13 +39,23 @@ class FieldViewModel : ViewModel() {
             .getReference("fields")
 
     private lateinit var fieldListener: ValueEventListener
+    private var isListenerInitialized: Boolean = false
 
     init {
 //        populateData()
         listenForFieldsUpdates()
     }
 
-    private fun listenForFieldsUpdates() {
+    fun listenForFieldsUpdates() {
+        if (isListenerInitialized || currentUserId.isEmpty()) {
+            if (currentUserId.isEmpty()) {
+                Log.e("FieldViewModel", "User ID is missing!")
+            }
+            return
+        }
+
+        val fieldsByUserQuery = databaseRef.orderByChild("userId").equalTo(currentUserId)
+
         fieldListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val fieldsList = mutableListOf<Field>()
@@ -68,22 +81,33 @@ class FieldViewModel : ViewModel() {
                 }
             }
         }
-        databaseRef.addValueEventListener(fieldListener)
+        fieldsByUserQuery.addValueEventListener(fieldListener)
+        isListenerInitialized = true
+//        databaseRef.addValueEventListener(fieldListener)
         Log.d("FieldViewModel", "Firebase listener for fields was added")
     }
 
     override fun onCleared() {
         super.onCleared()
-        databaseRef.removeEventListener(fieldListener)
-        Log.d("FieldViewModel", "Firebase listener for fields was removed.")
+//        databaseRef.removeEventListener(fieldListener)
+        if (isListenerInitialized) {
+            val fieldsByUserQuery = databaseRef.orderByChild("userId").equalTo(currentUserId)
+            fieldsByUserQuery.removeEventListener(fieldListener)
+            Log.d("FieldViewModel", "Firebase listener for fields was removed.")
+        }
     }
 
     fun createNewField(field: Field) {
+        if (currentUserId.isEmpty()) {
+            viewModelScope.launch { _eventChannel.send(Event.ShowMessage("Please log in first to create field!")) }
+            return
+        }
+
         _isLoading.value = true
         val newKey = databaseRef.push().key
 
         if (newKey != null) {
-            val fieldToSave = field.copy(fieldId = newKey)
+            val fieldToSave = field.copy(fieldId = newKey, userId = currentUserId)
             databaseRef.child(newKey).setValue(fieldToSave)
                 .addOnSuccessListener {
                     viewModelScope.launch {
@@ -104,6 +128,16 @@ class FieldViewModel : ViewModel() {
     }
 
     fun updateField(field: Field) {
+        if (currentUserId.isEmpty()) {
+            viewModelScope.launch { _eventChannel.send(Event.ShowMessage("Please log in first to update field!")) }
+            return
+        }
+
+        if (field.userId != currentUserId) {
+            viewModelScope.launch { _eventChannel.send(Event.ShowMessage("You don't have access to this field!")) }
+            return
+        }
+
         _isLoading.value = true
         val fieldId = field.fieldId
 
@@ -127,7 +161,13 @@ class FieldViewModel : ViewModel() {
     }
 
     fun deleteField(field: Field, context: Context) {
+        if (currentUserId.isEmpty() || field.userId != currentUserId) {
+            viewModelScope.launch { _eventChannel.send(Event.ShowMessage("Please log in first to delete field!")) }
+            return
+        }
+
         _isLoading.value = true
+
         databaseRef.child(field.fieldId.toString()).removeValue()
             .addOnSuccessListener {
                 deleteLocalImageFile(field.fieldPhotoPath, context)

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,17 +15,17 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
             android:text="Riwayat Prediksi"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:paddingBottom="16dp"/>
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewHistory"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/fragment_card_prediction_history"
-            android:visibility="visible"/>
+            android:visibility="visible"
+            tools:listitem="@layout/fragment_card_prediction_history" />
 
         <TextView
             android:id="@+id/tvEmptyMessage"
@@ -34,8 +33,8 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="Belum ada riwayat prediksi yang tersimpan."
-            android:visibility="gone"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -45,8 +44,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
+        android:backgroundTint="@color/bg_primary_500"
+        android:contentDescription="Make New Prediction"
         app:srcCompat="@drawable/ic_filled_add_24_bg_primary_500"
-        app:tint="@color/white"
-        android:contentDescription="Mulai Prediksi Baru" />
+        app:tint="@color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
