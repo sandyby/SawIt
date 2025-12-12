@@ -19,7 +19,6 @@ class PredictionHistoryAdapter : ListAdapter<Prediction, PredictionHistoryAdapte
     var onItemClicked: ((Prediction) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
-        // Menggunakan kelas binding yang baru
         val binding = FragmentCardPredictionHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return HistoryViewHolder(binding)
     }
@@ -28,7 +27,6 @@ class PredictionHistoryAdapter : ListAdapter<Prediction, PredictionHistoryAdapte
         holder.bind(getItem(position), onItemClicked)
     }
 
-    // Menggunakan kelas binding yang baru di ViewHolder
     class HistoryViewHolder(private val binding: FragmentCardPredictionHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(history: Prediction, clickListener: ((Prediction) -> Unit)?) {
             val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())

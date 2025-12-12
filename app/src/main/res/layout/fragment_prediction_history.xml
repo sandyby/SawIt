@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:background="@color/bg_secondary_900"
     tools:context=".fragments.PredictionHistoryFragment">
 
     <LinearLayout
@@ -15,26 +17,26 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="16dp"
-            android:text="Riwayat Prediksi"
+            android:text="Prediction History"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingBottom="16dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewHistory"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"
-            tools:listitem="@layout/fragment_card_prediction_history" />
+            tools:listitem="@layout/fragment_card_prediction_history"
+            android:visibility="visible"/>
 
         <TextView
             android:id="@+id/tvEmptyMessage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="Belum ada riwayat prediksi yang tersimpan."
-            android:textSize="16sp"
-            android:visibility="gone" />
+            android:text="There are no saved prediction history."
+            android:visibility="gone"
+            android:textSize="16sp"/>
 
     </LinearLayout>
 
@@ -44,9 +46,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:backgroundTint="@color/bg_primary_500"
-        android:contentDescription="Make New Prediction"
-        app:srcCompat="@drawable/ic_filled_add_24_bg_primary_500"
-        app:tint="@color/white" />
+        app:srcCompat="@drawable/ic_filled_add_24_text_primary_900"
+        app:backgroundTint="@color/bg_primary_500"
+        app:tint="@color/white"
+        android:contentDescription="Start New Prediction" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
