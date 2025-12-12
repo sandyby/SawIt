@@ -11,14 +11,17 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.sawit.R
 import com.example.sawit.databinding.FragmentPredictionKondisiTanamanBinding
-import com.example.sawit.viewmodels.PredictionViewModel
+import com.example.sawit.viewmodels.PredictionViewModel // <-- Import ViewModel Prediksi
 
 class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_tanaman) {
 
     private var _binding: FragmentPredictionKondisiTanamanBinding? = null
     private val binding get() = _binding!!
+
+    // Inisialisasi PredictionViewModel
     private val predictionViewModel: PredictionViewModel by viewModels()
 
+    // Kunci argumen untuk navigasi
     companion object {
         const val ARG_CONDITION_LABEL = "condition_label"
         const val ARG_PREDICTED_YIELD = "predicted_yield"
@@ -37,9 +40,11 @@ class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_t
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val lahanList = arrayOf("Lahan 1", "Lahan Manjur Sukses")
+
+        val lahanList = arrayOf("Lahan 1", "Lahan Manjur Sukses") // Data Dropdown
         val adapter = ArrayAdapter(requireContext(), R.layout.dropdown_item, lahanList)
         binding.inputLahan.setAdapter(adapter)
+
 
         binding.btnPredict.setOnClickListener {
 
@@ -50,13 +55,15 @@ class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_t
             val tminStr = binding.etTmin.text.toString().trim()
             val tmaxStr = binding.etTmax.text.toString().trim()
 
+            // 1. Validasi Input Kosong
             if (lahan.isEmpty() || luasStr.isEmpty() || curahHujanStr.isEmpty() ||
                 hasilPanenActualStr.isEmpty() || tminStr.isEmpty() || tmaxStr.isEmpty()
             ) {
-                Toast.makeText(requireContext(), "All data must be filled", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Semua field harus diisi!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
+            // 2. Konversi ke Float dan Validasi Angka
             val luas = luasStr.toFloatOrNull()
             val curahHujan = curahHujanStr.toFloatOrNull()
             val hasilPanenActual = hasilPanenActualStr.toFloatOrNull()
@@ -66,10 +73,11 @@ class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_t
             if (luas == null || curahHujan == null || hasilPanenActual == null ||
                 tmin == null || tmax == null
             ) {
-                Toast.makeText(requireContext(), "Number has to be in a valid format", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Input harus berupa angka yang valid!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
+            // Panggil ViewModel untuk Prediksi dan Simpan Data
             predictionViewModel.predictAndSaveKondisiTanaman(
                 fieldName = lahan,
                 tmin = tmin,
@@ -78,6 +86,7 @@ class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_t
                 area = luas,
                 actualYield = hasilPanenActual,
                 onSuccess = { conditionLabel, predictedYield, gapPercentage ->
+                    // 3. Navigasi ke ResultKondisiTanaman Fragment
                     val resultFragment = ResultKondisiTanaman().apply {
                         arguments = Bundle().apply {
                             putString(ARG_CONDITION_LABEL, conditionLabel)
@@ -93,7 +102,7 @@ class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_t
                         .commit()
                 },
                 onError = { message ->
-                    Log.e("PredictionKondisiTanaman", "Error: $message")
+                    Log.e("KondisiTanaman", "Error: $message")
                     Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                 }
             )

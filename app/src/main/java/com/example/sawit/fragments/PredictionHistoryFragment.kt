@@ -46,10 +46,10 @@ class PredictionHistoryFragment : Fragment(R.layout.fragment_prediction_history)
             }
         }
 
-        binding.fabPredict.setOnClickListener {6
+        binding.fabPredict.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fl_scroll_view_content, PredictFragment())
-                .addToBackStack(null)
+                .addToBackStack(null) // Tambahkan ke back stack agar bisa kembali
                 .commit()
         }
     }

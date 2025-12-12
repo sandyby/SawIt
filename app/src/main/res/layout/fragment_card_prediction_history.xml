@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@color/bg_primary_400"
         android:padding="16dp">
 
         <LinearLayout
@@ -26,15 +27,16 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="16sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                tools:text="Total Panen"/>
+                tools:text="Total Harvest"/>
 
             <TextView
                 android:id="@+id/tvHistoryDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
+                android:textColor="@color/white"
                 tools:text="05 Des 2025, 14:30"/>
         </LinearLayout>
 
@@ -44,6 +46,7 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:layout_marginTop="4dp"
+            android:textColor="@color/white"
             tools:text="Lahan Manjur Sukses"/>
 
         <TextView
@@ -51,9 +54,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:textStyle="italic"
+            android:textStyle="bold"
             android:layout_marginTop="4dp"
-            tools:text="Prediksi: 85.200 kg"/>
+            android:textColor="@android:color/white"
+            tools:text="Prediction: 85.200 kg"/>
 
         <TextView
             android:id="@+id/tvCondition"
@@ -63,7 +67,7 @@
             android:padding="4dp"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            tools:text="Kondisi: Baik"
+            tools:text="Condition: Good"
             android:visibility="gone"/>
 
     </LinearLayout>

@@ -1,26 +1,26 @@
+// File: com/example/sawit/viewmodels/PredictionViewModel.kt
 package com.example.sawit.viewmodels
 
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sawit.ml.PredictionUtils
+import com.example.sawit.ml.PredictionUtils // Asumsi Anda memiliki kelas ini
 import com.example.sawit.models.Prediction
-import com.example.sawit.data.roaming.PredictionHistoryManager
+import com.example.sawit.data.roaming.PredictionHistoryManager // <--- Menggunakan Manager Baru
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * ViewModel ini bertanggung jawab untuk menjalankan logika Prediksi ML
- * dan berkomunikasi dengan PredictionHistoryManager untuk penyimpanan hasil.
- */
+
 class PredictionViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val historyManager = PredictionHistoryManager()
+    private val historyManager = PredictionHistoryManager() // <--- Menggunakan Manager Baru
 
     private val context: Context
         get() = getApplication<Application>().applicationContext
+
 
     fun predictAndSaveTotalPanen(
         fieldName: String, tmin: Float, tmax: Float, rainfall: Float, area: Float,
@@ -34,7 +34,7 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
 
                 val historyEntry = Prediction(
                     fieldName = fieldName,
-                    predictionType = "Total Harvest",
+                    predictionType = "Total Panen",
                     predictedYield = predictedYield,
                     tmin = tmin, tmax = tmax, rainfall = rainfall, area = area
                 )
@@ -43,10 +43,11 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
                 onSuccess(predictedYield)
 
             } catch (e: Exception) {
-                onError("Failed to predict total harvest: ${e.message}")
+                onError("Gagal prediksi Total Panen: ${e.message}")
             }
         }
     }
+
 
     fun predictAndSaveKondisiTanaman(
         fieldName: String, tmin: Float, tmax: Float, rainfall: Float, area: Float, actualYield: Float,
@@ -68,7 +69,7 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
 
                 val historyEntry = Prediction(
                     fieldName = fieldName,
-                    predictionType = "Condition",
+                    predictionType = "Kondisi",
                     predictedYield = predictedYield,
                     actualYield = actualYield,
                     conditionLabel = conditionLabel,
@@ -80,7 +81,7 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
                 onSuccess(conditionLabel, predictedYield, gapPercentage)
 
             } catch (e: Exception) {
-                onError("Failed to predict tree condition: ${e.message}")
+                onError("Gagal prediksi Kondisi Tanaman: ${e.message}")
             }
         }
     }

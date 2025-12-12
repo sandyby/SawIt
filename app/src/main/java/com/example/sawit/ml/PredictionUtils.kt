@@ -1,7 +1,7 @@
 package com.example.sawit.ml
 
 import android.content.Context
-import ai.onnxruntime.* // Mengaktifkan ONNX Runtime
+import ai.onnxruntime.*
 import java.nio.FloatBuffer
 
 object PredictionUtils {
@@ -23,13 +23,14 @@ object PredictionUtils {
         val tensor = OnnxTensor.createTensor(OrtEnvironment.getEnvironment(), FloatBuffer.wrap(inputArray), INPUT_SHAPE)
 
         val result = session.run(mapOf(INPUT_NAME to tensor))
-
         val outputIndex = (result.get(0).value as LongArray)[0].toInt()
 
         result.close()
         return outputIndex
     }
 
+
+    // Fungsi Prediksi Yield (Hasil Panen)
     fun predictYield(
         context: Context,
         tmin: Float,
@@ -42,10 +43,11 @@ object PredictionUtils {
 
         val inputArray = floatArrayOf(tmin, tmax, rainfall, area)
 
+        // Membuat tensor dari FloatBuffer
         val tensor = OnnxTensor.createTensor(OrtEnvironment.getEnvironment(), FloatBuffer.wrap(inputArray), INPUT_SHAPE)
 
         val result = session.run(mapOf(INPUT_NAME to tensor))
-
+        // Output dari regressor model adalah FloatArray of [1, 1]
         val output = (result.get(0).value as Array<FloatArray>)[0][0]
 
         result.close()

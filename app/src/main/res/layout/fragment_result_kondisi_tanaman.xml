@@ -18,10 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Plant Condition Analysis"
+            android:gravity="center"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#758B50"
-            android:gravity="center"
+            android:textColor="@color/text_primary_500"
             android:layout_marginBottom="24dp" />
 
         <com.google.android.material.card.MaterialCardView
@@ -38,12 +38,14 @@
                 android:orientation="vertical"
                 android:padding="20dp"
                 android:gravity="center"
-                android:background="#758B50"> <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Plant Condition is Declared"
-                android:textSize="18sp"
-                android:textColor="@android:color/white" />
+                android:background="@color/bg_primary_400">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Plant Condition is Declared"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/tv_condition_label"
@@ -88,16 +90,16 @@
             android:padding="8dp">
 
             <TableRow android:paddingBottom="4dp">
-                <TextView android:text="Gap Persentage" android:textStyle="bold" />
+                <TextView android:text="Gap Percentage" android:textStyle="bold" />
                 <TextView android:id="@+id/tv_gap_percentage_value" android:gravity="end" tools:text="+5.5%" android:textColor="#2196F3" android:textStyle="bold"/>
             </TableRow>
             <TableRow android:paddingBottom="4dp">
                 <TextView android:text="Actual Yield (Input)" android:textStyle="bold" />
-                <TextView android:id="@+id/tv_actual_yield_value" android:gravity="end" tools:text="81.000 kg" />
+                <TextView android:id="@+id/tv_actual_yield_value" android:gravity="end" tools:text="81,000 kg" />
             </TableRow>
             <TableRow>
-                <TextView android:text="Predicted Yield(Model)" android:textStyle="bold" />
-                <TextView android:id="@+id/tv_predicted_yield_value_detail" android:gravity="end" tools:text="85.500 kg" />
+                <TextView android:text="Predicted Yield (Model)" android:textStyle="bold" />
+                <TextView android:id="@+id/tv_predicted_yield_value_detail" android:gravity="end" tools:text="85,500 kg" />
             </TableRow>
         </TableLayout>
 
