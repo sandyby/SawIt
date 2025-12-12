@@ -2,12 +2,14 @@ package com.example.sawit.viewmodels
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawit.models.Field
 import com.example.sawit.models.FieldLocation
 import com.example.sawit.models.User
 import com.google.firebase.Firebase
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -34,6 +36,10 @@ class UserViewModel : ViewModel() {
     val isLoading: StateFlow<Boolean> = _isLoading
     private val _currentUser = MutableStateFlow<FirebaseUser?>(auth.currentUser)
     val currentUser: StateFlow<FirebaseUser?> = _currentUser
+    private val _userProfile = MutableStateFlow<User?>(null)
+    val userProfile: StateFlow<User?> = _userProfile.asStateFlow()
+    private lateinit var userListener: ValueEventListener
+    private var isListenerInitialized: Boolean = false
 
     sealed class AuthEvent {
         data class Success(val user: User) : AuthEvent()
@@ -46,6 +52,45 @@ class UserViewModel : ViewModel() {
     init {
         auth.addAuthStateListener { firebaseAuth ->
             _currentUser.value = firebaseAuth.currentUser
+        }
+    }
+
+    fun listenForUserUpdates() {
+        val userId = auth.currentUser?.uid
+        if (userId.isNullOrEmpty() || isListenerInitialized) {
+            return
+        }
+
+        val userByIdQuery = databaseRef.child(userId)
+
+        userListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val userProfile = snapshot.getValue(User::class.java)
+
+                if (userProfile != null) {
+                    _userProfile.value = userProfile.copy(uid = userId)
+                    Log.d("UserViewModel", "Real-time profile update received for UID: $userId")
+                } else {
+                    _userProfile.value = null
+                    Log.w("UserViewModel", "Real-time update received null data for UID: $userId")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("UserViewModel", "Database listener cancelled: ${error.message}")
+            }
+        }
+        userByIdQuery.addValueEventListener(userListener)
+        isListenerInitialized = true
+        Log.d("UserViewModel", "ValueEventListener attached for UID: $userId")
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (isListenerInitialized && auth.currentUser != null) {
+            databaseRef.child(auth.currentUser!!.uid).removeEventListener(userListener)
+            isListenerInitialized = false
+            Log.d("UserViewModel", "ValueEventListener removed.")
         }
     }
 
@@ -101,7 +146,9 @@ class UserViewModel : ViewModel() {
                 var userProfile = snapshot.getValue(User::class.java)
                 if (snapshot.exists() && userProfile != null) {
                     userProfile = userProfile.copy(uid = uid)
+                    _userProfile.value = userProfile
                     _authEvents.value = AuthEvent.Success(userProfile)
+                    listenForUserUpdates()
                 } else {
                     auth.signOut()
                     _authEvents.value =
@@ -116,7 +163,7 @@ class UserViewModel : ViewModel() {
             }
     }
 
-    private fun saveNewUserProfile(uid: String, email: String, fullName: String) {
+    fun saveNewUserProfile(uid: String, email: String, fullName: String) {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         val userProfile = User(
             uid = uid,
@@ -139,6 +186,7 @@ class UserViewModel : ViewModel() {
                         .addOnSuccessListener {
                             _authEvents.value =
                                 AuthEvent.Error("Registration failed, profile save failed and account was deleted! Please try again.")
+                            refreshUserProfile()
                             _isLoading.value = false
                         }
                         .addOnFailureListener { e ->
@@ -162,6 +210,59 @@ class UserViewModel : ViewModel() {
         auth.signOut()
         _currentUser.value = null
         Log.d("UserViewModel", "User signed out immediately after registration!")
+    }
+
+    fun updatePassword(oldPassword: String, newPassword: String) = viewModelScope.launch {
+        _isLoading.value = true
+        _authEvents.value = null
+
+        val user = auth.currentUser
+        if (user == null) {
+            _authEvents.value = AuthEvent.Error("User not logged in. Please log in again.")
+            _isLoading.value = false
+            return@launch
+        }
+
+        val credential = EmailAuthProvider.getCredential(
+            user.email ?: "",
+            oldPassword
+        )
+
+        user.reauthenticate(credential)
+            .addOnSuccessListener {
+                user.updatePassword(newPassword)
+                    .addOnSuccessListener {
+                        _authEvents.value = AuthEvent.Success(
+                            User(
+                                uid = user.uid,
+                                fullName = user.displayName ?: "",
+                                email = user.email ?: ""
+                            )
+                        )
+//                        refreshUserProfile()
+                        Log.d("UserViewModel", "Password successfully updated.")
+                        _isLoading.value = false
+                    }
+                    .addOnFailureListener { exception ->
+                        _authEvents.value = AuthEvent.Error(
+                            exception.localizedMessage ?: "Failed to update password."
+                        )
+                        _isLoading.value = false
+                    }
+            }
+            .addOnFailureListener { exception ->
+                _authEvents.value = AuthEvent.Error(
+                    "Incorrect current password or login expired. Please check your current password."
+                )
+                _isLoading.value = false
+            }
+    }
+
+    fun refreshUserProfile() {
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            fetchUserProfile(uid)
+        }
     }
 
     fun consumeAuthEvent() {

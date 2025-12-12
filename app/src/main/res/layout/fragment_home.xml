@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/bg_secondary_900"
     android:fillViewport="true">
 
@@ -45,8 +46,8 @@
                     android:textSize="16sp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
                     android:id="@+id/tv_fullName"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/lato_black"
                     android:text="User"
@@ -61,9 +62,9 @@
                 android:layout_weight="1" />
 
             <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/cv_notification"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:id="@+id/cv_notification"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </LinearLayout>
@@ -174,10 +175,12 @@
 
         <TextView
             android:layout_width="wrap_content"
+            android:id="@+id/tv_fields_view_more"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_filled_chevron_right_24_text_primary_900"
             android:fontFamily="@font/lato_bold"
             android:gravity="center_vertical"
+            android:paddingStart="8dp"
             android:text="View More"
             android:textColor="@color/text_primary_900"
             app:layout_constraintEnd_toEndOf="parent"
@@ -188,9 +191,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:clipToPadding="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_fields_label" />
+            app:layout_constraintTop_toBottomOf="@id/tv_fields_label"
+            tools:listitem="@layout/fields_card_item_dashboard"
+            tools:itemCount="2" />
+
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:id="@+id/cl_fields"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/tv_fields_label">-->
+
+<!--            <androidx.recyclerview.widget.RecyclerView-->
+<!--                android:id="@+id/rv_fields_overview"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:visibility="visible"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
 
         <TextView
             android:id="@+id/tv_activities_label"
@@ -207,6 +237,8 @@
 
         <TextView
             android:layout_width="wrap_content"
+            android:id="@+id/tv_activities_view_more"
+            android:paddingStart="8dp"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_filled_chevron_right_24_text_primary_900"
             android:fontFamily="@font/lato_bold"

@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -43,6 +44,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.libraries.places.api.Places
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
@@ -79,6 +82,13 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityCreateFieldsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         WindowCompat.setDecorFitsSystemWindows(window, true)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        showLoading(true)
 
         imagePickerLauncher = registerForActivityResult(
             ActivityResultContracts.GetContent()
@@ -102,6 +112,7 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         setupUI()
         setupListeners()
+        setupMap()
         observeViewModelEvents()
 
         val mapFragment =
@@ -137,6 +148,23 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun setupMap(){
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map_fragment_container) as? SupportMapFragment
+
+        mapFragment?.getMapAsync { googleMap ->
+            lifecycleScope.launch {
+                delay(1200)
+                showLoading(false)
+            }
+        }
+    }
+
+    private fun showLoading(show: Boolean) {
+        val loadingOverlay = binding.cpiLoadingOverlay
+        loadingOverlay.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
     private fun setupListeners() {
         binding.ivBack.setOnClickListener { finish() }
         binding.buttonSave.setOnClickListener { validateAndSaveField() }
@@ -147,6 +175,9 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.uiSettings.isCompassEnabled = true
 
         mMap.setOnMapClickListener { latLng ->
             placeMarker(latLng)
