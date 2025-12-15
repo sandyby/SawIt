@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="180dp"
-    android:layout_height="220dp"
+    android:layout_height="190dp"
+    android:layout_marginEnd="8dp"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="16dp"
-    android:layout_marginEnd="8dp"
     app:cardElevation="0dp"
     app:strokeColor="@color/bg_primary_500"
     app:strokeWidth="1dp">
@@ -23,33 +23,60 @@
             android:src="@drawable/sawit_lahan1"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
+            android:id="@+id/ll_metric_badges"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            app:cardBackgroundColor="@color/bg_primary_500"
-            app:cardCornerRadius="6dp"
-            app:cardElevation="0dp"
+            android:orientation="horizontal"
+            android:padding="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/tv_fields_area_badge"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/lato_bold"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
-                android:textColor="@color/white"
-                android:textSize="10sp"
-                tools:text="12 Ha" />
-        </com.google.android.material.card.MaterialCardView>
+                app:cardBackgroundColor="@color/text_primary_900"
+                app:cardCornerRadius="6dp"
+                app:cardElevation="0dp">
+
+                <TextView
+                    android:id="@+id/tv_fields_area_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lato_bold"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    tools:text="130.0 Ha" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:cardBackgroundColor="@color/text_primary_900"
+                app:cardCornerRadius="6dp"
+                app:cardElevation="0dp">
+
+                <TextView
+                    android:id="@+id/tv_fields_age_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lato_bold"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    tools:text="5 Years Old" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
-            android:paddingHorizontal="5dp"
+            android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_fields_photo">
@@ -68,8 +95,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:layout_marginTop="4dp"
-                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -98,7 +125,7 @@
                 android:layout_marginVertical="8dp"
                 android:ellipsize="end"
                 android:fontFamily="@font/lato_bold"
-                android:maxLines="3"
+                android:maxLines="1"
                 android:text="A little description"
                 android:textColor="@color/bg_primary_500"
                 android:textSize="10sp" />

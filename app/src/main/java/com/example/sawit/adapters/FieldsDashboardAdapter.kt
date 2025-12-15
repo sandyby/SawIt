@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.sawit.R
 import com.example.sawit.models.Field
+import com.example.sawit.utils.formatFieldArea
+import com.example.sawit.utils.formatOilPalmAge
 import java.io.File
 
 class FieldsDashboardAdapter(
@@ -31,15 +33,13 @@ class FieldsDashboardAdapter(
         val tvFieldDesc: TextView = view.findViewById<TextView>(R.id.tv_fields_description)
         val tvFieldLocation: TextView = view.findViewById<TextView>(R.id.tv_fields_location)
         val tvFieldAreaBadge: TextView = view.findViewById<TextView>(R.id.tv_fields_area_badge)
+        val tvFieldAgeBadge: TextView = view.findViewById<TextView>(R.id.tv_fields_age_badge)
 
         fun bind(field: Field) {
             tvFieldName.text = field.fieldName
             tvFieldLocation.text = field.fieldLocation.address
-            tvFieldAreaBadge.text = itemView.context.getString(R.string.fields_area_badge, field.fieldArea)
-//            tvFieldAreaBadge.text = buildString {
-//                append(field.fieldArea.toString())
-//                append(" Ha")
-//            }
+            tvFieldAreaBadge.text = field.fieldArea.formatFieldArea()
+            tvFieldAgeBadge.text = field.avgOilPalmAgeInMonths.formatOilPalmAge()
             tvFieldDesc.text = field.fieldDesc
             if (field.fieldPhotoPath != null) {
                 val imageFile = File(field.fieldPhotoPath)

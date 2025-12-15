@@ -171,13 +171,6 @@ class UserViewModel : ViewModel() {
     ) {
         if (uid.isEmpty()) return
         _isLoading.value = true
-//        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-//        val userProfile = User(
-//            uid = uid,
-//            fullName = fullName,
-//            email = email,
-////            createdAt = dateFormat.format(Date())
-//        )
 
         databaseRef.child(uid).get().addOnSuccessListener { snapshot ->
             val existingUser = snapshot.getValue(User::class.java)
@@ -193,7 +186,6 @@ class UserViewModel : ViewModel() {
 
                 val updatedUser = existingUser.copy(
                     fullName = fullName,
-                    // Email is typically not changed here as it requires Firebase Auth update
                     profilePhotoBase64 = newProfilePhotoBase64 ?: existingUser.profilePhotoBase64,
                     profilePhotoLocalPath = newProfilePhotoLocalPath
                         ?: existingUser.profilePhotoLocalPath
@@ -202,62 +194,22 @@ class UserViewModel : ViewModel() {
                 databaseRef.child(uid).setValue(updatedUser)
                     .addOnSuccessListener {
                         _isLoading.value = false
-//                        viewModelScope.launch {
                         _authEvents.value = AuthEvent.Success(updatedUser)
-//                        }
                     }
                     .addOnFailureListener { e ->
                         Log.e("UserViewModel", "Failed to update profile", e)
                         _isLoading.value = false
-//                        viewModelScope.launch {
-                        _authEvents.value = AuthEvent.Error("Failed to savedata!")
-//                        }
+                        _authEvents.value = AuthEvent.Error("Failed to save data!")
                     }
             } else {
-                // User not found, handle error or log out
                 _isLoading.value = false
-//                viewModelScope.launch {
                 _authEvents.value = AuthEvent.Error("Please log in first!")
-//                }
             }
         }.addOnFailureListener {
             _isLoading.value = false
-//            viewModelScope.launch {
-            _authEvents.value = AuthEvent.Error("Something went wrong while trying to update your profile!")
-            //            }
+            _authEvents.value =
+                AuthEvent.Error("Something went wrong while trying to update your profile!")
         }
-//        val profileRef = databaseRef.child(uid)
-//
-//        profileRef.setValue(userProfile)
-//            .addOnSuccessListener {
-//                _authEvents.value = AuthEvent.Success(userProfile)
-//                _isLoading.value = false
-//            }
-//            .addOnFailureListener { e ->
-//                val authUser = auth.currentUser
-//                if (authUser != null && authUser.uid == uid) {
-//                    authUser.delete()
-//                        .addOnSuccessListener {
-//                            _authEvents.value =
-//                                AuthEvent.Error("Registration failed, profile save failed and account was deleted! Please try again.")
-//                            refreshUserProfile()
-//                            _isLoading.value = false
-//                        }
-//                        .addOnFailureListener { e ->
-//                            _authEvents.value =
-//                                AuthEvent.Error("Registration failed, please contact the developer!")
-//                            Log.e(
-//                                "UserViewModel",
-//                                "Account deletion failedError: ${e.localizedMessage}"
-//                            )
-//                            _isLoading.value = false
-//                        }
-//                } else {
-//                    _authEvents.value =
-//                        AuthEvent.Error("Registration failed (profile save failed).")
-//                    _isLoading.value = false
-//                }
-//            }
     }
 
     fun signOutAfterRegistration() = viewModelScope.launch {
@@ -266,50 +218,42 @@ class UserViewModel : ViewModel() {
         Log.d("UserViewModel", "User signed out immediately after registration!")
     }
 
-    fun uploadProfileImage(context: Context, imageUri: Uri, oldLocalPath: String?) =
+    fun updateImageLocalPath(newLocalPath: String) {
         viewModelScope.launch {
-            _isLoading.value = true
-            _authEvents.value = null
+            userProfile.value?.let { currentUser ->
+                val updatedUser = currentUser.copy(
+                    profilePhotoLocalPath = newLocalPath,
+                    profilePhotoBase64 = null
+                )
 
-            val userId = auth.currentUser?.uid
-            if (userId == null) {
-                _authEvents.value = AuthEvent.Error("User not logged in!")
-                _isLoading.value = false
-                return@launch
+                val updates = mapOf(
+                    "profilePhotoLocalPath" to newLocalPath,
+                    "profilePhotoBase64" to null
+                )
+
+                databaseRef.child(currentUser.uid).updateChildren(updates)
+                    .addOnSuccessListener {
+                        Log.d("UserViewModel", "Local cache path persisted successfully.")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("UserViewModel", "Failed to persist local cache path: $e")
+                    }
             }
-
-            val base64Image = ImageCacheManager.uriToBase64(context, imageUri)
-            if (base64Image.isNullOrEmpty()) {
-                _authEvents.value = AuthEvent.Error("Failed to encode image for upload!")
-                _isLoading.value = false
-                return@launch
-            }
-
-            val newLocalPath = ImageCacheManager.saveUriToLocalCache(context, imageUri)
-            if (newLocalPath == null) {
-                _authEvents.value = AuthEvent.Error("Image Base64 success but local cache failed!")
-                _isLoading.value = false
-                return@launch
-            }
-
-            val updates = hashMapOf<String, Any>(
-                "profilePhotoBase64" to base64Image,
-                "profilePhotoLocalPath" to newLocalPath
-            )
-
-            databaseRef.child(userId).updateChildren(updates)
-                .addOnSuccessListener {
-                    ImageCacheManager.deleteLocalFile(oldLocalPath)
-                    _authEvents.value =
-                        AuthEvent.Success(User(uid = userId, fullName = "", email = ""))
-                    _isLoading.value = false
-                }
-                .addOnFailureListener { e ->
-                    _authEvents.value =
-                        AuthEvent.Error(e.localizedMessage ?: "Database update failed.")
-                    _isLoading.value = false
-                }
         }
+    //        if (uid.isEmpty()) return
+//
+//        val pathUpdate = mapOf("profilePhotoLocalPath" to newLocalPath)
+//
+//        databaseRef.child(uid).updateChildren(
+//            pathUpdate
+//        )
+//            .addOnSuccessListener {
+//                Log.d("UserViewModel", "Updated new local path: $newLocalPath")
+//            }
+//            .addOnFailureListener { e ->
+//                Log.d("UserViewModel", "Failed to update the local path in the DB!")
+//            }
+    }
 
     fun updatePassword(oldPassword: String, newPassword: String) = viewModelScope.launch {
         _isLoading.value = true

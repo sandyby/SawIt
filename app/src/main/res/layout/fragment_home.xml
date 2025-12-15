@@ -255,288 +255,300 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@color/white"
+            android:backgroundTint="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_activities_label">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_activities_timeline"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintTop_toBottomOf="@id/tv_activities_label"
+                tools:itemCount="3"
+                tools:listitem="@layout/activities_timeline_item" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:orientation="vertical"-->
+<!--                android:paddingHorizontal="16dp"-->
+<!--                android:paddingVertical="8dp">-->
 
-                    <com.github.vipulasri.timelineview.TimelineView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        app:endLineColor="@color/bg_primary_500"
-                        app:lineStyle="dash"
-                        app:lineWidth="2dp"
-                        app:marker="@drawable/timeline_marker_ring_upcoming"
-                        app:markerSize="20dp"
-                        app:startLineColor="@android:color/transparent" />
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="center_vertical"-->
+<!--                    android:orientation="horizontal">-->
 
-                    <TextView
-                        android:layout_width="72dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="8dp"
-                        android:fontFamily="@font/lato_bold"
-                        android:text="27/10/2025"
-                        android:textSize="12sp" />
+<!--                    <com.github.vipulasri.timelineview.TimelineView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        app:endLineColor="@color/bg_primary_500"-->
+<!--                        app:lineStyle="dash"-->
+<!--                        app:lineWidth="2dp"-->
+<!--                        app:marker="@drawable/timeline_marker_ring_upcoming"-->
+<!--                        app:markerSize="20dp"-->
+<!--                        app:startLineColor="@android:color/transparent" />-->
 
-                    <com.google.android.material.card.MaterialCardView
-                        style="@style/CustomActivitiesCardItemViewStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="4dp"
-                        android:layout_weight="1"
-                        android:background="@color/text_primary_900"
-                        android:backgroundTint="@color/text_primary_900">
+<!--                    <TextView-->
+<!--                        android:layout_width="72dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginHorizontal="8dp"-->
+<!--                        android:fontFamily="@font/lato_bold"-->
+<!--                        android:text="27/10/2025"-->
+<!--                        android:textSize="12sp" />-->
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="8dp">
+<!--                    <com.google.android.material.card.MaterialCardView-->
+<!--                        style="@style/CustomActivitiesCardItemViewStyle"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginVertical="4dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@color/text_primary_900"-->
+<!--                        android:backgroundTint="@color/text_primary_900">-->
 
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
+<!--                        <LinearLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="match_parent"-->
+<!--                            android:gravity="center_vertical"-->
+<!--                            android:orientation="horizontal"-->
+<!--                            android:padding="8dp">-->
 
-
-                                <TextView
-                                    android:id="@+id/tv_activities_field_name"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:alpha="0.8"
-                                    android:ellipsize="end"
-                                    android:fontFamily="@font/lato_italic"
-                                    android:maxLines="1"
-                                    android:text="Lahan Manjur Sukses"
-                                    android:textColor="@color/text_100"
-                                    android:textSize="14sp"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent" />
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:fontFamily="@font/lato_bold"
-                                    android:maxLines="1"
-                                    android:text="Harvesting Crops"
-                                    android:textColor="@color/bg_secondary_900"
-                                    android:textSize="20sp"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@id/tv_activities_field_name" />
-
-                            </LinearLayout>
-
-                            <ImageButton
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:background="@android:color/transparent"
-                                android:contentDescription="View Details"
-                                android:padding="8dp"
-                                android:scaleType="center"
-                                android:src="@drawable/ic_filled_chevron_right_36_white" />
-
-                        </LinearLayout>
+<!--                            <LinearLayout-->
+<!--                                android:layout_width="0dp"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_weight="1"-->
+<!--                                android:orientation="vertical">-->
 
 
-                    </com.google.android.material.card.MaterialCardView>
+<!--                                <TextView-->
+<!--                                    android:id="@+id/tv_activities_field_name"-->
+<!--                                    android:layout_width="match_parent"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:alpha="0.8"-->
+<!--                                    android:ellipsize="end"-->
+<!--                                    android:fontFamily="@font/lato_italic"-->
+<!--                                    android:maxLines="1"-->
+<!--                                    android:text="Lahan Manjur Sukses"-->
+<!--                                    android:textColor="@color/text_100"-->
+<!--                                    android:textSize="14sp"-->
+<!--                                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                                    app:layout_constraintTop_toTopOf="parent" />-->
 
-                </LinearLayout>
+<!--                                <TextView-->
+<!--                                    android:layout_width="match_parent"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:ellipsize="end"-->
+<!--                                    android:fontFamily="@font/lato_bold"-->
+<!--                                    android:maxLines="1"-->
+<!--                                    android:text="Harvesting Crops"-->
+<!--                                    android:textColor="@color/bg_secondary_900"-->
+<!--                                    android:textSize="20sp"-->
+<!--                                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                                    app:layout_constraintTop_toBottomOf="@id/tv_activities_field_name" />-->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+<!--                            </LinearLayout>-->
 
-                    <com.github.vipulasri.timelineview.TimelineView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        app:endLineColor="@color/bg_primary_500"
-                        app:lineWidth="2dp"
-                        app:marker="@drawable/timeline_marker_ring_today"
-                        app:markerInCenter="true"
-                        app:markerSize="20dp"
-                        app:startLineColor="@color/bg_primary_500"
-                        app:startLineStyle="dashed" />
+<!--                            <ImageButton-->
+<!--                                android:layout_width="36dp"-->
+<!--                                android:layout_height="36dp"-->
+<!--                                android:background="@android:color/transparent"-->
+<!--                                android:contentDescription="View Details"-->
+<!--                                android:padding="8dp"-->
+<!--                                android:scaleType="center"-->
+<!--                                android:src="@drawable/ic_filled_chevron_right_36_white" />-->
 
-                    <TextView
-                        android:layout_width="72dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="8dp"
-                        android:fontFamily="@font/lato_bold"
-                        android:text="07/10/2025"
-                        android:textSize="12sp" />
-
-
-                    <com.google.android.material.card.MaterialCardView
-                        style="@style/CustomActivitiesCardItemViewStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="4dp"
-                        android:layout_weight="1"
-                        android:background="@color/text_primary_900"
-                        android:backgroundTint="@color/text_primary_900">
-
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="8dp">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:alpha="0.8"
-                                    android:ellipsize="end"
-                                    android:fontFamily="@font/lato_italic"
-                                    android:maxLines="1"
-                                    android:text="Lahan 1 lorem ipsum dolor si amet lorem ipsum dolor si amet"
-                                    android:textColor="@color/text_100"
-                                    android:textSize="14sp"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent" />
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:fontFamily="@font/lato_bold"
-                                    android:maxLines="1"
-                                    android:text="Watering Crops"
-                                    android:textColor="@color/bg_secondary_900"
-                                    android:textSize="20sp"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@id/tv_activities_field_name" />
-
-                            </LinearLayout>
-
-                            <ImageButton
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:background="@android:color/transparent"
-                                android:padding="8dp"
-                                android:scaleType="center"
-                                android:src="@drawable/ic_filled_chevron_right_36_white" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <com.github.vipulasri.timelineview.TimelineView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        app:endLineColor="@android:color/transparent"
-                        app:lineWidth="2dp"
-                        app:markerInCenter="false"
-                        app:markerPaddingTop="24dp"
-                        app:markerSize="20dp"
-                        app:startLineColor="@color/bg_primary_500"
-                        app:startLineStyle="normal" />
-
-                    <TextView
-                        android:layout_width="72dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="8dp"
-                        android:fontFamily="@font/lato_bold"
-                        android:text="20/09/2025"
-                        android:textSize="12sp" />
-
-                    <com.google.android.material.card.MaterialCardView
-                        style="@style/CustomActivitiesCardItemViewStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="4dp"
-                        android:layout_weight="1"
-                        android:background="@color/text_primary_900"
-                        android:backgroundTint="@color/text_primary_900">
+<!--                        </LinearLayout>-->
 
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="8dp">
+<!--                    </com.google.android.material.card.MaterialCardView>-->
 
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
+<!--                </LinearLayout>-->
 
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:alpha="0.8"
-                                    android:ellipsize="end"
-                                    android:fontFamily="@font/lato_italic"
-                                    android:maxLines="1"
-                                    android:text="Lahan Manjur Sukses"
-                                    android:textColor="@color/text_100"
-                                    android:textSize="14sp"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent" />
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="center_vertical"-->
+<!--                    android:orientation="horizontal">-->
 
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:fontFamily="@font/lato_bold"
-                                    android:maxLines="1"
-                                    android:text="Watering Crops"
-                                    android:textColor="@color/bg_secondary_900"
-                                    android:textSize="20sp"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@id/tv_activities_field_name" />
+<!--                    <com.github.vipulasri.timelineview.TimelineView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        app:endLineColor="@color/bg_primary_500"-->
+<!--                        app:lineWidth="2dp"-->
+<!--                        app:marker="@drawable/timeline_marker_ring_today"-->
+<!--                        app:markerInCenter="true"-->
+<!--                        app:markerSize="20dp"-->
+<!--                        app:startLineColor="@color/bg_primary_500"-->
+<!--                        app:startLineStyle="dashed" />-->
 
-                            </LinearLayout>
-
-                            <ImageButton
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:background="@android:color/transparent"
-                                android:padding="8dp"
-                                android:scaleType="center"
-                                android:src="@drawable/ic_filled_chevron_right_36_white" />
-
-                        </LinearLayout>
+<!--                    <TextView-->
+<!--                        android:layout_width="72dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginHorizontal="8dp"-->
+<!--                        android:fontFamily="@font/lato_bold"-->
+<!--                        android:text="07/10/2025"-->
+<!--                        android:textSize="12sp" />-->
 
 
-                    </com.google.android.material.card.MaterialCardView>
+<!--                    <com.google.android.material.card.MaterialCardView-->
+<!--                        style="@style/CustomActivitiesCardItemViewStyle"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginVertical="4dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@color/text_primary_900"-->
+<!--                        android:backgroundTint="@color/text_primary_900">-->
 
-                </LinearLayout>
-            </LinearLayout>
+
+<!--                        <LinearLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="match_parent"-->
+<!--                            android:gravity="center_vertical"-->
+<!--                            android:orientation="horizontal"-->
+<!--                            android:padding="8dp">-->
+
+<!--                            <LinearLayout-->
+<!--                                android:layout_width="0dp"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_weight="1"-->
+<!--                                android:orientation="vertical">-->
+
+<!--                                <TextView-->
+<!--                                    android:layout_width="match_parent"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:alpha="0.8"-->
+<!--                                    android:ellipsize="end"-->
+<!--                                    android:fontFamily="@font/lato_italic"-->
+<!--                                    android:maxLines="1"-->
+<!--                                    android:text="Lahan 1 lorem ipsum dolor si amet lorem ipsum dolor si amet"-->
+<!--                                    android:textColor="@color/text_100"-->
+<!--                                    android:textSize="14sp"-->
+<!--                                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                                    app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--                                <TextView-->
+<!--                                    android:layout_width="match_parent"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:ellipsize="end"-->
+<!--                                    android:fontFamily="@font/lato_bold"-->
+<!--                                    android:maxLines="1"-->
+<!--                                    android:text="Watering Crops"-->
+<!--                                    android:textColor="@color/bg_secondary_900"-->
+<!--                                    android:textSize="20sp"-->
+<!--                                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                                    app:layout_constraintTop_toBottomOf="@id/tv_activities_field_name" />-->
+
+<!--                            </LinearLayout>-->
+
+<!--                            <ImageButton-->
+<!--                                android:layout_width="36dp"-->
+<!--                                android:layout_height="36dp"-->
+<!--                                android:background="@android:color/transparent"-->
+<!--                                android:padding="8dp"-->
+<!--                                android:scaleType="center"-->
+<!--                                android:src="@drawable/ic_filled_chevron_right_36_white" />-->
+
+<!--                        </LinearLayout>-->
+
+<!--                    </com.google.android.material.card.MaterialCardView>-->
+
+<!--                </LinearLayout>-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="center_vertical"-->
+<!--                    android:orientation="horizontal">-->
+
+<!--                    <com.github.vipulasri.timelineview.TimelineView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        app:endLineColor="@android:color/transparent"-->
+<!--                        app:lineWidth="2dp"-->
+<!--                        app:markerInCenter="false"-->
+<!--                        app:markerPaddingTop="24dp"-->
+<!--                        app:markerSize="20dp"-->
+<!--                        app:startLineColor="@color/bg_primary_500"-->
+<!--                        app:startLineStyle="normal" />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="72dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginHorizontal="8dp"-->
+<!--                        android:fontFamily="@font/lato_bold"-->
+<!--                        android:text="20/09/2025"-->
+<!--                        android:textSize="12sp" />-->
+
+<!--                    <com.google.android.material.card.MaterialCardView-->
+<!--                        style="@style/CustomActivitiesCardItemViewStyle"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginVertical="4dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@color/text_primary_900"-->
+<!--                        android:backgroundTint="@color/text_primary_900">-->
+
+
+<!--                        <LinearLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="match_parent"-->
+<!--                            android:gravity="center_vertical"-->
+<!--                            android:orientation="horizontal"-->
+<!--                            android:padding="8dp">-->
+
+<!--                            <LinearLayout-->
+<!--                                android:layout_width="0dp"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_weight="1"-->
+<!--                                android:orientation="vertical">-->
+
+<!--                                <TextView-->
+<!--                                    android:layout_width="match_parent"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:alpha="0.8"-->
+<!--                                    android:ellipsize="end"-->
+<!--                                    android:fontFamily="@font/lato_italic"-->
+<!--                                    android:maxLines="1"-->
+<!--                                    android:text="Lahan Manjur Sukses"-->
+<!--                                    android:textColor="@color/text_100"-->
+<!--                                    android:textSize="14sp"-->
+<!--                                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                                    app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--                                <TextView-->
+<!--                                    android:layout_width="match_parent"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:ellipsize="end"-->
+<!--                                    android:fontFamily="@font/lato_bold"-->
+<!--                                    android:maxLines="1"-->
+<!--                                    android:text="Watering Crops"-->
+<!--                                    android:textColor="@color/bg_secondary_900"-->
+<!--                                    android:textSize="20sp"-->
+<!--                                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                                    app:layout_constraintTop_toBottomOf="@id/tv_activities_field_name" />-->
+
+<!--                            </LinearLayout>-->
+
+<!--                            <ImageButton-->
+<!--                                android:layout_width="36dp"-->
+<!--                                android:layout_height="36dp"-->
+<!--                                android:background="@android:color/transparent"-->
+<!--                                android:padding="8dp"-->
+<!--                                android:scaleType="center"-->
+<!--                                android:src="@drawable/ic_filled_chevron_right_36_white" />-->
+
+<!--                        </LinearLayout>-->
+
+
+<!--                    </com.google.android.material.card.MaterialCardView>-->
+
+<!--                </LinearLayout>-->
+<!--            </LinearLayout>-->
 
             <!--            <androidx.core.widget.NestedScrollView-->
             <!--                android:id="@+id/iv_activites_timeline"-->
