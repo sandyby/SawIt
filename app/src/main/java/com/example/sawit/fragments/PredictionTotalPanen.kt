@@ -22,8 +22,8 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
     private var _binding: FragmentPredictionTotalPanenBinding? = null
     private val binding get() = _binding!!
 
-    private val fieldViewModel: FieldViewModel by viewModels() // Asumsi ini ada
-    private val predictionViewModel: PredictionViewModel by viewModels() // <-- Inisialisasi PredictionViewModel
+    private val fieldViewModel: FieldViewModel by viewModels()
+    private val predictionViewModel: PredictionViewModel by viewModels()
 
     companion object {
         const val ARG_PREDICTED_YIELD = "predicted_yield"

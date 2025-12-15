@@ -21,14 +21,17 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.bumptech.glide.Glide
 import com.example.sawit.R
 import com.example.sawit.activities.EditPasswordActivity
 import com.example.sawit.activities.EditProfileActivity
 import com.example.sawit.activities.LoginActivity
 import com.example.sawit.databinding.FragmentProfileBinding
+import com.example.sawit.utils.ImageCacheManager
 import com.example.sawit.viewmodels.UserViewModel
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 class ProfileFragment : Fragment() {
@@ -176,26 +179,61 @@ class ProfileFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                // 6. Observe the Real-time User Profile Data
                 launch {
                     userViewModel.userProfile.collect { user ->
                         if (user != null) {
                             binding.tvUserName.text = user.fullName
                             binding.tvUserEmail.text = user.email
 
-                            // Load image if path exists (assuming you save the path to the DB/Prefs)
-                            user.profilePhotoPath?.let { path ->
+                            val localPath = user.profilePhotoLocalPath
+                            val base64String = user.profilePhotoBase64
+
+                            if (ImageCacheManager.isCached(localPath)) {
+                                // 1a. Load from local cache (FAST)
                                 Glide.with(this@ProfileFragment)
-                                    .load(Uri.parse(path)) // Assuming path is a local URI/file path
-                                    .placeholder(R.drawable.ic_profile_placeholder)
+                                    .load(File(localPath!!))
+                                    .placeholder(R.drawable.ic_filled_person_24_secondary_overlay)
                                     .into(binding.ivProfilePic)
                             }
+// 2. If no local cache, check the database Base64 string
+                            else if (!base64String.isNullOrEmpty()) {
+                                // 2a. Fetch from DB (Base64) -> Save to local cache -> Load from cache
+
+                                // Convert Base64 back to file and save locally
+                                val newLocalPath = ImageCacheManager.base64ToLocalCache(requireContext(), base64String)
+
+                                if (newLocalPath != null) {
+                                    // After successfully caching, update the database with the new local path
+                                    // (Optional but ensures persistence if app data is cleared, avoiding Base64 decode next time)
+                                    // userViewModel.updateLocalPathInDb(newLocalPath) // Requires a new VM function
+
+                                    // Load image from the newly created local path
+                                    Glide.with(this@ProfileFragment)
+                                        .load(File(newLocalPath))
+                                        .placeholder(R.drawable.ic_filled_person_24_secondary_overlay)
+                                        .into(binding.ivProfilePic)
+                                } else {
+                                    // Base64 decoding failed
+                                    binding.ivProfilePic.setImageResource(R.drawable.ic_filled_person_24_secondary_overlay)
+                                }
+                            } else {
+                                // 3. Load placeholder
+                                binding.ivProfilePic.setImageResource(R.drawable.ic_filled_person_24_secondary_overlay)
+                            }
+
+                            // Load image if path exists (assuming you save the path to the DB/Prefs)
+//                            user.profilePhotoPath?.let { path ->
+//                                Glide.with(this@ProfileFragment)
+//                                    .load(Uri.parse(path)) // Assuming path is a local URI/file path
+//                                    .placeholder(R.drawable.ic_profile_placeholder)
+//                                    .into(binding.ivProfilePic)
+//                            }
 
                             // Update SharedPreferences in the background (optional, but good for cold start persistence)
                             updateUserPrefs(user.fullName, user.email)
                         } else {
                             // Handle case where user profile data is not found (e.g., failed DB read)
-                            binding.tvUserName.text = "Error Loading Profile"
+                            binding.tvUserName.text = "User"
                         }
                     }
                 }
@@ -204,8 +242,15 @@ class ProfileFragment : Fragment() {
                 launch {
                     userViewModel.currentUser.collect { firebaseUser ->
                         if (firebaseUser == null) {
-                            // Authentication session expired/user logged out
-                            // This might be redundant as logout() already redirects.
+                            userViewModel.logout()
+                            clearUserSession(requireContext())
+
+                            Toast.makeText(requireContext(), "Please log in first!", Toast.LENGTH_SHORT).show()
+
+                            val intent = Intent(requireContext(), LoginActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                            requireActivity().finish()
                         }
                     }
                 }
@@ -227,6 +272,14 @@ class ProfileFragment : Fragment() {
 //        finish()
 //    }
 
+    private fun updateUserPrefs(fullName: String, email: String) {
+        requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE).edit {
+            putString("fullName", fullName)
+            putString("email", email)
+            apply()
+        }
+    }
+
     private fun clearUserSession(context: Context) {
         val authSharedPref =
             context.getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
@@ -238,8 +291,13 @@ class ProfileFragment : Fragment() {
         val userSharedPref =
             requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         userSharedPref.edit {
-            remove("fullName")
-            remove("email")
+            clear()
+            apply()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

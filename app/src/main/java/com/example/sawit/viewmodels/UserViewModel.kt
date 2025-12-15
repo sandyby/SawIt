@@ -1,6 +1,7 @@
 package com.example.sawit.viewmodels
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.sawit.models.Field
 import com.example.sawit.models.FieldLocation
 import com.example.sawit.models.User
+import com.example.sawit.utils.ImageCacheManager
 import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
@@ -210,6 +212,48 @@ class UserViewModel : ViewModel() {
         auth.signOut()
         _currentUser.value = null
         Log.d("UserViewModel", "User signed out immediately after registration!")
+    }
+
+    fun uploadProfileImage(context: Context, imageUri: Uri, oldLocalPath: String?) = viewModelScope.launch {
+        _isLoading.value = true
+        _authEvents.value = null
+
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            _authEvents.value = AuthEvent.Error("User not logged in!")
+            _isLoading.value = false
+            return@launch
+        }
+
+        val base64Image = ImageCacheManager.uriToBase64(context, imageUri)
+        if (base64Image.isNullOrEmpty()) {
+            _authEvents.value = AuthEvent.Error("Failed to encode image for upload!")
+            _isLoading.value = false
+            return@launch
+        }
+
+        val newLocalPath = ImageCacheManager.saveUriToLocalCache(context, imageUri)
+        if (newLocalPath == null) {
+            _authEvents.value = AuthEvent.Error("Image Base64 success but local cache failed!")
+            _isLoading.value = false
+            return@launch
+        }
+
+        val updates = hashMapOf<String, Any>(
+            "profilePhotoBase64" to base64Image,
+            "profilePhotoLocalPath" to newLocalPath
+        )
+
+        databaseRef.child(userId).updateChildren(updates)
+            .addOnSuccessListener {
+                ImageCacheManager.deleteLocalFile(oldLocalPath)
+                _authEvents.value = AuthEvent.Success(User(uid = userId, fullName = "", email = ""))
+                _isLoading.value = false
+            }
+            .addOnFailureListener { e ->
+                _authEvents.value = AuthEvent.Error(e.localizedMessage ?: "Database update failed.")
+                _isLoading.value = false
+            }
     }
 
     fun updatePassword(oldPassword: String, newPassword: String) = viewModelScope.launch {
