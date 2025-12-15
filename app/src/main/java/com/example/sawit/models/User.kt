@@ -8,7 +8,16 @@ data class User(
     val uid: String = "",
     val fullName: String = "",
     val email: String = "",
-    val createdAt: String = ""
+    val createdAt: String = "",
+    val profilePhotoBase64: String? = null,
+    val profilePhotoLocalPath: String? = null
 ) : Parcelable {
-    constructor() : this("", "", "")
+    constructor() : this(
+        uid = "",
+        fullName = "",
+        email = "",
+        createdAt = "",
+        profilePhotoBase64 = null,
+        profilePhotoLocalPath = null
+    )
 }
