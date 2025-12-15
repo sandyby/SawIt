@@ -27,7 +27,7 @@
             android:clickable="true"
             android:contentDescription="Back"
             android:focusable="true"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_filled_keyboard_backspace_24_text_primary_900" />
 
         <TextView
@@ -56,6 +56,7 @@
 
         <ImageView
             android:id="@+id/iv_profile_picture_edit"
+            android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="Profile Picture"

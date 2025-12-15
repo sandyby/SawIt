@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +35,11 @@ class FieldsDashboardAdapter(
         fun bind(field: Field) {
             tvFieldName.text = field.fieldName
             tvFieldLocation.text = field.fieldLocation.address
-            tvFieldAreaBadge.text = field.fieldArea.toString()
+            tvFieldAreaBadge.text = itemView.context.getString(R.string.fields_area_badge, field.fieldArea)
+//            tvFieldAreaBadge.text = buildString {
+//                append(field.fieldArea.toString())
+//                append(" Ha")
+//            }
             tvFieldDesc.text = field.fieldDesc
             if (field.fieldPhotoPath != null) {
                 val imageFile = File(field.fieldPhotoPath)
@@ -70,8 +75,10 @@ class FieldsDashboardAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (currentList.isEmpty()) return VIEW_TYPE_ADD
-        return if (position < currentList.size) VIEW_TYPE_FIELD else VIEW_TYPE_ADD
+        val count = currentList.size.coerceAtMost(2)
+//        if (currentList.isEmpty()) return VIEW_TYPE_ADD
+//        return if (position < currentList.size) VIEW_TYPE_FIELD else VIEW_TYPE_ADD
+        return if (position < count) VIEW_TYPE_FIELD else VIEW_TYPE_ADD
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -109,8 +116,11 @@ class FieldsDashboardAdapter(
 
     override fun getItemCount(): Int {
         val count = currentList.size
-        if (count == 0) return 1
-        return if (count > 2) 2 else 2
+        val fieldCardsToShow = count.coerceAtMost(2)
+        val addCard = 1
+//        if (count == 0) return 1
+//        return if (count > 2) 2 else 2
+        return fieldCardsToShow + addCard
     }
 
     class FieldDiffCallback : DiffUtil.ItemCallback<Field>() {

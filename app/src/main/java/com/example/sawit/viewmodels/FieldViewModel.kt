@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,8 @@ class FieldViewModel : ViewModel() {
     val events = _eventChannel.receiveAsFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+    private val _scrollToFieldId = MutableStateFlow<String?>(null)
+    val scrollToFieldId: StateFlow<String?> = _scrollToFieldId.asStateFlow()
     private val currentUserId: String
         get() = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
@@ -44,6 +47,15 @@ class FieldViewModel : ViewModel() {
     init {
 //        populateData()
         listenForFieldsUpdates()
+    }
+
+    fun setScrollToFieldId(fieldId: String) {
+        _scrollToFieldId.value = fieldId
+    }
+
+    // Function to clear the ID after scrolling
+    fun clearScrollToFieldId() {
+        _scrollToFieldId.value = null
     }
 
     fun listenForFieldsUpdates() {
@@ -111,7 +123,9 @@ class FieldViewModel : ViewModel() {
             databaseRef.child(newKey).setValue(fieldToSave)
                 .addOnSuccessListener {
                     viewModelScope.launch {
+                        setScrollToFieldId(newKey)
                         _eventChannel.send(Event.ShowMessage("Successfully created new field: ${field.fieldName}!"))
+                        delay(1250)
                         _eventChannel.send(Event.FinishActivity)
                     }
                     _isLoading.value = false

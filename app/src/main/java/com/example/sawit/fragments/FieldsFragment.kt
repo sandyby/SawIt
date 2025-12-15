@@ -96,7 +96,6 @@ class FieldsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             fieldViewModel.fieldsData.collectLatest { fields ->
                 adapter.submitList(fields)
-
                 if (fields.isEmpty()) {
                     binding.clEmptyState.visibility = View.VISIBLE
                     binding.rvFieldsFields.visibility = View.GONE
@@ -104,6 +103,14 @@ class FieldsFragment : Fragment() {
                 } else {
                     binding.clEmptyState.visibility = View.GONE
                     binding.rvFieldsFields.visibility = View.VISIBLE
+                }
+                fieldViewModel.scrollToFieldId.value?.let {
+                    targetId ->
+                    val index = fields.indexOfFirst { it.fieldId == targetId }
+                    if (index != -1){
+                        binding.rvFieldsFields.scrollToPosition(index)
+                        fieldViewModel.clearScrollToFieldId()
+                    }
                 }
             }
         }

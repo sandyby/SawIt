@@ -21,15 +21,18 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.bumptech.glide.Glide
 import com.example.sawit.R
 import com.example.sawit.databinding.ActivityEditProfileBinding
 import com.example.sawit.databinding.FragmentFieldsBinding
 import com.example.sawit.databinding.FragmentHomeBinding
+import com.example.sawit.utils.ImageCacheManager
 import com.example.sawit.viewmodels.UserViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import java.io.File
 
 class EditProfileActivity : AppCompatActivity() {
 
@@ -37,14 +40,19 @@ class EditProfileActivity : AppCompatActivity() {
     private val binding get() = _binding!!
     private lateinit var currentFullName: String
     private lateinit var currentEmailAddress: String
+    private var selectedImageUri: Uri? = null
+    private var newPhotoBase64: String? = null
+    private var newPhotoLocalPath: String? = null
     private val userViewModel: UserViewModel by viewModels()
 
     // Launcher untuk memilih gambar dari gallery
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             if (uri != null) {
+                selectedImageUri = uri
                 binding.ivProfilePictureEdit.setImageURI(uri)
-                saveProfilePicToPreferences(uri.toString())
+                //                binding.ivProfilePictureEdit.setImageURI(uri)
+//                saveProfilePicToPreferences(uri.toString())
             }
         }
 
@@ -76,6 +84,9 @@ class EditProfileActivity : AppCompatActivity() {
         binding.tietEmailAddressField.setText(currentEmailAddress)
 
         setupListeners()
+
+        userViewModel.listenForUserUpdates()
+        observeViewModel()
 
 //        binding.ivBack.setOnClickListener {
 //            finish()
@@ -152,6 +163,33 @@ class EditProfileActivity : AppCompatActivity() {
                 newName
             )
         }
+
+        var photoBase64ToSave: String? = null
+        var photoLocalPathToSave: String? = null
+
+        if (selectedImageUri != null) {
+            // 1. Process Image
+            photoBase64ToSave = ImageCacheManager.uriToBase64(this, selectedImageUri!!)
+
+            // 2. Convert Base64 to local cache file (Needed to update the local path in DB)
+            photoLocalPathToSave = photoBase64ToSave?.let { base64 ->
+                ImageCacheManager.base64ToLocalCache(this, base64)
+            }
+
+            if (photoBase64ToSave.isNullOrEmpty() || photoLocalPathToSave.isNullOrEmpty()) {
+                Toast.makeText(this, "Failed to process profile picture!", Toast.LENGTH_SHORT)
+                    .show()
+                // Don't save anything if the image processing failed
+                return
+            }
+        }
+        userViewModel.saveNewUserProfile(
+            currentUser!!.uid,
+            currentEmailAddress,
+            newName,
+            newPhotoBase64,
+            newPhotoLocalPath
+        )
     }
 
     private fun saveProfilePicToPreferences(uri: String) {
@@ -176,6 +214,36 @@ class EditProfileActivity : AppCompatActivity() {
         return true
     }
 
+    private fun loadProfilePicture(localPath: String?, base64String: String?) {
+        val placeholderId = R.drawable.ic_filled_person_24_secondary_overlay
+
+        if (ImageCacheManager.isCached(localPath)) {
+            // 1. Load from local cache (FAST)
+            Glide.with(this)
+                .load(File(localPath!!))
+                .placeholder(placeholderId)
+                .error(placeholderId)
+                .into(binding.ivProfilePictureEdit)
+        } else if (!base64String.isNullOrEmpty()) {
+            // 2. Fetch from DB (Base64) -> Save to local cache -> Load from cache
+            val newLocalPath = ImageCacheManager.base64ToLocalCache(this, base64String)
+
+            if (newLocalPath != null) {
+                Glide.with(this)
+                    .load(File(newLocalPath))
+                    .placeholder(placeholderId)
+                    .error(placeholderId)
+                    .into(binding.ivProfilePictureEdit)
+            } else {
+                // Base64 decoding failed
+                binding.ivProfilePictureEdit.setImageResource(placeholderId)
+            }
+        } else {
+            // 3. Load placeholder
+            binding.ivProfilePictureEdit.setImageResource(placeholderId)
+        }
+    }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -183,6 +251,17 @@ class EditProfileActivity : AppCompatActivity() {
                     userViewModel.isLoading.collect { isLoading ->
                         binding.btnSaveProfile.isEnabled = !isLoading
                         binding.btnSaveProfile.text = if (isLoading) "SAVING..." else "SAVE CHANGES"
+                    }
+                }
+
+                launch {
+                    userViewModel.userProfile.collect { user ->
+                        if (user != null) {
+                            loadProfilePicture(user.profilePhotoLocalPath, user.profilePhotoBase64)
+
+                            binding.tietFullNameField.setText(user.fullName)
+                            binding.tietEmailAddressField.setText(user.email)
+                        }
                     }
                 }
 

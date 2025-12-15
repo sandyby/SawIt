@@ -403,6 +403,7 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
                             }
 
                             is FieldViewModel.Event.FinishActivity -> {
+                                setResult(Activity.RESULT_OK)
                                 finish()
                             }
                         }

@@ -12,6 +12,5 @@
         <item>Pruning</item>
         <item>Pest Control</item>
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="fields_area_badge">%1$.2f Ha</string>
 </resources>

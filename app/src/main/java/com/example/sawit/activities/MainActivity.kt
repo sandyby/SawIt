@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
         transaction.replace(R.id.fl_scroll_view_content, fragment).commit()
     }
 
-    fun showFieldsFragmentWithTransition() {
+    fun navigateToFieldsFragment() {
         val transaction = supportFragmentManager.beginTransaction()
 
         // Use the 4-parameter overload for a smooth slide transition
