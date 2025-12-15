@@ -1,30 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="200dp"
-    android:layout_height="200dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="180dp"
+    android:layout_height="220dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    android:layout_marginEnd="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/bg_primary_500"
+    app:strokeWidth="1dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/iv_fields_photo"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:scaleType="center"
-            android:src="@drawable/sawit_lahan1" />
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/sawit_lahan1"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardBackgroundColor="@color/bg_primary_500"
+            app:cardCornerRadius="6dp"
+            app:cardElevation="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_fields_area_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lato_bold"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                tools:text="12 Ha" />
+        </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="6dp"
-            android:layout_marginVertical="4dp"
-            android:background="@color/white"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="5dp"
+            android:paddingVertical="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_fields_photo">
 
             <TextView
                 android:id="@+id/tv_fields_name"
@@ -33,41 +61,123 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/lato_bold"
                 android:maxLines="2"
-                android:text="Lahan 1sdadsada"
                 android:textColor="@color/text_primary_900"
-                android:textSize="16sp" />
+                android:textSize="14sp"
+                tools:text="Lahan Manjur Sukses" />
 
-            <TextView
-                android:id="@+id/tv_fields_location"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="8dp"
-                android:alpha="0.75"
-                android:drawableStart="@drawable/ic_filled_location_on_12_text_primary_900"
-                android:drawablePadding="2dp"
-                android:ellipsize="end"
-                android:fontFamily="@font/lato_bold"
-                android:maxWidth="80dp"
-                android:maxLines="1"
-                android:text="Kota Tangerang Selatan HSHSHSHSHHSHSHSH"
-                android:textColor="@color/text_primary_900"
-                android:textSize="10sp" />
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_filled_location_on_12_text_primary_900"
+                    app:tint="@color/text_600" />
+
+                <TextView
+                    android:id="@+id/tv_fields_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/lato_regular"
+                    android:maxLines="1"
+                    android:textColor="@color/text_600"
+                    android:textSize="11sp"
+                    tools:text="Ngabang, Kalimantan" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/tv_fields_desc"
+                android:id="@+id/tv_fields_description"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginVertical="8dp"
                 android:ellipsize="end"
                 android:fontFamily="@font/lato_bold"
-                android:maxLines="4"
-                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat dapibus porttitor. Nam laoreet augue blandit, accumsan velit a, rutrum quam. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Morbi eget augue tellus. Proin non arcu ut nulla egestas commodo non ac felis. Nulla pulvinar risus ac orci porttitor, in mollis dolor semper. Duis et tincidunt diam, at sollicitudin quam. Etiam vel purus magna. Etiam euismod turpis enim, sit amet porta tortor posuere non. Ut dictum ligula eu faucibus ultrices. Pellentesque eget nunc nibh."
-                android:textColor="@color/text_primary_900"
+                android:maxLines="3"
+                android:text="A little description"
+                android:textColor="@color/bg_primary_500"
                 android:textSize="10sp" />
 
         </LinearLayout>
 
-    </LinearLayout>
-
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+    <!--<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--    android:layout_width="200dp"-->
+    <!--    android:layout_height="200dp">-->
+
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:background="@color/white"-->
+    <!--        android:orientation="vertical">-->
+
+    <!--        <ImageView-->
+    <!--            android:id="@+id/iv_fields_photo"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="100dp"-->
+    <!--            android:scaleType="center"-->
+    <!--            android:src="@drawable/sawit_lahan1" />-->
+
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginHorizontal="6dp"-->
+    <!--            android:layout_marginVertical="4dp"-->
+    <!--            android:background="@color/white"-->
+    <!--            android:gravity="center_vertical"-->
+    <!--            android:orientation="vertical">-->
+
+    <!--            <TextView-->
+    <!--                android:id="@+id/tv_fields_name"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:ellipsize="end"-->
+    <!--                android:fontFamily="@font/lato_bold"-->
+    <!--                android:maxLines="2"-->
+    <!--                android:text="Lahan 1sdadsada"-->
+    <!--                android:textColor="@color/text_primary_900"-->
+    <!--                android:textSize="16sp" />-->
+
+    <!--            <TextView-->
+    <!--                android:id="@+id/tv_fields_location"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="2dp"-->
+    <!--                android:layout_marginBottom="8dp"-->
+    <!--                android:alpha="0.75"-->
+    <!--                android:drawableStart="@drawable/ic_filled_location_on_12_text_primary_900"-->
+    <!--                android:drawablePadding="2dp"-->
+    <!--                android:ellipsize="end"-->
+    <!--                android:fontFamily="@font/lato_bold"-->
+    <!--                android:maxWidth="80dp"-->
+    <!--                android:maxLines="1"-->
+    <!--                android:text="Kota Tangerang Selatan HSHSHSHSHHSHSHSH"-->
+    <!--                android:textColor="@color/text_primary_900"-->
+    <!--                android:textSize="10sp" />-->
+
+    <!--            <TextView-->
+    <!--                android:id="@+id/tv_fields_desc"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:ellipsize="end"-->
+    <!--                android:fontFamily="@font/lato_bold"-->
+    <!--                android:maxLines="4"-->
+    <!--                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat dapibus porttitor. Nam laoreet augue blandit, accumsan velit a, rutrum quam. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Morbi eget augue tellus. Proin non arcu ut nulla egestas commodo non ac felis. Nulla pulvinar risus ac orci porttitor, in mollis dolor semper. Duis et tincidunt diam, at sollicitudin quam. Etiam vel purus magna. Etiam euismod turpis enim, sit amet porta tortor posuere non. Ut dictum ligula eu faucibus ultrices. Pellentesque eget nunc nibh."-->
+    <!--                android:textColor="@color/text_primary_900"-->
+    <!--                android:textSize="10sp" />-->
+
+    <!--        </LinearLayout>-->
+
+    <!--    </LinearLayout>-->
+
+
+    <!--</com.google.android.material.card.MaterialCardView>-->

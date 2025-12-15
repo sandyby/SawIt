@@ -1,4 +1,3 @@
-// File: com/example/sawit/fragments/PredictionTotalPanen.kt
 package com.example.sawit.fragments
 
 import android.os.Bundle
@@ -13,8 +12,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.sawit.R
 import com.example.sawit.databinding.FragmentPredictionTotalPanenBinding
-import com.example.sawit.viewmodels.FieldViewModel // Asumsi ini ada
-import com.example.sawit.viewmodels.PredictionViewModel // <-- Import ViewModel Prediksi
+import com.example.sawit.viewmodels.FieldViewModel
+import com.example.sawit.viewmodels.PredictionViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -26,7 +25,6 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
     private val fieldViewModel: FieldViewModel by viewModels() // Asumsi ini ada
     private val predictionViewModel: PredictionViewModel by viewModels() // <-- Inisialisasi PredictionViewModel
 
-    // Kunci argumen untuk navigasi
     companion object {
         const val ARG_PREDICTED_YIELD = "predicted_yield"
         const val ARG_TMIN = "tmin"
@@ -46,7 +44,6 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Load dropdown field names (Logika yang sudah ada)
         viewLifecycleOwner.lifecycleScope.launch {
             fieldViewModel.fieldsData.collectLatest { fields ->
                 val fieldNames = fields.map { it.fieldName }
@@ -62,7 +59,6 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
             val tminStr = binding.inputTmin.text.toString().trim()
             val tmaxStr = binding.inputTmax.text.toString().trim()
 
-            // Validasi Input Kosong
             if (selectedField.isEmpty() || areaStr.isEmpty() || rainfallStr.isEmpty() ||
                 tminStr.isEmpty() || tmaxStr.isEmpty()
             ) {
@@ -70,7 +66,6 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
                 return@setOnClickListener
             }
 
-            // Konversi ke Float dan Validasi Angka
             val area = areaStr.toFloatOrNull()
             val rainfall = rainfallStr.toFloatOrNull()
             val tmin = tminStr.toFloatOrNull()
@@ -81,7 +76,6 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
                 return@setOnClickListener
             }
 
-            // Panggil ViewModel untuk Prediksi dan Simpan Data
             predictionViewModel.predictAndSaveTotalPanen(
                 fieldName = selectedField,
                 tmin = tmin,
@@ -89,7 +83,6 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
                 rainfall = rainfall,
                 area = area,
                 onSuccess = { predictedYield ->
-                    // 3. Navigasi ke ResultTotalPanen Fragment
                     val resultFragment = ResultTotalPanen().apply {
                         arguments = Bundle().apply {
                             putFloat(ARG_PREDICTED_YIELD, predictedYield)

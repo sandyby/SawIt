@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         homeFragment = HomeFragment()
         fieldsFragment = FieldsFragment()
         activitiesFragmment = ActivitiesFragment()
-        predictionsFragment= PredictionHistoryFragment()
+        predictionsFragment = PredictionHistoryFragment()
         profileFragment = ProfileFragment()
 
         show(homeFragment)
@@ -145,7 +145,36 @@ class MainActivity : AppCompatActivity() {
 
     private fun show(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
+        supportFragmentManager.popBackStack(
+            null,
+            androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
         transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_in_left)
         transaction.replace(R.id.fl_scroll_view_content, fragment).commit()
+    }
+
+    fun showFieldsFragmentWithTransition() {
+        val transaction = supportFragmentManager.beginTransaction()
+
+        // Use the 4-parameter overload for a smooth slide transition
+        transaction.setCustomAnimations(
+            R.anim.slide_in_right,  // New fragment enters (FieldsFragment)
+            R.anim.slide_in_left,   // Current fragment exits (HomeFragment)
+            R.anim.slide_in_left,   // Pop Enter (HomeFragment re-enters)
+            R.anim.slide_in_right  // Pop Exit (FieldsFragment exits on back)
+        )
+
+        transaction.replace(R.id.fl_scroll_view_content, fieldsFragment)
+
+        // CRUCIAL: Add to back stack
+        transaction.addToBackStack(null)
+
+        transaction.commit()
+
+        // Update the header title
+        topHeaderFragment.setTopHeaderFragmentTitle("Fields")
+
+        // Optionally update the bottom bar selection to highlight 'Fields'
+        bottomBar.selectTabById(R.id.tab_fields, true)
     }
 }

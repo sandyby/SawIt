@@ -1,6 +1,7 @@
 package com.example.sawit.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +16,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sawit.R
+import com.example.sawit.activities.CreateFieldActivity
+import com.example.sawit.activities.MainActivity
 import com.example.sawit.adapters.FieldsDashboardAdapter
 import com.example.sawit.databinding.FragmentHomeBinding
 import com.example.sawit.ui.NotificationIconWithBadge
@@ -53,7 +56,8 @@ class HomeFragment : Fragment() {
             )
         }
 
-        val userSharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val userSharedPref =
+            requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         fullName = userSharedPref.getString("fullName", "User") ?: "User"
 
         return binding.root
@@ -62,9 +66,27 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = FieldsDashboardAdapter { field ->
-            Toast.makeText(context, "clicked: ${field.fieldName}", Toast.LENGTH_SHORT).show()
+        val adapter = FieldsDashboardAdapter(
+            onClick = { field ->
+                Toast.makeText(context, "clicked: ${field.fieldName}", Toast.LENGTH_SHORT).show()
+            },
+            onAddClick = {
+                val intent = Intent(requireContext(), CreateFieldActivity::class.java)
+                startActivity(intent)
+            }
+        )
+
+        binding.tvFieldsViewMore.setOnClickListener {
+            val mainActivity = activity as? MainActivity
+            mainActivity?.showFieldsFragmentWithTransition()
         }
+//            val transaction = supportFragmentManager.beginTransaction()
+//            transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_in_left)
+//            transaction.replace(R.id.fl_scroll_view_content, fragment).commit()
+////            val intent = Intent(requireContext(), Fe::class.java)
+////            startActivity(intent)
+//        }
+
 
         binding.tvFullName.text = fullName
 
@@ -75,10 +97,13 @@ class HomeFragment : Fragment() {
         val spacingInPx = resources.getDimensionPixelSize(R.dimen.horizontal_item_spacing)
         binding.rvFieldsOverview.addItemDecoration(HorizontalSpaceItemDecoration(spacingInPx))
 
+        binding
+
         viewLifecycleOwner.lifecycleScope.launch {
             fieldViewModel.fieldsData.collectLatest { fields ->
                 val dashboardList = fields.take(2)
                 adapter.submitList(dashboardList)
+                binding.rvFieldsOverview.visibility = View.VISIBLE
             }
         }
     }

@@ -13,10 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * ViewModel ini bertanggung jawab untuk menjalankan logika Prediksi ML
- * dan berkomunikasi dengan PredictionHistoryManager untuk penyimpanan hasil.
- */
+
 class PredictionViewModel(application: Application) : AndroidViewModel(application) {
 
     private val historyManager = PredictionHistoryManager() // <--- Menggunakan Manager Baru
@@ -24,7 +21,7 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
     private val context: Context
         get() = getApplication<Application>().applicationContext
 
-    // --- 1. Fungsi Prediksi Total Panen (Yield) ---
+
     fun predictAndSaveTotalPanen(
         fieldName: String, tmin: Float, tmax: Float, rainfall: Float, area: Float,
         onSuccess: (predictedYield: Float) -> Unit, onError: (message: String) -> Unit
@@ -51,7 +48,7 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    // --- 2. Fungsi Prediksi Kondisi Tanaman ---
+
     fun predictAndSaveKondisiTanaman(
         fieldName: String, tmin: Float, tmax: Float, rainfall: Float, area: Float, actualYield: Float,
         onSuccess: (conditionLabel: String, predictedYield: Float, gapPercentage: Float) -> Unit,
@@ -65,9 +62,9 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
 
                 val gapPercentage = ((actualYield - predictedYield) / (predictedYield.takeIf { it != 0f } ?: 1e-6f)) * 100
                 val conditionLabel = when {
-                    gapPercentage >= 15 -> "Baik"
-                    gapPercentage <= -15 -> "Buruk"
-                    else -> "Cukup"
+                    gapPercentage >= 15 -> "Good"
+                    gapPercentage <= -15 -> "Bad"
+                    else -> "Enough"
                 }
 
                 val historyEntry = Prediction(

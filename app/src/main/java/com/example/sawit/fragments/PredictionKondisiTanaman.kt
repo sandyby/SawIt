@@ -38,16 +38,12 @@ class PredictionKondisiTanaman : Fragment(R.layout.fragment_prediction_kondisi_t
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ==========================
-        // LOGIKA DROPDOWN (LAHAN LIST)
-        // ==========================
+
         val lahanList = arrayOf("Lahan 1", "Lahan Manjur Sukses") // Data Dropdown
         val adapter = ArrayAdapter(requireContext(), R.layout.dropdown_item, lahanList)
         binding.inputLahan.setAdapter(adapter)
 
-        // ==========================
-        // BUTTON PREDICT
-        // ==========================
+
         binding.btnPredict.setOnClickListener {
 
             val lahan = binding.inputLahan.text.toString().trim()

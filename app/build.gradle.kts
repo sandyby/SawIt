@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.play.services.location)
     val room_version = "2.8.4"
+    implementation("com.google.android.libraries.places:places:5.1.1")
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:${room_version}")
@@ -72,6 +73,7 @@ dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2025.10.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
+    implementation("com.github.bumptech.glide:glide:5.0.5")
     implementation("androidx.compose.material3:material3:1.4.0")
     implementation("androidx.compose.ui:ui:1.9.3")
     implementation("androidx.activity:activity-compose:1.11.0")
