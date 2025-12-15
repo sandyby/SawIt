@@ -34,7 +34,7 @@ class FieldsDashboardAdapter(
         fun bind(field: Field) {
             tvFieldName.text = field.fieldName
             tvFieldLocation.text = field.fieldLocation.address
-//            tvFieldAreaBadge.text =
+            tvFieldAreaBadge.text = field.fieldArea.toString()
             tvFieldDesc.text = field.fieldDesc
             if (field.fieldPhotoPath != null) {
                 val imageFile = File(field.fieldPhotoPath)
