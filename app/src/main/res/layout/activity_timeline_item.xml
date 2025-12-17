@@ -10,13 +10,11 @@
     <com.github.vipulasri.timelineview.TimelineView
         android:id="@+id/timeline_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:endLineColor="@color/bg_primary_500"
+        android:layout_height="match_parent"
         app:lineStyle="dash"
         app:lineWidth="2dp"
         app:marker="@drawable/timeline_marker_ring_upcoming"
-        app:markerSize="20dp"
-        app:startLineColor="@color/bg_primary_500" />
+        app:markerSize="20dp" />
 
     <TextView
         android:id="@+id/tv_activity_date"

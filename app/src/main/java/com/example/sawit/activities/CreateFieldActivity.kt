@@ -144,7 +144,12 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             val imageFile = File(path)
             if (imageFile.exists()) {
                 Glide.with(this).load(imageFile).into(binding.ivFieldPhoto)
+            } else {
+                Log.d("CreateFieldActivity", "Local file is not found at path: $path")
+                Glide.with(this).load(R.drawable.placeholder_200x100).into(binding.ivFieldPhoto)
             }
+        } ?: run {
+            Glide.with(this).load(R.drawable.placeholder_200x100).into(binding.ivFieldPhoto)
         }
     }
 
@@ -301,7 +306,7 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun saveImageLocally(context: Context, imageUri: Uri): String? {
-        val fileName = "field_photo_${UUID.randomUUID()}.jpg" // Use UUID for unique file name
+        val fileName = "field_photo_${UUID.randomUUID()}.jpg"
         val file = File(context.filesDir, fileName)
 
         return try {
@@ -310,7 +315,7 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
                     inputStream.copyTo(outputStream)
                 }
             }
-            file.absolutePath // Return the permanent local file path
+            file.absolutePath
         } catch (e: Exception) {
             Log.e("FileSave", "Failed to save image locally", e)
             null
@@ -351,6 +356,7 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (selectedImageUri != null) {
             finalImagePath = saveImageLocally(this, selectedImageUri!!)
+            Log.d("CreateFieldActivity", "validateAndSaveField: $finalImagePath")
             if (finalImagePath == null) {
                 Toast.makeText(this, "Failed saving the image file!", Toast.LENGTH_SHORT).show()
                 return

@@ -20,7 +20,11 @@ data class Field(
     val avgOilPalmAgeInMonths: Int? = null,
     val oilPalmType: String = "",
     val fieldDesc: String = "",
-) : Parcelable
+) : Parcelable {
+    companion object {
+        val ADD_PLACEHOLDER = Field(fieldId = "ADD_PLACEHOLDER", fieldName = "Add New Field", fieldLocation = FieldLocation())
+    }
+}
 
 @Parcelize
 data class FieldLocation(

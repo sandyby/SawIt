@@ -12,5 +12,4 @@
         <item>Pruning</item>
         <item>Pest Control</item>
     </string-array>
-    <string name="fields_area_badge">%1$.1f Ha</string>
 </resources>

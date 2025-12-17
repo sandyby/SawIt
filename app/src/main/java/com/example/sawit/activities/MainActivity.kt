@@ -155,26 +155,31 @@ class MainActivity : AppCompatActivity() {
 
     fun navigateToFieldsFragment() {
         val transaction = supportFragmentManager.beginTransaction()
-
-        // Use the 4-parameter overload for a smooth slide transition
         transaction.setCustomAnimations(
-            R.anim.slide_in_right,  // New fragment enters (FieldsFragment)
-            R.anim.slide_in_left,   // Current fragment exits (HomeFragment)
-            R.anim.slide_in_left,   // Pop Enter (HomeFragment re-enters)
-            R.anim.slide_in_right  // Pop Exit (FieldsFragment exits on back)
+            R.anim.slide_in_right,
+            R.anim.slide_in_left,
+            R.anim.slide_in_left,
+            R.anim.slide_in_right
         )
-
         transaction.replace(R.id.fl_scroll_view_content, fieldsFragment)
-
-        // CRUCIAL: Add to back stack
         transaction.addToBackStack(null)
-
         transaction.commit()
-
-        // Update the header title
         topHeaderFragment.setTopHeaderFragmentTitle("Fields")
-
-        // Optionally update the bottom bar selection to highlight 'Fields'
         bottomBar.selectTabById(R.id.tab_fields, true)
+    }
+
+    fun navigateToActivitiesFragment() {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(
+            R.anim.slide_in_right,
+            R.anim.slide_in_left,
+            R.anim.slide_in_left,
+            R.anim.slide_in_right
+        )
+        transaction.replace(R.id.fl_scroll_view_content, activitiesFragmment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+        topHeaderFragment.setTopHeaderFragmentTitle("Activities")
+        bottomBar.selectTabById(R.id.tab_activity, true)
     }
 }

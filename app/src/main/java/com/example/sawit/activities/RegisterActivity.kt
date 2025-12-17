@@ -140,6 +140,11 @@ class RegisterActivity : AppCompatActivity() {
                     false
                 }
 
+                fullName.length > 30 -> {
+                    tilFullName.error = "Full name must be at most 30 characters long"
+                    false
+                }
+
                 !fullName.matches(Regex("^[a-zA-Z]{3,}(?: [a-zA-Z]+){0,2}$")) -> {
                     tilFullName.error = "Full name must not contain invalid symbols"
                     false
@@ -253,13 +258,6 @@ class RegisterActivity : AppCompatActivity() {
                     userViewModel.authEvents.collect { event ->
                         when (event) {
                             is UserViewModel.AuthEvent.Success -> {
-                                Toast.makeText(
-                                    this@RegisterActivity,
-                                    "Registration Successful! Please log in.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                userViewModel.signOutAfterRegistration()
-                                startLoginActivity()
                                 userViewModel.consumeAuthEvent()
                             }
 
@@ -279,6 +277,17 @@ class RegisterActivity : AppCompatActivity() {
                                     tilEmail.error = "E-mail is already registered!"
                                 }
 
+                                userViewModel.consumeAuthEvent()
+                            }
+
+                            is UserViewModel.AuthEvent.RegistrationSuccess -> {
+                                Toast.makeText(
+                                    this@RegisterActivity,
+                                    "Registration Successful! Please log in.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                startLoginActivity()
                                 userViewModel.consumeAuthEvent()
                             }
 

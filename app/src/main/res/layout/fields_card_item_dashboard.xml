@@ -39,16 +39,31 @@
                 app:cardCornerRadius="6dp"
                 app:cardElevation="0dp">
 
-                <TextView
-                    android:id="@+id/tv_fields_area_badge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/lato_bold"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:textColor="@color/white"
-                    android:textSize="10sp"
-                    tools:text="130.0 Ha" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="6dp">
+
+                    <ImageView
+                        android:id="@+id/iv_fields_area_badge_icon"
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:contentDescription="Fields Area Badge Icon"
+                        android:layout_marginEnd="3dp"
+                        android:src="@drawable/ic_outline_size_fullscreen_24_white" />
+
+                    <TextView
+                        android:id="@+id/tv_fields_area_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lato_bold"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        tools:text="130.0 Ha" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -59,16 +74,31 @@
                 app:cardCornerRadius="6dp"
                 app:cardElevation="0dp">
 
-                <TextView
-                    android:id="@+id/tv_fields_age_badge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/lato_bold"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:textColor="@color/white"
-                    android:textSize="10sp"
-                    tools:text="5 Years Old" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="6dp">
+
+                        <ImageView
+                            android:id="@+id/iv_fields_age_badge_icon"
+                            android:layout_width="13dp"
+                            android:layout_height="13dp"
+                            android:contentDescription="Fields Age Badge Icon"
+                            android:layout_marginEnd="3dp"
+                            android:src="@drawable/ic_outline_clock_24_white" />
+
+                        <TextView
+                            android:id="@+id/tv_fields_age_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato_bold"
+                            android:textColor="@color/white"
+                            android:textSize="10sp"
+                            tools:text="5 yrs" />
+                    </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 

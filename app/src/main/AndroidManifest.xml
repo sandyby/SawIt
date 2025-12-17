@@ -61,10 +61,10 @@
         <activity android:name=".activities.CreateEditActivity" />
         <activity
             android:name=".activities.EditProfileActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.EditPasswordActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>

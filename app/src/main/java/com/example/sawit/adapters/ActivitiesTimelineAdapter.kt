@@ -1,5 +1,7 @@
 package com.example.sawit.adapters
 
+import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +20,15 @@ import com.google.android.material.card.MaterialCardView
 class ActivitiesTimelineAdapter(
     private val onClick: (ActivityTimelineItem) -> Unit
 ) : ListAdapter<ActivityTimelineItem, ActivitiesTimelineAdapter.ViewHolder>(ActivityDiffCallback()) {
+    companion object {
+        const val VIEW_TYPE_START = 100
+        const val VIEW_TYPE_MIDDLE = 101
+        const val VIEW_TYPE_END = 102
+        const val VIEW_TYPE_ONLY_ONE = 103
+    }
+
     inner class ViewHolder(view: View, viewType: Int) : RecyclerView.ViewHolder(view) {
+        private val positionViewType = viewType
         val timelineView: TimelineView = view.findViewById(R.id.timeline_view)
         val tvActivityDate: TextView = view.findViewById(R.id.tv_activity_date)
         val tvFieldName: TextView = view.findViewById(R.id.tv_activity_timeline_field_name)
@@ -27,24 +37,35 @@ class ActivitiesTimelineAdapter(
         val ibViewDetails: ImageButton = view.findViewById(R.id.iv_activity_view_more_btn)
 
         init {
-            timelineView.initLine(viewType)
+//            timelineView.initLine(viewType)
         }
 
-        fun bind(item: ActivityTimelineItem, position: Int) {
+        fun bind(item: ActivityTimelineItem) {
             tvActivityDate.text = item.date
             tvFieldName.text = item.fieldName
             tvActivityTitle.text = item.activityTitle
 
             val context = itemView.context
+            val upcomingColor = ContextCompat.getColor(context, R.color.bg_primary_400)
+            val todayColor = ContextCompat.getColor(context, R.color.bg_primary_500)
+            val completedColor = ContextCompat.getColor(context, R.color.text_primary_900)
+            val transparentColor = Color.TRANSPARENT
+
+            var desiredStartLineColor = upcomingColor
+            var desiredEndLineColor = upcomingColor
 
             when (item.status) {
                 ActivityStatus.UPCOMING -> {
                     timelineView.marker =
                         ContextCompat.getDrawable(context, R.drawable.timeline_marker_ring_upcoming)
+//                    timelineView.setEndLineColor(
+//                        upcomingColor, upcomingColor
+//                    )
+                    timelineView.setLineStyle(TimelineView.LineStyle.DASHED)
                     mcvActivityCard.setCardBackgroundColor(
                         ContextCompat.getColor(
                             context,
-                            R.color.text_primary_900
+                            R.color.bg_primary_400
                         )
                     )
                 }
@@ -52,11 +73,20 @@ class ActivitiesTimelineAdapter(
                 ActivityStatus.TODAY -> {
                     timelineView.marker =
                         ContextCompat.getDrawable(context, R.drawable.timeline_marker_ring_today)
-                    timelineView.setLineStyle(TimelineView.LineStyle.DASHED)
+                    desiredStartLineColor = upcomingColor
+                    timelineView.setStartLineStyle(TimelineView.LineStyle.DASHED)
+                    desiredEndLineColor = todayColor
+                    timelineView.setEndLineStyle(TimelineView.LineStyle.NORMAL)
+//                    timelineView.setStartLineColor(
+//                        upcomingColor, upcomingColor
+//                    )
+//                    timelineView.setEndLineColor(
+//                        todayColor, todayColor
+//                    )
                     mcvActivityCard.setCardBackgroundColor(
                         ContextCompat.getColor(
                             context,
-                            R.color.bg_primary_500
+                            R.color.text_primary_500
                         )
                     )
                 }
@@ -66,13 +96,46 @@ class ActivitiesTimelineAdapter(
                         context,
                         R.drawable.timeline_marker_ring_completed
                     )
-                    // Customize card color for COMPLETED
+                    timelineView.setLineStyle(TimelineView.LineStyle.NORMAL)
+                    desiredStartLineColor = completedColor
+                    desiredEndLineColor = completedColor
+//                    timelineView.setStartLineColor(
+//                        completedColor, completedColor
+//                    )
+//                    timelineView.setEndLineColor(
+//                        completedColor, completedColor
+//                    )
                     mcvActivityCard.setCardBackgroundColor(
                         ContextCompat.getColor(
                             context,
                             R.color.text_600
                         )
                     )
+                }
+            }
+
+            timelineView.setStartLineColor(desiredStartLineColor, desiredStartLineColor)
+            timelineView.setEndLineColor(desiredEndLineColor, desiredEndLineColor)
+            timelineView.setLineWidth(2)
+
+            Log.d("ActivitiesTimelineAdapter", "bind: $positionViewType")
+
+            when (positionViewType) {
+                VIEW_TYPE_START -> {
+                    timelineView.setStartLineColor(transparentColor, transparentColor)
+                }
+
+                VIEW_TYPE_END -> {
+                    timelineView.setEndLineColor(transparentColor, transparentColor)
+                }
+
+                VIEW_TYPE_ONLY_ONE -> {
+                    timelineView.setStartLineColor(transparentColor, transparentColor)
+                    timelineView.setEndLineColor(transparentColor, transparentColor)
+                }
+
+                VIEW_TYPE_MIDDLE -> {
+//
                 }
             }
 
@@ -97,7 +160,15 @@ class ActivitiesTimelineAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return TimelineView.getTimeLineViewType(position, itemCount)
+        val itemCount = currentList.size
+        Log.d("ActivitiesTimelineAdapter", "itemCount: $itemCount")
+        return when {
+            itemCount == 1 -> VIEW_TYPE_ONLY_ONE
+            position == 0 -> VIEW_TYPE_START
+            position == itemCount - 1 -> VIEW_TYPE_END
+            else -> VIEW_TYPE_MIDDLE
+        }
+//        return TimelineView.getTimeLineViewType(position, itemCount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -107,6 +178,10 @@ class ActivitiesTimelineAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position), position)
+        holder.bind(getItem(position))
+//        val isFirstItem = position == 0
+//        val isLastItem = position == itemCount - 1
+//        val timelineView = holder.itemView.findViewById<TimelineView>(R.id.timeline_view)
+//        timelineView.initLine(getItemViewType())
     }
 }

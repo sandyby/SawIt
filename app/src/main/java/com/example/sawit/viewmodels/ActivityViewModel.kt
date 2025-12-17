@@ -150,10 +150,11 @@ class ActivityViewModel : ViewModel() {
         }
     }
 
-    fun updateActivityStatus(id: String?, newStatus: String) {
-        _activities.value = _activities.value.map { activity ->
-            if (activity.id == id) activity.copy(status = newStatus) else activity
-        }
+    fun updateActivityStatus(activityId: String, newStatus: String) {
+        databaseRef.child(activityId).child("status").setValue(newStatus)
+            .addOnFailureListener {
+                viewModelScope.launch { _eventChannel.send(Event.ShowMessage("Failed to update status")) }
+            }
     }
 
     fun deleteActivity(activityId: String?) {
@@ -165,7 +166,6 @@ class ActivityViewModel : ViewModel() {
             .addOnFailureListener { e ->
                 viewModelScope.launch { _eventChannel.send(Event.ShowMessage("Failed to delete activity.")) }
             }
-//        _activities.value = _activities.value.filter { it.id != id }
     }
 
     fun loadHardcodedActivities() {

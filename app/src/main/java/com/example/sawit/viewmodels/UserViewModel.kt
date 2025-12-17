@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawit.models.Field
@@ -46,6 +47,7 @@ class UserViewModel : ViewModel() {
     sealed class AuthEvent {
         data class Success(val user: User) : AuthEvent()
         data class Error(val message: String) : AuthEvent()
+        object RegistrationSuccess: AuthEvent()
     }
 
     private val _authEvents = MutableStateFlow<AuthEvent?>(null)
@@ -124,7 +126,8 @@ class UserViewModel : ViewModel() {
             .addOnSuccessListener { authResult ->
                 val uid = authResult.user?.uid
                 if (uid != null) {
-                    saveNewUserProfile(uid, email, fullName)
+                    createNewUserProfile(uid, email, fullName)
+//                    saveNewUserProfile(uid, email, fullName)
                 } else {
                     _authEvents.value = AuthEvent.Error("Registration failed: no UID generated.")
                     _isLoading.value = false
@@ -165,6 +168,39 @@ class UserViewModel : ViewModel() {
             }
     }
 
+    fun updateExistingUserProfile(
+        fullName: String,
+        newProfilePhotoBase64: String? = null,
+        newProfilePhotoLocalPath: String? = null
+    ) {
+        val uid = auth.currentUser?.uid
+        val existingUser = _userProfile.value
+
+        if (uid.isNullOrEmpty() || existingUser == null) {
+            _authEvents.value = AuthEvent.Error("Authentication session expired. Please log in again.")
+            return
+        }
+
+        _isLoading.value = true
+
+        val updatedUser = existingUser.copy(
+            fullName = fullName,
+            profilePhotoBase64 = newProfilePhotoBase64 ?: existingUser.profilePhotoBase64,
+            profilePhotoLocalPath = newProfilePhotoLocalPath ?: existingUser.profilePhotoLocalPath
+        )
+
+        databaseRef.child(uid).setValue(updatedUser)
+            .addOnSuccessListener {
+                _isLoading.value = false
+                _authEvents.value = AuthEvent.Success(updatedUser)
+            }
+            .addOnFailureListener { e ->
+                Log.e("UserViewModel", "Failed to update profile", e)
+                _isLoading.value = false
+                _authEvents.value = AuthEvent.Error("Failed to save profile changes!")
+            }
+    }
+
     fun saveNewUserProfile(
         uid: String, email: String, fullName: String, newProfilePhotoBase64: String? = null,
         newProfilePhotoLocalPath: String? = null
@@ -202,14 +238,61 @@ class UserViewModel : ViewModel() {
                         _authEvents.value = AuthEvent.Error("Failed to save data!")
                     }
             } else {
-                _isLoading.value = false
-                _authEvents.value = AuthEvent.Error("Please log in first!")
+                val newUser = User(
+                    uid = uid,
+                    fullName = fullName,
+                    email = email,
+                    createdAt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(
+                        Date()
+                    ),
+                    profilePhotoBase64 = newProfilePhotoBase64,
+                    profilePhotoLocalPath = newProfilePhotoLocalPath
+                )
+
+                databaseRef.child(uid).setValue(newUser)
+                    .addOnSuccessListener {
+                        _isLoading.value = false
+                        _authEvents.value = AuthEvent.Success(newUser)
+                        Log.d("UserViewModel", "New profile created successfully for UID: $uid")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("UserViewModel", "Failed to create new profile", e)
+                        _isLoading.value = false
+                        _authEvents.value =
+                            AuthEvent.Error("Registration failed: Could not save user data!")
+                    }
             }
         }.addOnFailureListener {
             _isLoading.value = false
             _authEvents.value =
                 AuthEvent.Error("Something went wrong while trying to update your profile!")
         }
+    }
+
+    private fun createNewUserProfile(
+        uid: String, email: String, fullName: String, newProfilePhotoBase64: String? = null,
+        newProfilePhotoLocalPath: String? = null
+    ) {
+        val newUser = User(
+            uid = uid,
+            fullName = fullName,
+            email = email,
+            createdAt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()),
+            profilePhotoBase64 = newProfilePhotoBase64,
+            profilePhotoLocalPath = newProfilePhotoLocalPath
+        )
+
+        databaseRef.child(uid).setValue(newUser)
+            .addOnSuccessListener {
+                Log.d("UserViewModel", "New profile created successfully for UID: $uid. Signing out...")
+                _authEvents.value = AuthEvent.RegistrationSuccess
+                logout()
+            }
+            .addOnFailureListener { e ->
+                Log.e("UserViewModel", "Failed to create new profile", e)
+                _isLoading.value = false
+                _authEvents.value = AuthEvent.Error("Registration failed: Could not save user data!")
+            }
     }
 
     fun signOutAfterRegistration() = viewModelScope.launch {
@@ -240,7 +323,7 @@ class UserViewModel : ViewModel() {
                     }
             }
         }
-    //        if (uid.isEmpty()) return
+        //        if (uid.isEmpty()) return
 //
 //        val pathUpdate = mapOf("profilePhotoLocalPath" to newLocalPath)
 //

@@ -41,8 +41,6 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var currentFullName: String
     private lateinit var currentEmailAddress: String
     private var selectedImageUri: Uri? = null
-    private var newPhotoBase64: String? = null
-    private var newPhotoLocalPath: String? = null
     private val userViewModel: UserViewModel by viewModels()
 
     // Launcher untuk memilih gambar dari gallery
@@ -143,6 +141,15 @@ class EditProfileActivity : AppCompatActivity() {
         if (newName.isEmpty()) {
             binding.tilFullNameField.error = "Full name can't be empty!"
             return
+        } else if (newName.length < 3) {
+            binding.tilFullNameField.error = "Full name must be at least 3 characters long!"
+            return
+        } else if (newName.length > 30) {
+            binding.tilFullNameField.error = "Full name must be at most 30 characters long!"
+            return
+        } else if (newName.matches(Regex("^[a-zA-Z]{3,}(?: [a-zA-Z]+){0,2}$"))) {
+            binding.tilFullNameField.error = "Full name must not contain invalid symbols!"
+            return
         } else {
             binding.tilFullNameField.error = null
         }
@@ -156,39 +163,29 @@ class EditProfileActivity : AppCompatActivity() {
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
-        } else {
-            userViewModel.saveNewUserProfile(
-                currentUser.uid,
-                currentEmailAddress,
-                newName
-            )
+            return
         }
 
         var photoBase64ToSave: String? = null
         var photoLocalPathToSave: String? = null
 
         if (selectedImageUri != null) {
-            // 1. Process Image
             photoBase64ToSave = ImageCacheManager.uriToBase64(this, selectedImageUri!!)
-
-            // 2. Convert Base64 to local cache file (Needed to update the local path in DB)
             photoLocalPathToSave = photoBase64ToSave?.let { base64 ->
                 ImageCacheManager.base64ToLocalCache(this, base64)
             }
+            Log.d("EditProfileActivity", "photoLocalPath: $photoLocalPathToSave")
 
             if (photoBase64ToSave.isNullOrEmpty() || photoLocalPathToSave.isNullOrEmpty()) {
                 Toast.makeText(this, "Failed to process profile picture!", Toast.LENGTH_SHORT)
                     .show()
-                // Don't save anything if the image processing failed
                 return
             }
         }
-        userViewModel.saveNewUserProfile(
-            currentUser!!.uid,
-            currentEmailAddress,
+        userViewModel.updateExistingUserProfile(
             newName,
-            newPhotoBase64,
-            newPhotoLocalPath
+            photoBase64ToSave,
+            photoLocalPathToSave
         )
     }
 
@@ -285,6 +282,10 @@ class EditProfileActivity : AppCompatActivity() {
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 userViewModel.consumeAuthEvent()
+                            }
+
+                            is UserViewModel.AuthEvent.RegistrationSuccess -> {
+
                             }
 
                             null -> {

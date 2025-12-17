@@ -92,10 +92,11 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:contentDescription="Edit Icon"
-                    android:src="@android:drawable/ic_menu_edit"
+                    android:src="@drawable/ic_filled_edit_24_bg_primary_900"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    android:backgroundTint="@color/text_primary_900"
                     app:tint="@color/text_primary_900" />
 
                 <TextView
@@ -134,11 +135,12 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:contentDescription="Lock Icon"
-                    android:src="@android:drawable/ic_lock_idle_lock"
+                    android:src="@drawable/ic_filled_lock_24_bg_primary_900"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/text_primary_500" />
+                    android:backgroundTint="@color/text_primary_900"
+                    app:tint="@color/text_primary_900" />
 
                 <TextView
                     android:layout_width="0dp"

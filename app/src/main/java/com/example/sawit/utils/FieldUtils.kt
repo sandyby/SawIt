@@ -1,6 +1,8 @@
 package com.example.sawit.utils
 
+import java.util.Arrays
 import java.util.Locale
+import java.util.stream.Collectors
 
 fun Int?.formatOilPalmAge(): String {
     val ageInMonths = this
@@ -18,5 +20,14 @@ fun Int?.formatOilPalmAge(): String {
 fun Double?.formatFieldArea(): String {
     val area = this
     if (area == null || area <= 0.0) return "N/A"
-    return String.format(Locale("id", "ID"), "%.1f", area)
+    return String.format(Locale.getDefault(), "%.1f Ha", area)
+}
+
+fun String?.formatFieldPalmOilType(): String {
+    val palmOilType = this?.trim()
+    if (palmOilType == null || palmOilType.isEmpty()) return "N/A"
+    return palmOilType.split(" ").joinToString(" ") { word ->
+        val lowercaseWord = word.lowercase()
+        lowercaseWord.replaceFirstChar { it.titlecaseChar() }
+    }
 }

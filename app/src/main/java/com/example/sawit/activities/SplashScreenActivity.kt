@@ -5,15 +5,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
+import com.example.sawit.viewmodels.UserViewModel
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SplashScreenActivity : AppCompatActivity() {
     private var isReadyToProceed = false
+    private val userViewModel: UserViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
@@ -30,19 +36,44 @@ class SplashScreenActivity : AppCompatActivity() {
                     splashScreenViewProvider.remove()
                 }.start()
         }
-        simAppInit()
+        checkAuthAndProceed()
     }
 
-    private fun simAppInit() {
+    private fun checkAuthAndProceed(){
+        val auth = FirebaseAuth.getInstance()
+        val authSharedPref = getSharedPreferences("AuthSession", MODE_PRIVATE)
+        val isRememberMeOn = authSharedPref.getBoolean("rememberMe", false)
+        val currentUser = auth.currentUser
+
         lifecycleScope.launch {
-            delay(1000L)
-            isReadyToProceed = true
-            startInitPage()
+            if (currentUser != null && isRememberMeOn) {
+                userViewModel.listenForUserUpdates()
+
+                userViewModel.userProfile.filterNotNull().first().let {
+                    isReadyToProceed = true
+                    goToActivity(MainActivity::class.java)
+                }
+            } else {
+                if (currentUser != null && !isRememberMeOn) {
+                    userViewModel.logout()
+                }
+                isReadyToProceed = true
+                goToActivity(LoginActivity::class.java)
+            }
         }
     }
 
-    private fun startInitPage() {
-        startActivity(Intent(this@SplashScreenActivity, LoginActivity::class.java))
+//    private fun simAppInit() {
+//        lifecycleScope.launch {
+//            delay(1000L)
+//            isReadyToProceed = true
+//            startInitPage()
+//        }
+//    }
+
+    private fun goToActivity(destination: Class<*>) {
+        val intent = Intent(this, destination)
+        startActivity(intent)
         finish()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }

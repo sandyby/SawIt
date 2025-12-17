@@ -85,6 +85,7 @@ dependencies {
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.github.vipulasri:timelineview:1.2.2")
+    implementation("io.github.pushpalroy:jetlime:4.1.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.9.5")
     implementation("androidx.navigation:navigation-ui-ktx:2.9.5")
     implementation("androidx.fragment:fragment-ktx:1.8.9")

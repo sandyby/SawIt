@@ -40,8 +40,7 @@ class PlannedActivitiesFragment : Fragment(R.layout.fragment_activities_list) {
         adapter = ActivitiesAdapter(
             onCheckboxClicked = { activity, isChecked ->
                 val newStatus = if (isChecked) "completed" else "planned"
-                val updatedActivity = activity.copy(status = newStatus)
-                viewModel.updateActivity(updatedActivity)
+                viewModel.updateActivityStatus(activity.id!!, newStatus)
             },
             onEditClicked = { activity ->
                 val intent = Intent(requireContext(), CreateEditActivity::class.java).apply {

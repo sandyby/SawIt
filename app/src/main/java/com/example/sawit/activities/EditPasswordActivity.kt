@@ -157,6 +157,10 @@ class EditPasswordActivity : AppCompatActivity() {
                                 userViewModel.consumeAuthEvent()
                             }
 
+                            is UserViewModel.AuthEvent.RegistrationSuccess -> {
+
+                            }
+
                             null -> {
                                 // event consumed
                             }

@@ -1,5 +1,6 @@
 package com.example.sawit.adapters
 
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -25,6 +26,7 @@ class FieldsDashboardAdapter(
     companion object {
         private const val VIEW_TYPE_FIELD = 1
         private const val VIEW_TYPE_ADD = 2
+        private val ADD_FIELD_ID = Field.ADD_PLACEHOLDER.fieldId
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -43,6 +45,7 @@ class FieldsDashboardAdapter(
             tvFieldDesc.text = field.fieldDesc
             if (field.fieldPhotoPath != null) {
                 val imageFile = File(field.fieldPhotoPath)
+                Log.d("FieldsDashboardAdapter", "imageFile path: ${imageFile.absolutePath}")
                 Glide.with(itemView.context).load(imageFile)
                     .placeholder(R.drawable.placeholder_200x100)
                     .error(R.drawable.placeholder_200x100)
@@ -57,28 +60,58 @@ class FieldsDashboardAdapter(
     }
 
     inner class AddFieldViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        fun bind(isListEmpty: Boolean) {
+        fun bind() {
             val params = itemView.layoutParams
-            if (isListEmpty){
-                params.width = ViewGroup.LayoutParams.MATCH_PARENT
-            } else {
-                val widthInPx = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    180f,
-                    itemView.resources.displayMetrics
-                ).toInt()
-                params.width = widthInPx
-            }
+//            if (isListEmpty){
+//                params.width = ViewGroup.LayoutParams.MATCH_PARENT
+//            } else {
+//                val widthInPx = TypedValue.applyDimension(
+//                    TypedValue.COMPLEX_UNIT_DIP,
+//                    180f,
+//                    itemView.resources.displayMetrics
+//                ).toInt()
+//                params.width = widthInPx
+//            }
+//            itemView.layoutParams = params
+//            itemView.setOnClickListener { onAddClick() }
+            val widthInPx = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                180f,
+                itemView.resources.displayMetrics
+            ).toInt()
+
+            // Set width only if needed, or leave it defined in XML as match_parent/fixed.
+            params.width = widthInPx
+
             itemView.layoutParams = params
             itemView.setOnClickListener { onAddClick() }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        val count = currentList.size.coerceAtMost(2)
-//        if (currentList.isEmpty()) return VIEW_TYPE_ADD
-//        return if (position < currentList.size) VIEW_TYPE_FIELD else VIEW_TYPE_ADD
-        return if (position < count) VIEW_TYPE_FIELD else VIEW_TYPE_ADD
+        val item = getItem(position)
+        return if (item.fieldId == ADD_FIELD_ID) VIEW_TYPE_ADD else VIEW_TYPE_FIELD
+        ////        val count = currentList.size.coerceAtMost(2)
+//////        if (currentList.isEmpty()) return VIEW_TYPE_ADD
+//////        return if (position < currentList.size) VIEW_TYPE_FIELD else VIEW_TYPE_ADD
+////        return if (position < count) VIEW_TYPE_FIELD else VIEW_TYPE_ADD
+//        if (position >= currentList.size) {
+//            // If position is out of bounds, this indicates an inconsistency.
+//            // Fallback to a safe type or throw a controlled error.
+//            // For a ListAdapter, the framework should NOT call getItemViewType
+//            // if position >= currentList.size. Since it is, we return a safe default.
+//            return VIEW_TYPE_FIELD
+//        }
+//
+//        // Proceed if the position is within bounds (which should be true if getItemCount > 0)
+//        val item = getItem(position)
+//
+//        // Check if the item is our special placeholder
+//        return if (item.fieldId == ADD_FIELD_ID) {
+//            VIEW_TYPE_ADD
+//        } else {
+//            VIEW_TYPE_FIELD
+//        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -107,28 +140,40 @@ class FieldsDashboardAdapter(
         holder: RecyclerView.ViewHolder,
         position: Int
     ) {
+        val item = getItem(position)
         if (holder is ViewHolder) {
-            holder.bind(getItem(position))
+            holder.bind(item)
         } else if (holder is AddFieldViewHolder) {
-            holder.bind(currentList.isEmpty())
+            holder.bind()
         }
+        //        if (holder is ViewHolder) {
+//            holder.bind(getItem(position))
+//        } else if (holder is AddFieldViewHolder) {
+//            holder.bind()
+//        }
     }
 
-    override fun getItemCount(): Int {
-        val count = currentList.size
-        val fieldCardsToShow = count.coerceAtMost(2)
-        val addCard = 1
-//        if (count == 0) return 1
-//        return if (count > 2) 2 else 2
-        return fieldCardsToShow + addCard
-    }
+//    override fun getItemCount(): Int {
+//        val count = currentList.size
+//        val fieldCardsToShow = count.coerceAtMost(2)
+//        val addCard = 1
+////        if (count == 0) return 1
+////        return if (count > 2) 2 else 2
+//        return fieldCardsToShow + addCard
+//    }
 
     class FieldDiffCallback : DiffUtil.ItemCallback<Field>() {
         override fun areItemsTheSame(oldItem: Field, newItem: Field): Boolean {
+            if (oldItem.fieldId == ADD_FIELD_ID || newItem.fieldId == ADD_FIELD_ID) {
+                return oldItem.fieldId == newItem.fieldId
+            }
             return oldItem.fieldId == newItem.fieldId
         }
 
         override fun areContentsTheSame(oldItem: Field, newItem: Field): Boolean {
+            if (oldItem.fieldId == ADD_FIELD_ID && newItem.fieldId == ADD_FIELD_ID) {
+                return true
+            }
             return oldItem == newItem
         }
     }

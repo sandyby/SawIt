@@ -57,6 +57,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.getValue
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.security.MessageDigest
 
@@ -91,19 +93,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        if (userViewModel.currentUser.value != null) {
-            startMainActivity()
-            return
-        }
-
         setContentView(R.layout.activity_login)
-        WindowCompat.setDecorFitsSystemWindows(window, true)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main))
-        { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
         /*
         * deklarasi variable untuk menampung sharedpreferences, yakni segala informasi
@@ -114,9 +104,9 @@ class LoginActivity : AppCompatActivity() {
         * sudah login sebelumnya, agar tidak perlu melakukan login lagi. ini bisa dikembangkan lebih jauh lagi kedepannya jika kami
         * memutuskan untuk meningkatkan UX dari segi session control, dan juga keamanan seperti session timeout, dsb
         * */
-//        val authSharedPref = getSharedPreferences("AuthSession", MODE_PRIVATE)
+        val authSharedPref = getSharedPreferences("AuthSession", MODE_PRIVATE)
 //        val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-//        val isRememberMeOn = authSharedPref.getBoolean("rememberMe", false)
+        val isRememberMeOn = authSharedPref.getBoolean("rememberMe", false)
 //        if (isRememberMeOn && authSharedPref.contains("userId")) {
 //            val intent = Intent(this, MainActivity::class.java)
 //            Log.d("INFO", "Langsung login")
@@ -162,15 +152,50 @@ class LoginActivity : AppCompatActivity() {
         tietEmail = findViewById(R.id.tiet_email_field)
         tilPassword = findViewById(R.id.til_password_field)
         tietPassword = findViewById(R.id.tiet_password_field)
-        tietEmail.addTextChangedListener(EmailWatcher())
-        tietPassword.addTextChangedListener(PasswordWatcher())
         tvSwitchRegister = findViewById<TextView>(R.id.tv_switchRegister)
+        mBtnLogin = findViewById<MaterialButton>(R.id.mBtn_login)
+        smRememberMe = findViewById<SwitchMaterial>(R.id.sm_rememberMe)
+        tvLoginErrorMsg = findViewById<TextView>(R.id.tv_login_error_msg)
+
+        if (userViewModel.currentUser.value != null) {
+            if (isRememberMeOn) {
+                mBtnLogin.isEnabled = false
+                userViewModel.listenForUserUpdates()
+
+                lifecycleScope.launch {
+                    userViewModel.userProfile.filterNotNull().first().let {
+                        startMainActivity()
+                        finish()
+                    }
+                    //                    repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                        userViewModel.userProfile.collect { user ->
+//                            if (user != null) {
+//                                startMainActivity()
+//                            }
+//                        }
+//                    }
+                }
+            } else {
+                userViewModel.logout()
+                Toast.makeText(this, "Session expired! Please log in again!", Toast.LENGTH_LONG)
+                    .show()
+            }
+        } else {
+        }
+
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main))
+        { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
         tvSwitchRegister.setOnClickListener()
         {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
-        mBtnLogin = findViewById<MaterialButton>(R.id.mBtn_login)
         mBtnLogin.setOnClickListener()
         {
             tvLoginErrorMsg.visibility = View.GONE
@@ -179,8 +204,8 @@ class LoginActivity : AppCompatActivity() {
             Log.d("LoginActivity", "$email $password")
             userViewModel.loginUser(email, password)
         }
-        smRememberMe = findViewById<SwitchMaterial>(R.id.sm_rememberMe)
-        tvLoginErrorMsg = findViewById<TextView>(R.id.tv_login_error_msg)
+        tietEmail.addTextChangedListener(EmailWatcher())
+        tietPassword.addTextChangedListener(PasswordWatcher())
         observeViewModel()
     }
 
@@ -333,6 +358,10 @@ class LoginActivity : AppCompatActivity() {
                                 tvLoginErrorMsg.text = event.message
                                 tvLoginErrorMsg.visibility = View.VISIBLE
                                 userViewModel.consumeAuthEvent()
+                            }
+
+                            is UserViewModel.AuthEvent.RegistrationSuccess -> {
+
                             }
 
                             null -> {
