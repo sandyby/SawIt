@@ -35,7 +35,8 @@ import androidx.core.graphics.toColorInt
 
 class ResultKondisiTanaman : Fragment(R.layout.fragment_result_kondisi_tanaman) {
 
-    private var binding: FragmentResultKondisiTanamanBinding? = null
+    private var _binding: FragmentResultKondisiTanamanBinding? = null
+    private val binding get() = _binding!!
 
     companion object {
         const val ARG_CONDITION_LABEL = "condition_label" // Baik/Cukup/Buruk
@@ -48,49 +49,80 @@ class ResultKondisiTanaman : Fragment(R.layout.fragment_result_kondisi_tanaman) 
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Asumsi View Binding terinstal dan layout XML sudah diupdate
-        binding = FragmentResultKondisiTanamanBinding.inflate(inflater, container, false)
-        return binding?.root
+        _binding = FragmentResultKondisiTanamanBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Ambil data dari arguments
-        val conditionLabel = arguments?.getString(ARG_CONDITION_LABEL) ?: "N/A"
-        val predictedYield = arguments?.getFloat(ARG_PREDICTED_YIELD) ?: 0.0f
-        val actualYield = arguments?.getFloat(ARG_ACTUAL_YIELD) ?: 0.0f
-        val gapPercentage = arguments?.getFloat(ARG_GAP_PERCENTAGE) ?: 0.0f
+        val conditionLabel = arguments?.getString("condition_label") ?: "N/A"
+        val predictedYield = arguments?.getFloat("predicted_yield") ?: 0.0f
+        val actualYield = arguments?.getFloat("actual_yield") ?: 0.0f
+        val gapPercentage = arguments?.getFloat("gap_percentage") ?: 0.0f
 
-        // 1. Tampilkan Hasil Klasifikasi Utama & Sesuaikan Warna Card (Bagian XML Biasa)
-        binding?.tvConditionLabel?.text = conditionLabel
+        binding.tvConditionLabel.text = conditionLabel
 
         val colorInt = when (conditionLabel) {
-            "Baik" -> "#4CAF50".toColorInt() // Hijau
-            "Cukup" -> "#FFC107".toColorInt() // Kuning
-            "Buruk" -> "#F44336".toColorInt() // Merah
-            else -> android.graphics.Color.GRAY
+            "Good" -> "#7D8657".toColorInt()
+            "Enough" -> "#ADB6BD".toColorInt()
+            "Bad" -> "#d00000".toColorInt()
+            else -> Color.GRAY
         }
-        binding?.cardConditionResult?.setCardBackgroundColor(colorInt)
+        binding.cardConditionResult.setCardBackgroundColor(colorInt)
 
-        // 2. Tampilkan Detail Analisis (Bagian XML Biasa)
-        binding?.tvGapPercentageValue?.text = "${"%.2f".format(gapPercentage)} %"
-        binding?.tvActualYieldValue?.text = "${"%.2f".format(actualYield)} kg"
-        binding?.tvPredictedYieldValueDetail?.text = "${"%.2f".format(predictedYield)} kg"
+        binding.tvGapPercentageValue.text = "${"%.2f".format(gapPercentage)} %"
+        binding.tvActualYieldValue.text = "${"%.2f".format(actualYield)} kg"
+        binding.tvPredictedYieldValueDetail.text = "${"%.2f".format(predictedYield)} kg"
 
-        // 3. Hosting Compose View untuk Chart
-        // Asumsi Anda mengganti BarChart XML (com.github.mikephil...) dengan ComposeView di XML
-        // Jika Anda masih menggunakan BarChart XML, ganti elemennya menjadi ComposeView:
-        // <androidx.compose.ui.platform.ComposeView
-        //     android:id="@+id/compose_view_chart"
-        //     android:layout_width="match_parent"
-        //     android:layout_height="300dp" />
-
-        val composeView = view.findViewById<ComposeView>(R.id.compose_view_chart) // ID ComposeView di XML
-        composeView.setContent {
+        binding.composeViewChart.setContent {
             YieldComparisonChart(predictedYield, actualYield)
         }
+
+        binding.btnBackToHome.setOnClickListener {
+            parentFragmentManager.popBackStack()
+            parentFragmentManager.popBackStack()
+        }
     }
+
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//        // Ambil data dari arguments
+//        val conditionLabel = arguments?.getString(ARG_CONDITION_LABEL) ?: "N/A"
+//        val predictedYield = arguments?.getFloat(ARG_PREDICTED_YIELD) ?: 0.0f
+//        val actualYield = arguments?.getFloat(ARG_ACTUAL_YIELD) ?: 0.0f
+//        val gapPercentage = arguments?.getFloat(ARG_GAP_PERCENTAGE) ?: 0.0f
+//
+//        // 1. Tampilkan Hasil Klasifikasi Utama & Sesuaikan Warna Card (Bagian XML Biasa)
+//        binding?.tvConditionLabel?.text = conditionLabel
+//
+//        val colorInt = when (conditionLabel) {
+//            "Baik" -> "#4CAF50".toColorInt() // Hijau
+//            "Cukup" -> "#FFC107".toColorInt() // Kuning
+//            "Buruk" -> "#F44336".toColorInt() // Merah
+//            else -> android.graphics.Color.GRAY
+//        }
+//        binding?.cardConditionResult?.setCardBackgroundColor(colorInt)
+//
+//        // 2. Tampilkan Detail Analisis (Bagian XML Biasa)
+//        binding?.tvGapPercentageValue?.text = "${"%.2f".format(gapPercentage)} %"
+//        binding?.tvActualYieldValue?.text = "${"%.2f".format(actualYield)} kg"
+//        binding?.tvPredictedYieldValueDetail?.text = "${"%.2f".format(predictedYield)} kg"
+//
+//        // 3. Hosting Compose View untuk Chart
+//        // Asumsi Anda mengganti BarChart XML (com.github.mikephil...) dengan ComposeView di XML
+//        // Jika Anda masih menggunakan BarChart XML, ganti elemennya menjadi ComposeView:
+//        // <androidx.compose.ui.platform.ComposeView
+//        //     android:id="@+id/compose_view_chart"
+//        //     android:layout_width="match_parent"
+//        //     android:layout_height="300dp" />
+//
+//        val composeView = view.findViewById<ComposeView>(R.id.compose_view_chart) // ID ComposeView di XML
+//        composeView.setContent {
+//            YieldComparisonChart(predictedYield, actualYield)
+//        }
+//    }
 
     // ==========================================================
     // FUNGSI COMPOSABLE CHART DENGAN COMPOSE CHARTS LIBRARY
@@ -139,7 +171,9 @@ class ResultKondisiTanaman : Fragment(R.layout.fragment_result_kondisi_tanaman) 
 
             // Mengganti BarChart dengan ColumnChart
             ColumnChart(
-                modifier = Modifier.fillMaxSize().padding(horizontal = 22.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 22.dp),
                 data = chartData,
                 barProperties = BarProperties(
                     // Opsi Kustomisasi Bar
@@ -190,6 +224,6 @@ class ResultKondisiTanaman : Fragment(R.layout.fragment_result_kondisi_tanaman) 
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        _binding = null
     }
 }

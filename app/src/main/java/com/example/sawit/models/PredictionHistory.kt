@@ -1,8 +1,11 @@
 package com.example.sawit.models
 
+import android.os.Parcelable
 import com.google.firebase.firestore.DocumentId
+import kotlinx.parcelize.Parcelize
 
-data class Prediction(
+@Parcelize
+data class PredictionHistory(
     @DocumentId
     var id: String? = null,
     val userId: String? = null,
@@ -17,4 +20,6 @@ data class Prediction(
     val tmax: Float = 0f,
     val rainfall: Float = 0f,
     val area: Float = 0f
-)
+): Parcelable {
+
+}

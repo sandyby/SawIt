@@ -5,70 +5,198 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white"
+    app:strokeColor="#F0F0F0"
+    app:strokeWidth="1dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/bg_primary_400"
         android:padding="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <View
+            android:id="@+id/viewStatusIndicator"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:background="@color/bg_primary_500"
+            app:layout_constraintBottom_toBottomOf="@id/tvFieldName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvPredictionType" />
+
+        <TextView
+            android:id="@+id/tvPredictionType"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/lato_bold"
+            android:textColor="@color/text_primary_900"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/tvHistoryDate"
+            app:layout_constraintStart_toEndOf="@id/viewStatusIndicator"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Harvest Prediction" />
 
-            <TextView
-                android:id="@+id/tvPredictionType"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                tools:text="Total Harvest"/>
-
-            <TextView
-                android:id="@+id/tvHistoryDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="@color/white"
-                tools:text="05 Des 2025, 14:30"/>
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tvHistoryDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/lato_regular"
+            android:textColor="@color/text_700"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvPredictionType"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvPredictionType"
+            tools:text="05 Dec, 14:30" />
 
         <TextView
             android:id="@+id/tvFieldName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/white"
-            tools:text="Lahan Manjur Sukses"/>
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/lato_regular"
+            android:textColor="@color/text_600"
+            android:textSize="13sp"
+            app:layout_constraintStart_toEndOf="@id/viewStatusIndicator"
+            app:layout_constraintTop_toBottomOf="@id/tvPredictionType"
+            tools:text="Lahan Manjur Sukses" />
 
-        <TextView
-            android:id="@+id/tvPredictedYield"
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="#F8F8F8"
+            app:layout_constraintTop_toBottomOf="@id/tvFieldName" />
+
+        <LinearLayout
+            android:id="@+id/layoutYield"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginTop="4dp"
-            android:textColor="@android:color/white"
-            tools:text="Prediction: 85.200 kg"/>
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider">
 
-        <TextView
-            android:id="@+id/tvCondition"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Predicted Yield"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05"
+                android:textColor="@color/text_600"/>
+
+            <TextView
+                android:id="@+id/tvPredictedYield"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lato_bold"
+                android:textColor="@color/text_primary_900"
+                android:textSize="18sp"
+                tools:text="85,200 kg" />
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardConditionChip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:padding="4dp"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            tools:text="Condition: Good"
-            android:visibility="gone"/>
+            app:cardBackgroundColor="#F1F8E9"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/layoutYield"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/layoutYield">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tvCondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:fontFamily="@font/lato_bold"
+                android:textColor="#7D8657"
+                android:textSize="12sp"
+                tools:text="GOOD" />
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<com.google.android.material.card.MaterialCardView-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_marginBottom="8dp"-->
+<!--    app:cardCornerRadius="8dp"-->
+<!--    app:cardElevation="2dp">-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical"-->
+<!--        android:background="@color/bg_primary_400"-->
+<!--        android:padding="16dp">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:gravity="center_vertical">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tvPredictionType"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:textSize="24sp"-->
+<!--                android:textStyle="bold"-->
+<!--                tools:text="Total Harvest"/>-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tvHistoryDate"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textSize="12sp"-->
+<!--                android:textColor="@color/white"-->
+<!--                tools:text="05 Des 2025, 14:30"/>-->
+<!--        </LinearLayout>-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/tvFieldName"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="14sp"-->
+<!--            android:layout_marginTop="4dp"-->
+<!--            android:textColor="@color/white"-->
+<!--            tools:text="Lahan Manjur Sukses"/>-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/tvPredictedYield"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="14sp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:layout_marginTop="4dp"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            tools:text="Prediction: 85.200 kg"/>-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/tvCondition"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:padding="4dp"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:textStyle="bold"-->
+<!--            tools:text="Condition: Good"-->
+<!--            android:visibility="gone"/>-->
+
+<!--    </LinearLayout>-->
+<!--</com.google.android.material.card.MaterialCardView>-->

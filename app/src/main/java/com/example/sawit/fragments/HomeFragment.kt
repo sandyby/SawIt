@@ -124,6 +124,7 @@ class HomeFragment : Fragment() {
                             ActivityStatus.UPCOMING -> 0
                             ActivityStatus.TODAY -> 1
                             ActivityStatus.COMPLETED -> 2
+                            ActivityStatus.OVERDUE -> 3
                         }
                     }.thenByDescending { it.date })
                     .take(3)

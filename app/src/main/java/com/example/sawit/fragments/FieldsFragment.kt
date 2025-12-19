@@ -10,11 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sawit.R
 import com.example.sawit.activities.CreateFieldActivity
 import com.example.sawit.activities.LoginActivity
 import com.example.sawit.adapters.FieldsFieldsAdapter
+import com.example.sawit.adapters.FieldsFooterAdapter
 import com.example.sawit.databinding.FragmentFieldsBinding
 import com.example.sawit.utils.VerticalSpaceItemDecoration
 import com.example.sawit.viewmodels.FieldViewModel
@@ -28,6 +30,8 @@ class FieldsFragment : Fragment() {
     private val binding get() = _binding!!
     private val fieldViewModel: FieldViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
+    private lateinit var adapter: FieldsFieldsAdapter
+    private lateinit var footerAdapter: FieldsFooterAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +52,6 @@ class FieldsFragment : Fragment() {
         val currentUser = userViewModel.currentUser.value
 
         if (currentUser != null) {
-            // Start listening for fields specific to the logged-in user's UID
             fieldViewModel.listenForFieldsUpdates()
         } else {
             Log.e("FieldsFragment", "User not logged in, field data listener cannot be started!")
@@ -57,7 +60,7 @@ class FieldsFragment : Fragment() {
             startActivity(intent)
         }
 
-        val adapter = FieldsFieldsAdapter(
+        adapter = FieldsFieldsAdapter(
             onClick = { field ->
                 val action = FieldsDetailFragment.newInstance(field.fieldId)
                 parentFragmentManager.beginTransaction()
@@ -66,7 +69,10 @@ class FieldsFragment : Fragment() {
                     .commit()
             },
             onDeleteClick = { field ->
-                MaterialAlertDialogBuilder(requireContext())
+                val dialog = MaterialAlertDialogBuilder(
+                    requireContext(),
+                    R.style.DeleteDialogTheme
+                ) // 💡 Pass the theme here
                     .setTitle("Delete Field")
                     .setMessage("Are you sure you want to delete '${field.fieldName}'?")
                     .setPositiveButton("Delete") { dialog, _ ->
@@ -77,17 +83,40 @@ class FieldsFragment : Fragment() {
                         dialog.dismiss()
                     }
                     .setCancelable(true)
-                    .show()
+                    .create()
+
+                dialog.show()
+                dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                    ?.setTextColor(resources.getColor(R.color.text_fiery_red_sunset_600, null))
+
+                dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+                    ?.setTextColor(resources.getColor(R.color.bg_primary_500, null))
+                //                MaterialAlertDialogBuilder(requireContext())
+//                    .setTitle("Delete Field")
+//                    .setMessage("Are you sure you want to delete '${field.fieldName}'?")
+//                    .setPositiveButton("Delete") { dialog, _ ->
+//                        fieldViewModel.deleteField(field, requireContext())
+//                        dialog.dismiss()
+//                    }
+//                    .setNegativeButton("Cancel") { dialog, _ ->
+//                        dialog.dismiss()
+//                    }
+//                    .setCancelable(true)
+//                    .show()
             }
         )
 
-        binding.efabFields.setOnClickListener { _ ->
+        footerAdapter = FieldsFooterAdapter()
+
+        val concatAdapter = ConcatAdapter(adapter, footerAdapter)
+
+        binding.fabFields.setOnClickListener { _ ->
             val intent = Intent(requireContext(), CreateFieldActivity::class.java)
             startActivity(intent)
         }
 
         binding.rvFieldsFields.apply {
-            this.adapter = adapter
+            this.adapter = concatAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             val spacingInPx = resources.getDimensionPixelSize(R.dimen.vertical_item_spacing)
             addItemDecoration(VerticalSpaceItemDecoration(spacingInPx))
@@ -99,15 +128,13 @@ class FieldsFragment : Fragment() {
                 if (fields.isEmpty()) {
                     binding.clEmptyState.visibility = View.VISIBLE
                     binding.rvFieldsFields.visibility = View.GONE
-                    binding.efabFields.extend()
                 } else {
                     binding.clEmptyState.visibility = View.GONE
                     binding.rvFieldsFields.visibility = View.VISIBLE
                 }
-                fieldViewModel.scrollToFieldId.value?.let {
-                    targetId ->
+                fieldViewModel.scrollToFieldId.value?.let { targetId ->
                     val index = fields.indexOfFirst { it.fieldId == targetId }
-                    if (index != -1){
+                    if (index != -1) {
                         binding.rvFieldsFields.scrollToPosition(index)
                         fieldViewModel.clearScrollToFieldId()
                     }

@@ -177,8 +177,8 @@ class LoginActivity : AppCompatActivity() {
                 }
             } else {
                 userViewModel.logout()
-                Toast.makeText(this, "Session expired! Please log in again!", Toast.LENGTH_LONG)
-                    .show()
+//                Toast.makeText(this, "Session expired! Please log in again!", Toast.LENGTH_LONG)
+//                    .show()
             }
         } else {
         }

@@ -1,5 +1,6 @@
 package com.example.sawit.ui.components
 
+import android.text.TextUtils
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
@@ -24,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -46,9 +48,11 @@ object TimelineColors {
     val Upcoming = R.color.bg_primary_400
     val Today = R.color.bg_primary_500
     val Completed = R.color.text_primary_900
-    val CardUpcoming = R.color.bg_primary_400
+    val Overdue = R.color.bg_secondary_overlay_2
+    val CardUpcoming = R.color.bg_primary_overlay_2
     val CardToday = R.color.bg_primary_500
     val CardCompleted = R.color.text_primary_900
+    val CardOverdue = R.color.bg_primary_500
 }
 
 @Composable
@@ -56,9 +60,11 @@ fun ActivityTimelineList(
     items: List<ActivityTimelineItem>,
     onItemClick: (ActivityTimelineItem) -> Unit
 ) {
+    val backgroundColor = colorResource(id = R.color.bg_secondary_900)
     val primaryLineColor = colorResource(id = TimelineColors.Today)
     val completedLineColor = colorResource(id = TimelineColors.Completed)
     val upcomingLineColor = colorResource(id = TimelineColors.Upcoming)
+    val overdueLineColor = colorResource(id = TimelineColors.Overdue)
 
     val jetLimeStyle = JetLimeDefaults.columnStyle(
         contentDistance = 4.dp,
@@ -80,23 +86,29 @@ fun ActivityTimelineList(
             ActivityStatus.COMPLETED -> completedLineColor
             ActivityStatus.UPCOMING -> upcomingLineColor
             ActivityStatus.TODAY -> primaryLineColor
+            ActivityStatus.OVERDUE -> overdueLineColor
             else -> primaryLineColor
         }
 
         val pointType = when (item.status) {
             ActivityStatus.COMPLETED -> EventPointType.custom(
-                icon = painterResource(R.drawable.ic_filled_completed_marker_24_bg_primary_500),
-                tint = colorResource(R.color.bg_primary_500)
+                icon = painterResource(R.drawable.ic_filled_completed_marker_24_bg_primary_900),
+                tint = colorResource(R.color.text_primary_900)
             )
 
             ActivityStatus.TODAY -> EventPointType.custom(
                 icon = painterResource(R.drawable.ic_filled_today_marker_24_bg_primary_500),
-                tint = null
+                tint = colorResource(R.color.bg_primary_500)
             )
 
             ActivityStatus.UPCOMING -> EventPointType.custom(
-                icon = painterResource(R.drawable.ic_filled_upcoming_marker_24_secondary_overlay_2),
-                tint = colorResource(R.color.bg_secondary_overlay_2)
+                icon = painterResource(R.drawable.ic_filled_warning_24_grayed_1),
+                tint = colorResource(R.color.bg_primary_overlay_2)
+            )
+
+            ActivityStatus.OVERDUE -> EventPointType.custom(
+                icon = painterResource(R.drawable.ic_filled_question_marker_24_bg_primary_500),
+                tint = colorResource(R.color.bg_primary_500)
             )
 
             else -> EventPointType.custom(
@@ -125,8 +137,8 @@ fun ActivityTimelineList(
 
         JetLimeEvent(
             style = JetLimeEventDefaults.eventStyle(
-                pointColor = pointColor,
-                pointRadius = 6.dp,
+                pointColor = backgroundColor,
+                pointRadius = 10.dp,
                 pointType = pointType,
                 pointStrokeWidth = 0.dp,
                 pointAnimation = pointAnimation,
@@ -145,9 +157,16 @@ private fun ActivityTimelineCard(
     onItemClick: (ActivityTimelineItem) -> Unit
 ) {
     val cardColor = when (item.status) {
-        ActivityStatus.UPCOMING -> colorResource(id = TimelineColors.Upcoming)
+        ActivityStatus.UPCOMING -> colorResource(id = TimelineColors.CardUpcoming)
         ActivityStatus.TODAY -> colorResource(id = TimelineColors.CardToday)
         ActivityStatus.COMPLETED -> colorResource(id = TimelineColors.CardCompleted)
+        ActivityStatus.OVERDUE -> colorResource(id = TimelineColors.CardOverdue)
+    }
+
+    val textColor = when (item.status) {
+        ActivityStatus.UPCOMING -> colorResource(id = R.color.text_100)
+        ActivityStatus.COMPLETED -> colorResource(id = R.color.white)
+        else -> colorResource(id = R.color.text_primary_900)
     }
 
     Row(
@@ -163,6 +182,8 @@ private fun ActivityTimelineCard(
                 .padding(8.dp, 0.dp, 0.dp, 0.dp),
             fontFamily = FontFamily(Font(R.font.lato_bold)),
             fontSize = 12.sp,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
             color = colorResource(id = R.color.text_primary_900)
         )
 
@@ -171,6 +192,7 @@ private fun ActivityTimelineCard(
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
             shape = MaterialTheme.shapes.medium,
+            elevation = CardDefaults.cardElevation(3.dp),
             modifier = Modifier
                 .weight(1f)
                 .clickable { onItemClick(item) }
@@ -182,13 +204,13 @@ private fun ActivityTimelineCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = item.fieldName,
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = textColor.copy(alpha = 0.9f),
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.lato_regular))
                     )
                     Text(
                         text = item.activityTitle,
-                        color = Color.White,
+                        color = textColor,
                         fontSize = 18.sp,
                         fontFamily = FontFamily(Font(R.font.lato_bold))
                     )
@@ -196,8 +218,8 @@ private fun ActivityTimelineCard(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_filled_chevron_right_36_white),
                     contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    tint = textColor,
+                    modifier = Modifier.size(32.dp)
                 )
             }
         }

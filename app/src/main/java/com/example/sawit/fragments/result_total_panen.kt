@@ -7,11 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.sawit.R
+import com.example.sawit.databinding.FragmentResultKondisiTanamanBinding
 import com.example.sawit.databinding.FragmentResultTotalPanenBinding // Gunakan View Binding jika ada
 
-class ResultTotalPanen : Fragment(R.layout.fragment_result_total_panen) { // Nama Fragment Sesuai Upload
+class ResultTotalPanen :
+    Fragment(R.layout.fragment_result_total_panen) { // Nama Fragment Sesuai Upload
 
-    private var binding: FragmentResultTotalPanenBinding? = null
+    private var _binding: FragmentResultTotalPanenBinding? = null
+    private val binding get() = _binding!!
 
     companion object {
         const val ARG_PREDICTED_YIELD = "predicted_yield"
@@ -25,33 +28,35 @@ class ResultTotalPanen : Fragment(R.layout.fragment_result_total_panen) { // Nam
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Asumsi Anda menggunakan View Binding. Sesuaikan jika tidak.
-        binding = FragmentResultTotalPanenBinding.inflate(inflater, container, false)
-        return binding?.root
+        _binding = FragmentResultTotalPanenBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        _binding = FragmentResultTotalPanenBinding.bind(view)
 
-        // Ambil data dari arguments
-        val predictedYield = arguments?.getFloat(ARG_PREDICTED_YIELD) ?: 0.0f
-        val tmin = arguments?.getFloat(ARG_TMIN) ?: 0.0f
-        val tmax = arguments?.getFloat(ARG_TMAX) ?: 0.0f
-        val rainfall = arguments?.getFloat(ARG_RAINFALL) ?: 0.0f
-        val area = arguments?.getFloat(ARG_AREA) ?: 0.0f
+        val predictedYield = arguments?.getFloat("predicted_yield") ?: 0.0f
+        val tmin = arguments?.getFloat("tmin") ?: 0.0f
+        val tmax = arguments?.getFloat("tmax") ?: 0.0f
+        val rainfall = arguments?.getFloat("rainfall") ?: 0.0f
+        val area = arguments?.getFloat("area") ?: 0.0f
 
-        // 1. Tampilkan Hasil Utama
-        binding?.tvPredictedYieldValue?.text = "%.2f".format(predictedYield)
+        binding.tvPredictedYieldValue.text = "%.2f".format(predictedYield)
 
-        // 2. Tampilkan Detail Input
-        binding?.tvDetailTmin?.text = "%.2f °C".format(tmin)
-        binding?.tvDetailTmax?.text = "%.2f °C".format(tmax)
-        binding?.tvDetailRainfall?.text = "%.2f mm".format(rainfall)
-        binding?.tvDetailArea?.text = "%.2f Ha".format(area)
+        binding.tvDetailTmin.text = "${"%.1f".format(tmin)}°C"
+        binding.tvDetailTmax.text = "${"%.1f".format(tmax)}°C"
+        binding.tvDetailRainfall.text = "${"%.1f".format(rainfall)} mm"
+        binding.tvDetailArea.text = "${"%.2f".format(area)} Ha"
+
+        binding.btnDone.setOnClickListener {
+            parentFragmentManager.popBackStack()
+            parentFragmentManager.popBackStack()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        _binding = null
     }
 }

@@ -9,10 +9,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sawit.R
 import com.example.sawit.activities.CreateEditActivity
 import com.example.sawit.adapters.ActivitiesAdapter
+import com.example.sawit.adapters.ActivitiesFooterAdapter
 import com.example.sawit.databinding.FragmentActivitiesListBinding
 import com.example.sawit.viewmodels.ActivityViewModel
 import kotlinx.coroutines.launch
@@ -24,6 +26,7 @@ class PlannedActivitiesFragment : Fragment(R.layout.fragment_activities_list) {
 
     private val viewModel: ActivityViewModel by activityViewModels()
     private lateinit var adapter: ActivitiesAdapter
+    private lateinit var footerAdapter: ActivitiesFooterAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,24 +56,12 @@ class PlannedActivitiesFragment : Fragment(R.layout.fragment_activities_list) {
             }
         )
 
-        //        adapter = ActivitiesAdapter(
-//            onCheckboxClicked = { activity, isChecked ->
-//                val status = if (isChecked) "completed" else "planned"
-//                viewModel.updateActivityStatus(activity.id, status)
-//            },
-//            onEditClicked = { activity ->
-//                val intent = Intent(requireContext(), CreateEditActivity::class.java).apply {
-//                    putExtra(CreateEditActivity.EXTRA_ACTIVITY, activity)
-//                }
-//                startActivity(intent)
-//            },
-//            onDeleteClicked = { activity ->
-//                viewModel.deleteActivity(activity.id)
-//            }
-//        )
+        footerAdapter = ActivitiesFooterAdapter()
+
+        val concatAdapter = ConcatAdapter(adapter, footerAdapter)
 
         binding.rvActivities.apply {
-            this.adapter = this@PlannedActivitiesFragment.adapter
+            this.adapter = concatAdapter
             layoutManager = LinearLayoutManager(context)
         }
     }

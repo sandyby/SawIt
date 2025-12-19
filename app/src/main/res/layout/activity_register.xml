@@ -110,11 +110,13 @@
                         app:boxCornerRadiusBottomEnd="8dp"
                         app:boxCornerRadiusBottomStart="8dp"
                         app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusTopStart="8dp"
+                        app:boxStrokeColor="@color/text_input_field"
                         app:counterEnabled="true"
                         app:counterMaxLength="30"
                         app:counterTextAppearance="@style/CustomCounterText"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:boxStrokeColor="@color/text_input_field"
+                        app:cursorColor="@color/text_primary_900"
+                        app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                         app:errorEnabled="false"
                         app:hintEnabled="false">
 
@@ -148,6 +150,8 @@
                         app:boxCornerRadiusTopEnd="8dp"
                         app:boxCornerRadiusTopStart="8dp"
                         app:boxStrokeColor="@color/text_input_field"
+                        app:cursorColor="@color/text_primary_900"
+                        app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                         app:errorEnabled="false"
                         app:hintEnabled="false">
 
@@ -181,6 +185,8 @@
                         app:boxCornerRadiusTopEnd="8dp"
                         app:boxCornerRadiusTopStart="8dp"
                         app:boxStrokeColor="@color/text_input_field"
+                        app:cursorColor="@color/text_primary_900"
+                        app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                         app:errorEnabled="false"
                         app:hintEnabled="false">
 
@@ -214,6 +220,8 @@
                         app:boxCornerRadiusTopEnd="8dp"
                         app:boxCornerRadiusTopStart="8dp"
                         app:boxStrokeColor="@color/text_input_field"
+                        app:cursorColor="@color/text_primary_900"
+                        app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                         app:errorEnabled="false"
                         app:hintEnabled="false">
 

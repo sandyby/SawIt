@@ -5,124 +5,253 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="@color/bg_secondary_900"
-    tools:context=".fragments.ResultTotalPanen">
+    android:background="@color/bg_secondary_900">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:text="Total Yield Prediction Result"
-            android:textColor="@color/text_primary_500"
-            android:gravity="center"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:text="Harvest Forecast"
+            android:fontFamily="@font/lato_bold"
+            android:textColor="@color/text_primary_900"
+            android:textSize="22sp"
+            android:layout_marginBottom="16dp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="32dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:orientation="vertical"
-                android:background="@color/bg_primary_400"
-                android:padding="20dp">
+                android:padding="32dp"
+                android:gravity="center"
+                android:background="@color/text_primary_900">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Predicted Yield (Kg/Ha)"
-                    android:textColor="@android:color/white"
-                    android:textSize="18sp" />
+                    android:text="Estimated Yield"
+                    android:textColor="@color/text_500"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/lato_regular" />
 
                 <TextView
                     android:id="@+id/tv_predicted_yield_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textColor="@android:color/white"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/white"
                     android:textSize="48sp"
-                    android:textStyle="bold"
-                    tools:text="84,500.00" />
+                    android:fontFamily="@font/lato_bold"
+                    tools:text="84,500" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="kilograms / hectare"
+                    android:textColor="@color/text_500"
+                    android:textSize="12sp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Parameters Used"
+            android:fontFamily="@font/lato_bold"
+            android:textColor="@color/text_primary_900"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"/>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="Input Parameter Details"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/white">
 
-        <TableLayout
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="8dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_filled_edit_48_bg_primary_900" app:tint="@color/bg_primary_500"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Temperature Range" android:textColor="@color/text_500"/>
+                    <TextView android:id="@+id/tv_detail_tmin" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="22°C" android:textColor="@color/text_900" android:fontFamily="@font/lato_bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" - " android:textColor="@color/text_500"/>
+                    <TextView android:id="@+id/tv_detail_tmax" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="32°C" android:textColor="@color/text_900" android:fontFamily="@font/lato_bold"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0"/>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="12dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_filled_lock_24_bg_primary_900" app:tint="@color/bg_primary_500"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Rainfall" android:textColor="@color/text_500"/>
+                    <TextView android:id="@+id/tv_detail_rainfall" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="250 mm" android:textColor="@color/text_900" android:fontFamily="@font/lato_bold"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0"/>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="12dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_filled_chart_area_spline_24_secondary_overlay" app:tint="@color/bg_primary_500"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Total Area" android:textColor="@color/text_500"/>
+                    <TextView android:id="@+id/tv_detail_area" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="5.5 Ha" android:textColor="@color/text_900" android:fontFamily="@font/lato_bold"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDone"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/table_border"
-            android:padding="8dp"
-            android:stretchColumns="1">
-
-            <TableRow android:paddingBottom="4dp">
-
-                <TextView
-                    android:text="Min Temperature (tmin)"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tv_detail_tmin"
-                    android:gravity="end"
-                    tools:text="2.0 °C" />
-            </TableRow>
-
-            <TableRow android:paddingBottom="4dp">
-
-                <TextView
-                    android:text="Max Temperature (tmax)"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tv_detail_tmax"
-                    android:gravity="end"
-                    tools:text="3.2 °C" />
-            </TableRow>
-
-            <TableRow android:paddingBottom="4dp">
-
-                <TextView
-                    android:text="Rainfall (prec)"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tv_detail_rainfall"
-                    android:gravity="end"
-                    tools:text="250 mm" />
-            </TableRow>
-
-            <TableRow android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Area (ha)"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tv_detail_area"
-                    android:gravity="end"
-                    tools:text="5.5 Ha" />
-            </TableRow>
-        </TableLayout>
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:text="Finish Analysis"
+            app:cornerRadius="12dp"
+            android:backgroundTint="@color/bg_primary_500"
+            android:textColor="@color/white"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<androidx.core.widget.NestedScrollView-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:padding="16dp"-->
+<!--    android:background="@color/bg_secondary_900"-->
+<!--    tools:context=".fragments.ResultTotalPanen">-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical">-->
+
+<!--        <TextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginBottom="24dp"-->
+<!--            android:text="Total Yield Prediction Result"-->
+<!--            android:textColor="@color/text_primary_500"-->
+<!--            android:gravity="center"-->
+<!--            android:textSize="24sp"-->
+<!--            android:textStyle="bold" />-->
+
+<!--        <com.google.android.material.card.MaterialCardView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginBottom="24dp"-->
+<!--            app:cardCornerRadius="16dp"-->
+<!--            app:cardElevation="8dp">-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:gravity="center"-->
+<!--                android:orientation="vertical"-->
+<!--                android:background="@color/bg_primary_400"-->
+<!--                android:padding="20dp">-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Predicted Yield (Kg/Ha)"-->
+<!--                    android:textColor="@android:color/white"-->
+<!--                    android:textSize="18sp" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tv_predicted_yield_value"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="8dp"-->
+<!--                    android:textColor="@android:color/white"-->
+<!--                    android:textSize="48sp"-->
+<!--                    android:textStyle="bold"-->
+<!--                    tools:text="84,500.00" />-->
+<!--            </LinearLayout>-->
+<!--        </com.google.android.material.card.MaterialCardView>-->
+
+<!--        <TextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginBottom="12dp"-->
+<!--            android:text="Input Parameter Details"-->
+<!--            android:textSize="18sp"-->
+<!--            android:textStyle="bold" />-->
+
+<!--        <TableLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@drawable/table_border"-->
+<!--            android:padding="8dp"-->
+<!--            android:stretchColumns="1">-->
+
+<!--            <TableRow android:paddingBottom="4dp">-->
+
+<!--                <TextView-->
+<!--                    android:text="Min Temperature (tmin)"-->
+<!--                    android:textStyle="bold" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tv_detail_tmin"-->
+<!--                    android:gravity="end"-->
+<!--                    tools:text="2.0 °C" />-->
+<!--            </TableRow>-->
+
+<!--            <TableRow android:paddingBottom="4dp">-->
+
+<!--                <TextView-->
+<!--                    android:text="Max Temperature (tmax)"-->
+<!--                    android:textStyle="bold" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tv_detail_tmax"-->
+<!--                    android:gravity="end"-->
+<!--                    tools:text="3.2 °C" />-->
+<!--            </TableRow>-->
+
+<!--            <TableRow android:paddingBottom="4dp">-->
+
+<!--                <TextView-->
+<!--                    android:text="Rainfall (prec)"-->
+<!--                    android:textStyle="bold" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tv_detail_rainfall"-->
+<!--                    android:gravity="end"-->
+<!--                    tools:text="250 mm" />-->
+<!--            </TableRow>-->
+
+<!--            <TableRow android:orientation="vertical">-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Area (ha)"-->
+<!--                    android:textStyle="bold" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tv_detail_area"-->
+<!--                    android:gravity="end"-->
+<!--                    tools:text="5.5 Ha" />-->
+<!--            </TableRow>-->
+<!--        </TableLayout>-->
+
+<!--    </LinearLayout>-->
+<!--</androidx.core.widget.NestedScrollView>-->

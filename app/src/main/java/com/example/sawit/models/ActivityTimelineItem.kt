@@ -11,5 +11,6 @@ data class ActivityTimelineItem(
 enum class ActivityStatus{
     UPCOMING,
     TODAY,
-    COMPLETED
+    COMPLETED,
+    OVERDUE
 }

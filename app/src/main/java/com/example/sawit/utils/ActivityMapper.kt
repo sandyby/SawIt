@@ -23,7 +23,7 @@ fun Activity.toTimelineItem(): ActivityTimelineItem {
         this.status.lowercase() == "completed" || this.status.lowercase() == "done" -> ActivityStatus.COMPLETED
         isSameDay -> ActivityStatus.TODAY
         isFuture -> ActivityStatus.UPCOMING
-        else -> ActivityStatus.COMPLETED
+        else -> ActivityStatus.OVERDUE
     }
 
     return ActivityTimelineItem(

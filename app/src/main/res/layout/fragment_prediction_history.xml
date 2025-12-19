@@ -1,54 +1,219 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@color/bg_secondary_900"
     tools:context=".fragments.PredictionHistoryFragment">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:padding="16dp">
 
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/tvHeaderTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/lato_bold"
             android:text="Prediction History"
+            android:textColor="@color/text_primary_900"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:paddingBottom="16dp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewHistory"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/fragment_card_prediction_history"
-            android:visibility="visible"/>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
+            android:paddingBottom="80dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvHeaderTitle"
+            tools:listitem="@layout/fragment_card_prediction_history" />
 
-        <TextView
-            android:id="@+id/tvEmptyMessage"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="There are no saved prediction history."
-            android:visibility="gone"
-            android:textSize="16sp"/>
+            android:layout_height="match_parent">
 
-    </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_fieldsFields"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="16dp"
+                android:visibility="visible" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_empty_state_prediction_histories"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="32dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/iv_empty_icon"
+                    android:layout_width="256dp"
+                    android:layout_height="256dp"
+                    android:alpha="1"
+                    android:contentDescription="Empty Prediction Histories Icon"
+                    android:src="@drawable/sawit_logo_cropped_160"
+                    app:layout_constraintBottom_toTopOf="@id/tv_empty_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+
+                <TextView
+                    android:id="@+id/tv_empty_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/lato_bold"
+                    android:text="No Prediction Histories Yet"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="@color/text_primary_900"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toTopOf="@id/tv_empty_message"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/iv_empty_icon" />
+
+                <TextView
+                    android:id="@+id/tv_empty_message"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/lato_regular"
+                    android:gravity="center"
+                    android:lineHeight="16sp"
+                    android:text="Tap the '+' button to perform a new prediction"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="@color/bg_primary_500"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_empty_title" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabPredict"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        app:srcCompat="@drawable/ic_filled_add_24_text_primary_900"
+        android:layout_margin="24dp"
         app:backgroundTint="@color/bg_primary_500"
-        app:tint="@color/white"
-        android:contentDescription="Start New Prediction" />
+        app:srcCompat="@drawable/ic_filled_add_24_text_primary_900"
+        app:tint="@color/white" />
+
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:paddingTop="16dp"-->
+    <!--        android:paddingHorizontal="16dp"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:orientation="vertical">-->
+
+    <!--        <TextView-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:fontFamily="@font/lato_bold"-->
+    <!--            android:text="Prediction History"-->
+    <!--            android:textSize="18sp"-->
+    <!--            android:textStyle="bold" />-->
+
+    <!--        <androidx.recyclerview.widget.RecyclerView-->
+    <!--            android:id="@+id/recyclerViewHistory"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:layout_marginTop="16dp"-->
+    <!--            android:visibility="visible"-->
+    <!--            tools:listitem="@layout/fragment_card_prediction_history" />-->
+
+    <!--        &lt;!&ndash;        <TextView&ndash;&gt;-->
+    <!--        &lt;!&ndash;            android:id="@+id/tvEmptyMessage"&ndash;&gt;-->
+    <!--        &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
+    <!--        &lt;!&ndash;            android:layout_height="match_parent"&ndash;&gt;-->
+    <!--        &lt;!&ndash;            android:gravity="center"&ndash;&gt;-->
+    <!--        &lt;!&ndash;            android:text="There are no saved prediction history."&ndash;&gt;-->
+    <!--        &lt;!&ndash;            android:textSize="16sp"&ndash;&gt;-->
+    <!--        &lt;!&ndash;            android:visibility="gone" />&ndash;&gt;-->
+
+    <!--    </LinearLayout>-->
+
+    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--        android:id="@+id/cl_empty_state_predictions"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:paddingHorizontal="32dp"-->
+    <!--        android:visibility="gone"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent">-->
+
+    <!--        <ImageView-->
+    <!--            android:id="@+id/iv_empty_predictions_icon"-->
+    <!--            android:layout_width="256dp"-->
+    <!--            android:layout_height="256dp"-->
+    <!--            android:contentDescription="Empty Predictions Icon"-->
+    <!--            android:src="@drawable/sawit_logo_cropped_160"-->
+    <!--            app:layout_constraintBottom_toTopOf="@id/tv_empty_predictions_title"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toTopOf="parent"-->
+    <!--            app:layout_constraintVertical_chainStyle="packed"-->
+    <!--            app:tint="?attr/colorOnSurfaceVariant" />-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/tv_empty_predictions_title"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginTop="24dp"-->
+    <!--            android:fontFamily="@font/lato_bold"-->
+    <!--            android:textAppearance="?attr/textAppearanceTitleMedium"-->
+    <!--            android:textColor="@color/text_primary_900"-->
+    <!--            android:textSize="20sp"-->
+    <!--            app:layout_constraintBottom_toTopOf="@id/tv_empty_predictions_message"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toBottomOf="@id/iv_empty_predictions_icon"-->
+    <!--            tools:text="No Predictions Yet" />-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/tv_empty_predictions_message"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginTop="4dp"-->
+    <!--            android:fontFamily="@font/lato_regular"-->
+    <!--            android:gravity="center"-->
+    <!--            android:lineHeight="16sp"-->
+    <!--            android:text="Tap the '+' button to perform your first prediction"-->
+    <!--            android:textAppearance="?attr/textAppearanceBodyMedium"-->
+    <!--            android:textColor="@color/bg_primary_500"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toBottomOf="@id/tv_empty_predictions_title"-->
+    <!--            app:layout_constraintVertical_bias="0.0" />-->
+
+    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+    <!--        android:id="@+id/fabPredict"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_gravity="bottom|end"-->
+    <!--        android:layout_margin="16dp"-->
+    <!--        android:contentDescription="Perform New Prediction"-->
+    <!--        app:backgroundTint="@color/bg_primary_500"-->
+    <!--        app:srcCompat="@drawable/ic_filled_add_24_text_primary_900"-->
+    <!--        app:tint="@color/white" />-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -7,10 +7,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginBottom="16dp"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
+    app:cardElevation="3dp"
     app:strokeColor="@color/bg_primary_500"
     app:strokeWidth="0.5dp">
 
@@ -56,8 +55,8 @@
                         android:id="@+id/iv_fields_area_badge_icon"
                         android:layout_width="13dp"
                         android:layout_height="13dp"
-                        android:contentDescription="Fields Area Badge Icon"
                         android:layout_marginEnd="3dp"
+                        android:contentDescription="Fields Area Badge Icon"
                         android:src="@drawable/ic_outline_size_fullscreen_24_white" />
 
                     <TextView
@@ -91,8 +90,8 @@
                         android:id="@+id/iv_fields_age_badge_icon"
                         android:layout_width="13dp"
                         android:layout_height="13dp"
-                        android:contentDescription="Fields Age Badge Icon"
                         android:layout_marginEnd="3dp"
+                        android:contentDescription="Fields Age Badge Icon"
                         android:src="@drawable/ic_outline_clock_24_white" />
 
                     <TextView
@@ -134,10 +133,13 @@
                         android:id="@+id/tv_fields_palm_oil_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ellipsize="end"
                         android:fontFamily="@font/lato_bold"
+                        android:maxWidth="100dp"
+                        android:maxLines="1"
                         android:textColor="@color/white"
                         android:textSize="10sp"
-                        tools:text="Nigrescens" />
+                        tools:text="NigrescensNigrescens Nigrescens Nigrescens" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
@@ -145,75 +147,86 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_fields_photo">
 
-            <TextView
-                android:id="@+id/tv_fields_name"
+            <LinearLayout
+                android:id="@+id/ll_field_content"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:fontFamily="@font/lato_bold"
-                android:maxLines="1"
-                android:textColor="@color/text_primary_900"
-                android:textSize="20sp"
-                app:layout_constraintEnd_toStartOf="@id/ib_delete_field_btn"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Lahan Manjur Sukses - Block C jAHJahjaHJH" />
-
-            <TextView
-                android:id="@+id/tv_fields_location"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:alpha="0.8"
-                android:drawablePadding="2dp"
-                android:ellipsize="end"
-                android:fontFamily="@font/lato_regular"
-                android:maxLines="1"
-                android:textColor="@color/text_primary_900"
-                android:textSize="14sp"
-                app:drawableStartCompat="@drawable/ic_filled_location_on_12_text_primary_900"
-                app:layout_constraintEnd_toStartOf="@id/ib_delete_field_btn"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_fields_name"
-                tools:text="Ngabang, Landak, Kalimantan BaratAJSSDHJADH JASSDHASHD" />
-
-            <TextView
-                android:id="@+id/tv_fields_description"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:ellipsize="end"
-                android:fontFamily="@font/lato_regular"
-                android:maxLines="2"
-                android:textColor="@color/bg_primary_500"
-                android:textSize="12sp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/ib_delete_field_btn"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_fields_location"
-                tools:text="This is a brief description of the land's current status and crop health." />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tv_fields_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/lato_bold"
+                    android:maxLines="1"
+                    android:textColor="@color/text_primary_900"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toStartOf="@id/ib_delete_field_btn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Lahan Manjur Sukses - Block C jAHJahjaHJH" />
+
+                <TextView
+                    android:id="@+id/tv_fields_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:alpha="0.8"
+                    android:drawablePadding="2dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/lato_regular"
+                    android:maxLines="1"
+                    android:textColor="@color/text_primary_900"
+                    android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_filled_location_on_12_text_primary_900"
+                    app:layout_constraintEnd_toStartOf="@id/ib_delete_field_btn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_fields_name"
+                    tools:text="Ngabang, Landak, Kalimantan BaratAJSSDHJADH JASSDHASHD" />
+
+                <TextView
+                    android:id="@+id/tv_fields_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/lato_regular"
+                    android:maxLines="2"
+                    android:textColor="@color/bg_primary_500"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/ib_delete_field_btn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_fields_location"
+                    tools:text="This is a brief description of the land's current status and crop health." />
+            </LinearLayout>
 
             <ImageButton
                 android:id="@+id/ib_delete_field_btn"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Delete Field"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_filled_delete_24_text_primary_900"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/text_fiery_red_sunset_600" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView><!--<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"-->
     <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->

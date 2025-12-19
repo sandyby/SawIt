@@ -16,12 +16,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tabBackground="@android:color/transparent"
-        app:tabTextAppearance="@style/CustomTabLayoutText"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/text_primary_900"
         app:tabIndicatorHeight="3dp"
         app:tabMode="fixed"
         app:tabSelectedTextColor="@color/text_primary_900"
+        app:tabTextAppearance="@style/CustomTabLayoutText"
         app:tabTextColor="@color/text_700" />
 
     <androidx.viewpager2.widget.ViewPager2
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:src="@drawable/ic_filled_add_24_text_primary_900"
-        app:backgroundTint="#6E7C3C"
+        app:backgroundTint="@color/bg_primary_500"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="@android:color/white"

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingVertical="32dp"
+    android:paddingHorizontal="24dp"
+    >
+
+    <TextView
+        android:id="@+id/tvFooterMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/lato_regular"
+        android:text="No more activities!\n\nTap the '+' button\nto create more!"
+        android:textAlignment="center"
+        android:textColor="@color/text_primary_900"
+        android:textSize="16sp" />
+
+</LinearLayout>

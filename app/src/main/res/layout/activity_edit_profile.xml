@@ -2,11 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_secondary_900"
-    android:id="@+id/main"
     android:layout_marginTop="16dp"
+    android:background="@color/bg_secondary_900"
     android:padding="20dp"
     tools:context=".activities.EditProfileActivity">
 
@@ -56,10 +56,10 @@
 
         <ImageView
             android:id="@+id/iv_profile_picture_edit"
-            android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="Profile Picture"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_filled_person_24_secondary_overlay" />
     </androidx.cardview.widget.CardView>
 
@@ -77,9 +77,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
+            android:backgroundTint="@color/text_primary_900"
             android:contentDescription="Edit Profile Picture Button"
             android:padding="12dp"
-            android:backgroundTint="@color/text_primary_900"
             android:src="@drawable/ic_filled_edit_24_bg_primary_900"
             app:tint="@color/text_primary_900" />
     </androidx.cardview.widget.CardView>
@@ -113,6 +113,8 @@
             app:boxCornerRadiusTopEnd="8dp"
             app:boxCornerRadiusTopStart="8dp"
             app:boxStrokeColor="@color/text_input_field"
+            app:cursorColor="@color/text_primary_900"
+            app:cursorErrorColor="@color/text_fiery_red_sunset_600"
             app:hintEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -158,11 +160,13 @@
                     app:boxCornerRadiusBottomEnd="8dp"
                     app:boxCornerRadiusBottomStart="8dp"
                     app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:boxStrokeColor="@color/text_input_field"
                     app:counterEnabled="true"
                     app:counterMaxLength="30"
                     app:counterTextAppearance="@style/CustomCounterText"
-                    app:boxCornerRadiusTopStart="8dp"
-                    app:boxStrokeColor="@color/text_input_field"
+                    app:cursorColor="@color/text_primary_900"
+                    app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText

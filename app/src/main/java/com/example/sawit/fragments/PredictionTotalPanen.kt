@@ -9,7 +9,9 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.sawit.R
 import com.example.sawit.databinding.FragmentPredictionTotalPanenBinding
 import com.example.sawit.viewmodels.FieldViewModel
@@ -43,7 +45,14 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        _binding = FragmentPredictionTotalPanenBinding.bind(view)
 
+        setupDropdown()
+        setupListeners()
+        observeViewModel()
+    }
+
+    private fun setupDropdown() {
         viewLifecycleOwner.lifecycleScope.launch {
             fieldViewModel.fieldsData.collectLatest { fields ->
                 val fieldNames = fields.map { it.fieldName }
@@ -51,63 +60,141 @@ class PredictionTotalPanen : Fragment(R.layout.fragment_prediction_total_panen) 
                 binding.inputFieldName.setAdapter(adapter)
             }
         }
+    }
 
+    private fun setupListeners() {
         binding.btnPredict.setOnClickListener {
             val selectedField = binding.inputFieldName.text.toString().trim()
-            val areaStr = binding.inputFieldArea.text.toString().trim()
-            val rainfallStr = binding.inputRainfall.text.toString().trim()
-            val tminStr = binding.inputTmin.text.toString().trim()
-            val tmaxStr = binding.inputTmax.text.toString().trim()
+            val area = binding.inputFieldArea.text.toString().toFloatOrNull()
+            val rainfall = binding.inputRainfall.text.toString().toFloatOrNull()
+            val tmin = binding.inputTmin.text.toString().toFloatOrNull()
+            val tmax = binding.inputTmax.text.toString().toFloatOrNull()
 
-            if (selectedField.isEmpty() || areaStr.isEmpty() || rainfallStr.isEmpty() ||
-                tminStr.isEmpty() || tmaxStr.isEmpty()
-            ) {
-                Toast.makeText(requireContext(), "Harap isi semua data!", Toast.LENGTH_SHORT).show()
+            if (selectedField.isEmpty() || area == null || rainfall == null || tmin == null || tmax == null) {
+                Toast.makeText(requireContext(), "Please fill in the required fields!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val area = areaStr.toFloatOrNull()
-            val rainfall = rainfallStr.toFloatOrNull()
-            val tmin = tminStr.toFloatOrNull()
-            val tmax = tmaxStr.toFloatOrNull()
+            predictionViewModel.predictTotalYield(selectedField, tmin, tmax, rainfall, area)
+        }
+    }
 
-            if (area == null || rainfall == null || tmin == null || tmax == null) {
-                Toast.makeText(requireContext(), "Input harus berupa angka yang valid!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            predictionViewModel.predictAndSaveTotalPanen(
-                fieldName = selectedField,
-                tmin = tmin,
-                tmax = tmax,
-                rainfall = rainfall,
-                area = area,
-                onSuccess = { predictedYield ->
-                    val resultFragment = ResultTotalPanen().apply {
-                        arguments = Bundle().apply {
-                            putFloat(ARG_PREDICTED_YIELD, predictedYield)
-                            putFloat(ARG_TMIN, tmin)
-                            putFloat(ARG_TMAX, tmax)
-                            putFloat(ARG_RAINFALL, rainfall)
-                            putFloat(ARG_AREA, area)
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    predictionViewModel.predictionResult.collect { result ->
+                        result?.let {
+                            val resultFragment = ResultTotalPanen().apply {
+                                arguments = Bundle().apply {
+                                    putFloat("predicted_yield", it.predictedYield)
+                                }
+                            }
+                            navigateToResult(resultFragment)
                         }
                     }
-
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.fl_scroll_view_content, resultFragment)
-                        .addToBackStack(null)
-                        .commit()
-                },
-                onError = { message ->
-                    Log.e("PredictionsFragment", "Error: $message")
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                 }
-            )
+
+                launch {
+                    predictionViewModel.events.collect { event ->
+                        when (event) {
+                            is PredictionViewModel.Event.ShowError ->
+                                Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                            is PredictionViewModel.Event.PredictionSaved ->
+                                Toast.makeText(context, "Saved to History!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+                launch {
+                    predictionViewModel.isLoading.collect { isLoading ->
+                        binding.btnPredict.isEnabled = !isLoading
+                        binding.btnPredict.text = if (isLoading) "Processing..." else "Predict"
+                    }
+                }
+            }
         }
+    }
+
+    private fun navigateToResult(fragment: Fragment) {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fl_scroll_view_content, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            fieldViewModel.fieldsData.collectLatest { fields ->
+//                val fieldNames = fields.map { it.fieldName }
+//                val adapter = ArrayAdapter(requireContext(), R.layout.dropdown_item, fieldNames)
+//                binding.inputFieldName.setAdapter(adapter)
+//            }
+//        }
+//
+//        binding.btnPredict.setOnClickListener {
+//            val selectedField = binding.inputFieldName.text.toString().trim()
+//            val areaStr = binding.inputFieldArea.text.toString().trim()
+//            val rainfallStr = binding.inputRainfall.text.toString().trim()
+//            val tminStr = binding.inputTmin.text.toString().trim()
+//            val tmaxStr = binding.inputTmax.text.toString().trim()
+//
+//            if (selectedField.isEmpty() || areaStr.isEmpty() || rainfallStr.isEmpty() ||
+//                tminStr.isEmpty() || tmaxStr.isEmpty()
+//            ) {
+//                Toast.makeText(requireContext(), "Harap isi semua data!", Toast.LENGTH_SHORT).show()
+//                return@setOnClickListener
+//            }
+//
+//            val area = areaStr.toFloatOrNull()
+//            val rainfall = rainfallStr.toFloatOrNull()
+//            val tmin = tminStr.toFloatOrNull()
+//            val tmax = tmaxStr.toFloatOrNull()
+//
+//            if (area == null || rainfall == null || tmin == null || tmax == null) {
+//                Toast.makeText(requireContext(), "Input harus berupa angka yang valid!", Toast.LENGTH_SHORT).show()
+//                return@setOnClickListener
+//            }
+//
+//            predictionViewModel.predictAndSaveTotalPanen(
+//                fieldName = selectedField,
+//                tmin = tmin,
+//                tmax = tmax,
+//                rainfall = rainfall,
+//                area = area,
+//                onSuccess = { predictedYield ->
+//                    val resultFragment = ResultTotalPanen().apply {
+//                        arguments = Bundle().apply {
+//                            putFloat(ARG_PREDICTED_YIELD, predictedYield)
+//                            putFloat(ARG_TMIN, tmin)
+//                            putFloat(ARG_TMAX, tmax)
+//                            putFloat(ARG_RAINFALL, rainfall)
+//                            putFloat(ARG_AREA, area)
+//                        }
+//                    }
+//
+//                    parentFragmentManager.beginTransaction()
+//                        .replace(R.id.fl_scroll_view_content, resultFragment)
+//                        .addToBackStack(null)
+//                        .commit()
+//                },
+//                onError = { message ->
+//                    Log.e("PredictionsFragment", "Error: $message")
+//                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+//                }
+//            )
+//        }
+//    }
+//
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//    }
 }

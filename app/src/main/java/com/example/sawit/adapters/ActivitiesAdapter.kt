@@ -1,5 +1,6 @@
 package com.example.sawit.adapters
 
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,9 +39,18 @@ class ActivitiesAdapter(
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
             binding.textViewDate.text = sdf.format(activity.date)
 
+            if (binding.textViewNotes.text.isNotEmpty()){
+                binding.textViewNotes.visibility = View.VISIBLE
+                binding.divider.visibility = View.VISIBLE
+            } else {
+                binding.textViewNotes.visibility = View.GONE
+                binding.divider.visibility = View.GONE
+            }
+
             binding.checkboxStatus.setOnCheckedChangeListener(null)
             binding.checkboxStatus.isChecked = activity.status == "completed"
             binding.checkboxStatus.setOnCheckedChangeListener { _, isChecked ->
+                binding.checkboxStatus.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                 onCheckboxClicked(activity, isChecked)
             }
 

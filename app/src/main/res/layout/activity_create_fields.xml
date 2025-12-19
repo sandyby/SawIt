@@ -134,6 +134,10 @@
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="@color/box_stroke_color_selector"
                     app:boxStrokeErrorColor="@color/text_error_900"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="80"
+                    app:cursorColor="@color/text_primary_900"
+                    app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -216,6 +220,8 @@
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="@color/box_stroke_color_selector"
                     app:boxStrokeErrorColor="@color/text_error_900"
+                    app:cursorColor="@color/text_primary_900"
+                    app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -261,6 +267,10 @@
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="@color/box_stroke_color_selector"
                     app:boxStrokeErrorColor="@color/text_error_900"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="128"
+                    app:cursorColor="@color/text_primary_900"
+                    app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -306,6 +316,8 @@
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="@color/box_stroke_color_selector"
                     app:boxStrokeErrorColor="@color/text_error_900"
+                    app:cursorColor="@color/text_primary_900"
+                    app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -354,6 +366,8 @@
                     app:counterEnabled="true"
                     app:counterMaxLength="300"
                     app:counterTextAppearance="@style/CustomCounterText"
+                    app:cursorColor="@color/text_primary_900"
+                    app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText

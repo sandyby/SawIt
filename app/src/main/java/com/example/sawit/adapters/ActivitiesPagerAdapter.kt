@@ -14,7 +14,6 @@ class ActivitiesPagerAdapter(
         private const val PLANNED_ID = 100L
         private const val COMPLETED_ID = 101L
     }
-//    private val fragmentKeys = listOf("planned", "completed")
 
     override fun getItemCount() = 2
 

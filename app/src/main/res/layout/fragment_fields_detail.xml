@@ -1,118 +1,271 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cl_fragments_fields_detail"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg_secondary_900">
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/ll_detail_fragment_header"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/bg_secondary_900"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/iv_back"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:clickable="true"
-            android:contentDescription="Back"
-            android:focusable="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_filled_keyboard_backspace_24_text_primary_900" />
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alignmentMode="alignMargins"
+            android:columnCount="2"
+            android:columnOrderPreserved="false">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F0F0F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Field Area"
+                        android:textColor="@color/text_500"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_detail_area"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lato_bold"
+                        android:text="5.5 Ha"
+                        android:textColor="@color/text_primary_900"
+                        android:textSize="18sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F0F0F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Palm Age"
+                        android:textColor="@color/text_500"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_detail_age"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lato_bold"
+                        android:text="48 Months"
+                        android:textColor="@color/text_primary_900"
+                        android:textSize="18sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </GridLayout>
 
         <TextView
-            android:id="@+id/tv_field_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginTop="20dp"
             android:fontFamily="@font/lato_bold"
-            android:text="Field Name"
-            android:textColor="@color/text_primary_900"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:text="Description"
+            android:textColor="@color/text_primary_900" />
 
-    <ImageView
-        android:id="@+id/iv_fields_location_map"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_gravity="bottom"
-        android:scaleType="centerCrop"
-        android:src="@drawable/sawit_lahan_2"
-        app:layout_anchor="@id/ll_detail_fragment_header"
-        app:layout_anchorGravity="bottom" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:padding="16dp"
-        app:layout_anchor="@id/iv_fields_location_map"
-        app:layout_anchorGravity="bottom">
-
-        <com.example.sawit.utils.FieldsTabView
-            android:id="@+id/ftv_fields"
+        <TextView
+            android:id="@+id/tv_detail_desc"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="No description provided."
+            android:textColor="@color/text_500" />
 
-        <FrameLayout
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="16dp"
-            app:layout_anchor="@id/ftv_fields"
-            app:layout_anchorGravity="bottom">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="16dp"
+            app:strokeColor="#F0F0F0"
+            app:strokeWidth="1dp">
 
-            <include
-                android:id="@+id/layout_details"
-                layout="@layout/fields_tabs_details"
-                android:visibility="visible" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
 
-            <!-- Statistics Layout -->
-            <include
-                android:id="@+id/layout_statistics"
-                layout="@layout/fields_tabs_statistics"
-                android:visibility="gone" />
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_filled_chart_area_spline_24_secondary_overlay"
+                    app:tint="@color/bg_primary_500" />
 
-            <!--            <ViewStub-->
-            <!--                android:id="@+id/vs_details_tab"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:inflatedId="@+id/inflated_details_tab"-->
-            <!--                android:layout="@layout/fields_tabs_details" />-->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-            <!--            <ViewStub-->
-            <!--                android:id="@+id/vs_statistics_tab"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:inflatedId="@+id/inflated_statistics_tab"-->
-            <!--                android:layout="@layout/fields_tabs_statistics" />-->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Address"
+                        android:textColor="@color/text_500"
+                        android:textSize="12sp" />
 
-        </FrameLayout>
+                    <TextView
+                        android:id="@+id/tv_detail_address"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lato_bold"
+                        android:text="Loading address..."
+                        android:textColor="@color/text_primary_900" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
+</androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/efab_fields"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="Add New Field"
-        android:text="Add New Field"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:backgroundTint="@color/bg_primary_500"
-        app:icon="@drawable/ic_filled_add_24_white"
-        app:iconSize="28dp"
-        app:iconTint="@color/white"
-        app:showMotionSpec="@null" />
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+    <!--<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--    android:id="@+id/cl_fragments_fields_detail"-->
+    <!--    android:layout_width="match_parent"-->
+    <!--    android:layout_height="match_parent"-->
+    <!--    android:background="@color/bg_secondary_900">-->
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/ll_detail_fragment_header"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="48dp"-->
+    <!--        android:background="@color/bg_secondary_900"-->
+    <!--        android:gravity="center_vertical"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        android:paddingStart="16dp"-->
+    <!--        android:paddingEnd="16dp">-->
+
+    <!--        <ImageView-->
+    <!--            android:id="@+id/iv_back"-->
+    <!--            android:layout_width="24dp"-->
+    <!--            android:layout_height="24dp"-->
+    <!--            android:clickable="true"-->
+    <!--            android:contentDescription="Back"-->
+    <!--            android:focusable="true"-->
+    <!--            android:scaleType="fitCenter"-->
+    <!--            android:src="@drawable/ic_filled_keyboard_backspace_24_text_primary_900" />-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/tv_field_name"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginStart="12dp"-->
+    <!--            android:fontFamily="@font/lato_bold"-->
+    <!--            android:text="Field Name"-->
+    <!--            android:textColor="@color/text_primary_900"-->
+    <!--            android:textSize="18sp"-->
+    <!--            android:textStyle="bold" />-->
+    <!--    </LinearLayout>-->
+
+    <!--    <ImageView-->
+    <!--        android:id="@+id/iv_fields_location_map"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="200dp"-->
+    <!--        android:layout_gravity="bottom"-->
+    <!--        android:scaleType="centerCrop"-->
+    <!--        android:src="@drawable/sawit_lahan_2"-->
+    <!--        app:layout_anchor="@id/ll_detail_fragment_header"-->
+    <!--        app:layout_anchorGravity="bottom" />-->
+
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_gravity="bottom"-->
+    <!--        android:orientation="vertical"-->
+    <!--        android:padding="16dp"-->
+    <!--        app:layout_anchor="@id/iv_fields_location_map"-->
+    <!--        app:layout_anchorGravity="bottom">-->
+
+    <!--        <com.example.sawit.utils.FieldsTabView-->
+    <!--            android:id="@+id/ftv_fields"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content" />-->
+
+    <!--        <FrameLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:layout_gravity="bottom"-->
+    <!--            android:layout_marginTop="16dp"-->
+    <!--            app:layout_anchor="@id/ftv_fields"-->
+    <!--            app:layout_anchorGravity="bottom">-->
+
+    <!--            <include-->
+    <!--                android:id="@+id/layout_details"-->
+    <!--                layout="@layout/fields_tabs_details"-->
+    <!--                android:visibility="visible" />-->
+
+    <!--            &lt;!&ndash; Statistics Layout &ndash;&gt;-->
+    <!--            <include-->
+    <!--                android:id="@+id/layout_statistics"-->
+    <!--                layout="@layout/fields_tabs_statistics"-->
+    <!--                android:visibility="gone" />-->
+
+    <!--            &lt;!&ndash;            <ViewStub&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:id="@+id/vs_details_tab"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:layout_height="match_parent"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:inflatedId="@+id/inflated_details_tab"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:layout="@layout/fields_tabs_details" />&ndash;&gt;-->
+
+    <!--            &lt;!&ndash;            <ViewStub&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:id="@+id/vs_statistics_tab"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:layout_height="match_parent"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:inflatedId="@+id/inflated_statistics_tab"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                android:layout="@layout/fields_tabs_statistics" />&ndash;&gt;-->
+
+    <!--        </FrameLayout>-->
+
+    <!--    </LinearLayout>-->
+
+    <!--    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton-->
+    <!--        android:id="@+id/efab_fields"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_gravity="bottom|end"-->
+    <!--        android:layout_margin="16dp"-->
+    <!--        android:contentDescription="Add New Field"-->
+    <!--        android:text="Add New Field"-->
+    <!--        android:textColor="@color/white"-->
+    <!--        android:textSize="16sp"-->
+    <!--        app:backgroundTint="@color/bg_primary_500"-->
+    <!--        app:icon="@drawable/ic_filled_add_24_white"-->
+    <!--        app:iconSize="28dp"-->
+    <!--        app:iconTint="@color/white"-->
+    <!--        app:showMotionSpec="@null" />-->
+
+    <!--</androidx.coordinatorlayout.widget.CoordinatorLayout>-->

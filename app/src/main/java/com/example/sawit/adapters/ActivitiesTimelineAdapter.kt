@@ -112,6 +112,8 @@ class ActivitiesTimelineAdapter(
                         )
                     )
                 }
+
+                ActivityStatus.OVERDUE -> null
             }
 
             timelineView.setStartLineColor(desiredStartLineColor, desiredStartLineColor)
