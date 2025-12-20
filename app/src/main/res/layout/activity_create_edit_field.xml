@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F0EDD0"
-    tools:context=".activities.CreateFieldActivity">
+    tools:context=".activities.CreateEditFieldActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -145,7 +145,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Enter your field name"
+                        android:imeOptions="actionNext"
                         android:inputType="text"
+                        android:nextFocusDown="@id/tiet_area_field"
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp"
                         android:textColor="@color/text_primary_900"
@@ -171,13 +173,44 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/map_fragment_container"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    app:layout_constraintDimensionRatio="1:1"
-                    tools:context=".activities.CreateFieldActivity" />
+                    android:layout_height="300dp"
+                    android:layout_marginTop="8dp">
+
+                    <fragment
+                        android:id="@+id/map_fragment_container"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/mcv_search_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="8dp">
+
+                        <androidx.appcompat.widget.SearchView
+                            android:id="@+id/search_view_location"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:iconifiedByDefault="false"
+                            app:queryHint="Search for field location..."
+                            app:queryBackground="@android:color/transparent" />
+
+                    </com.google.android.material.card.MaterialCardView>
+                </FrameLayout>
+
+                <!--                <androidx.fragment.app.FragmentContainerView-->
+                <!--                    android:id="@+id/map_fragment_container"-->
+                <!--                    android:name="com.google.android.gms.maps.SupportMapFragment"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="250dp"-->
+                <!--                    app:layout_constraintDimensionRatio="1:1"-->
+                <!--                    tools:context=".activities.CreateEditFieldActivity" />-->
 
                 <TextView
                     android:id="@+id/tv_selected_field_location"

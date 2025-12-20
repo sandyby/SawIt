@@ -1,10 +1,8 @@
 package com.example.sawit.activities
 
 import android.app.DatePickerDialog
-import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -18,23 +16,21 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.sawit.R
-import com.example.sawit.databinding.ActivityCreateEditBinding
+import com.example.sawit.databinding.ActivityCreateEditActivityBinding
 import com.example.sawit.models.Activity
 import com.example.sawit.viewmodels.ActivityViewModel
 import com.example.sawit.viewmodels.FieldViewModel
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlin.getValue
 
-class CreateEditActivity : AppCompatActivity() {
+class CreateEditActivityActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityCreateEditBinding
+    private lateinit var binding: ActivityCreateEditActivityBinding
     private val calendar = Calendar.getInstance()
     private val fieldViewModel: FieldViewModel by viewModels()
     private val activityViewModel: ActivityViewModel by viewModels()
@@ -44,13 +40,13 @@ class CreateEditActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_ACTIVITY = "EXTRA_ACTIVITY"
-        private const val FIELD_PLACEHOLDER = "Choose a Field"
+        private const val FIELD_PLACEHOLDER = "Choose a field"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityCreateEditBinding.inflate(layoutInflater)
+        binding = ActivityCreateEditActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         WindowCompat.setDecorFitsSystemWindows(window, true)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -153,10 +149,24 @@ class CreateEditActivity : AppCompatActivity() {
             binding.textFieldLayoutNotes.error = null
         }
 
-        if (!isValid) return
-
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID"))
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val activityDate = dateFormat.parse(dateStr) ?: Date()
+
+        val today = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
+
+        if (activityDate.before(today)) {
+            binding.textFieldLayoutDate.error = "You cannot schedule activities in the past, duh!"
+            isValid = false
+        } else {
+            binding.textFieldLayoutDate.error = null
+        }
+
+        if (!isValid) return
 
         val activityData = Activity(
             id = currentActivity?.id,
@@ -198,17 +208,15 @@ class CreateEditActivity : AppCompatActivity() {
     private fun observeFields() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                fieldViewModel.fieldsData.collect { fields ->
+                fieldViewModel.fieldsData.collectLatest { fields ->
                     fieldIdMap = fields.associate { it.fieldName to it.fieldId }
                     val actualFieldNames = fields.map { it.fieldName }
 
-                    // 1. Create the list with the placeholder
                     val fieldNamesWithPlaceholder = mutableListOf(FIELD_PLACEHOLDER)
                     fieldNamesWithPlaceholder.addAll(actualFieldNames)
 
-                    // 2. Fix: Use 'fieldNamesWithPlaceholder' in the adapter, not 'actualFieldNames'
                     val adapter = ArrayAdapter(
-                        this@CreateEditActivity,
+                        this@CreateEditActivityActivity,
                         R.layout.autocompleteview_dropdown_item,
                         fieldNamesWithPlaceholder
                     )
@@ -223,15 +231,12 @@ class CreateEditActivity : AppCompatActivity() {
                         )
                         setAdapter(adapter)
 
-                        // 3. Fix: Add an explicit click listener to ensure the value sticks
                         setOnItemClickListener { parent, _, position, _ ->
                             val selectedItem = parent.getItemAtPosition(position).toString()
                             setText(selectedItem, false)
                         }
                     }
 
-                    // 4. Fix: Only reset text to placeholder if the box is empty or currently holds the placeholder.
-                    // This prevents overwriting a valid selection if the data flow emits again.
                     val currentText = binding.autoCompleteField.text.toString()
                     if (currentText.isEmpty() || currentText == FIELD_PLACEHOLDER) {
                         binding.autoCompleteField.setText(FIELD_PLACEHOLDER, false)
@@ -249,7 +254,7 @@ class CreateEditActivity : AppCompatActivity() {
                         when (event) {
                             is ActivityViewModel.Event.ShowMessage -> {
                                 Toast.makeText(
-                                    this@CreateEditActivity,
+                                    this@CreateEditActivityActivity,
                                     event.message,
                                     Toast.LENGTH_LONG
                                 ).show()
@@ -290,13 +295,16 @@ class CreateEditActivity : AppCompatActivity() {
             updateDateInView()
         }
 
-        DatePickerDialog(
+        val datePicker = DatePickerDialog(
             this,
             dateSetListener,
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        )
+
+        datePicker.datePicker.minDate = System.currentTimeMillis()
+        datePicker.show()
     }
 
     private fun updateDateInView() {

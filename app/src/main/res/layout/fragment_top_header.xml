@@ -2,6 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fl_top_header"
+    android:clipToPadding="false"
+    android:clipChildren="false"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -9,6 +11,8 @@
         style="@style/CustomTopHeaderCardViewStyle"
         android:layout_width="match_parent"
         android:layout_height="120dp"
+        android:elevation="6dp"
+        app:cardElevation="2dp"
         app:cardBackgroundColor="@color/bg_primary_500">
 
         <LinearLayout

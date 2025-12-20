@@ -15,7 +15,6 @@ import com.example.sawit.R
 import com.example.sawit.fragments.ActivitiesFragment
 import com.example.sawit.fragments.FieldsFragment
 import com.example.sawit.fragments.HomeFragment
-import com.example.sawit.fragments.PredictFragment
 import com.example.sawit.fragments.PredictionHistoryFragment
 import com.example.sawit.fragments.ProfileFragment
 import com.example.sawit.fragments.TopHeaderFragment

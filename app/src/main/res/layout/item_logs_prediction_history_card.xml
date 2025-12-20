@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#F0F0F0"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <View
+            android:id="@+id/view_status_indicator"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:background="@color/bg_primary_500"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_prediction_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/lato_bold"
+            android:text="Harvest Prediction"
+            android:textColor="@color/text_primary_900"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@id/view_status_indicator"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_history_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="@font/lato_regular"
+            android:text="05 Dec 2025"
+            android:textColor="@color/text_600"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_prediction_type"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_prediction_type" />
+
+        <TextView
+            android:id="@+id/tv_predicted_yield_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:letterSpacing="0.05"
+            android:text="Estimated Yield"
+            android:textAllCaps="true"
+            android:textSize="10sp"
+            app:layout_constraintStart_toStartOf="@id/tv_prediction_type"
+            app:layout_constraintTop_toBottomOf="@id/tv_prediction_type" />
+
+        <LinearLayout
+            android:id="@+id/ll_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="@id/tv_prediction_type"
+            app:layout_constraintTop_toBottomOf="@id/tv_predicted_yield_label">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_filled_kg_weight_24_black"
+                app:tint="@color/text_primary_900" />
+
+            <TextView
+                android:id="@+id/tv_predicted_yield"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lato_bold"
+                android:layout_marginStart="2dp"
+                android:text="85,200 kg"
+                android:textColor="@color/text_primary_900"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_condition_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#E8F5E9"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/ll_content"
+            app:layout_constraintEnd_toEndOf="parent">tap th
+
+            <TextView
+                android:id="@+id/tv_condition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lato_bold"
+                android:paddingHorizontal="10dp"
+                android:textAllCaps="true"
+                android:paddingVertical="4dp"
+                android:text="GOOD"
+                android:textColor="@color/bg_primary_500"
+                android:textSize="11sp" />
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

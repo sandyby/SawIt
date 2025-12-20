@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 class PredictionViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -36,6 +37,7 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
 
     sealed class Event {
         data class ShowError(val message: String) : Event()
+        data class ShowMessage(val message: String) : Event()
         object PredictionSaved : Event()
     }
 
@@ -45,7 +47,12 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
         val gapPercentage: Float? = null
     )
 
+    fun clearPredictionResult() {
+        _predictionResult.value = null
+    }
+
     fun predictTotalYield(
+        fieldId: String,
         fieldName: String,
         tmin: Float,
         tmax: Float,
@@ -60,13 +67,15 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
                 }
 
                 val history = PredictionHistory(
+                    fieldId = fieldId,
                     fieldName = fieldName,
                     predictionType = "Total Yield",
                     predictedYield = yield,
                     tmin = tmin,
                     tmax = tmax,
                     rainfall = rainfall,
-                    area = area
+                    area = area,
+                    date = Date(System.currentTimeMillis())
                 )
 
                 saveToDatabase(history)
@@ -81,6 +90,7 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun predictPlantCondition(
+        fieldId: String,
         fieldName: String,
         tmin: Float,
         tmax: Float,
@@ -100,10 +110,11 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
                 val label = when {
                     gap >= 15 -> "Good"
                     gap <= -15 -> "Bad"
-                    else -> "Enough"
+                    else -> "Moderate"
                 }
 
                 val history = PredictionHistory(
+                    fieldId = fieldId,
                     fieldName = fieldName,
                     predictionType = "Condition",
                     predictedYield = predictedYield,
@@ -113,14 +124,15 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
                     tmin = tmin,
                     tmax = tmax,
                     rainfall = rainfall,
-                    area = area
+                    area = area,
+                    date = Date(System.currentTimeMillis())
                 )
 
                 saveToDatabase(history)
                 _predictionResult.value = PredictionResult(predictedYield, label, gap)
 
             } catch (e: Exception) {
-                _eventChannel.send(Event.ShowError("Analysis Error: ${e.localizedMessage}"))
+                _eventChannel.send(Event.ShowError("Prediction Error: ${e.localizedMessage}"))
             } finally {
                 _isLoading.value = false
             }
@@ -128,17 +140,24 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun saveToDatabase(history: PredictionHistory) {
-        if (currentUserId.isEmpty()) return
+        if (currentUserId.isEmpty()) {
+            viewModelScope.launch { _eventChannel.send(Event.ShowError("User not logged in!")) }
+            return
+        }
 
         val newKey = databaseRef.push().key ?: return
         val historyWithId = history.copy(id = newKey, userId = currentUserId)
 
         databaseRef.child(newKey).setValue(historyWithId)
             .addOnSuccessListener {
-                viewModelScope.launch { _eventChannel.send(Event.PredictionSaved) }
+                viewModelScope.launch {
+                    _eventChannel.send(Event.PredictionSaved)
+                }
             }
             .addOnFailureListener { e ->
-                Log.e("PredictionVM", "Database save failed", e)
+                viewModelScope.launch {
+                    _eventChannel.send(Event.ShowError("Saving to database failed: ${e.localizedMessage}"))
+                }
             }
     }
 }

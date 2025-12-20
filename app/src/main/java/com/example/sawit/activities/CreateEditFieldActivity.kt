@@ -3,7 +3,6 @@ package com.example.sawit.activities
 import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -17,7 +16,6 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -28,11 +26,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
+import com.example.sawit.BuildConfig
 import com.example.sawit.R
-import com.example.sawit.databinding.ActivityCreateFieldsBinding
+import com.example.sawit.databinding.ActivityCreateEditFieldBinding
 import com.example.sawit.models.Field
 import com.example.sawit.models.FieldLocation
 import com.example.sawit.viewmodels.FieldViewModel
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -45,6 +45,10 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -53,10 +57,10 @@ import java.io.IOException
 import java.util.Locale
 import java.util.UUID
 
-class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
+class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-    private lateinit var binding: ActivityCreateFieldsBinding
+    private lateinit var binding: ActivityCreateEditFieldBinding
     private val fieldViewModel: FieldViewModel by viewModels()
 
     private var currentField: Field? = null
@@ -74,12 +78,12 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private lateinit var imagePickerLauncher: ActivityResultLauncher<String>
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityCreateFieldsBinding.inflate(layoutInflater)
+        binding = ActivityCreateEditFieldBinding.inflate(layoutInflater)
         setContentView(binding.root)
         WindowCompat.setDecorFitsSystemWindows(window, true)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -95,7 +99,6 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         ) { uri: Uri? ->
             uri?.let {
                 selectedImageUri = it
-                // Display the image in the ImageView
                 Glide.with(this).load(it).into(binding.ivFieldPhoto)
             }
         }
@@ -118,6 +121,67 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment =
             supportFragmentManager.findFragmentById(R.id.map_fragment_container) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        setupSearchView()
+
+        if (isEditMode) {
+            currentField?.let {
+                populateForm(it)
+            }
+        }
+    }
+
+    private fun setupSearchView() {
+        binding.searchViewLocation.setOnQueryTextListener(object :
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (!query.isNullOrBlank()) {
+                    searchLocation(query)
+                    binding.searchViewLocation.clearFocus() // Hide keyboard
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean = false
+        })
+    }
+
+    private fun searchLocation(locationName: String) {
+        val geocoder = Geocoder(this, Locale.getDefault())
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val addresses = geocoder.getFromLocationName(locationName, 1)
+
+                launch(Dispatchers.Main) {
+                    if (!addresses.isNullOrEmpty()) {
+                        val address = addresses[0]
+                        val latLng = LatLng(address.latitude, address.longitude)
+
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                        placeMarker(latLng)
+
+                        selectedAddress = address.getAddressLine(0)
+                        binding.tvSelectedFieldLocation.text = selectedAddress
+                    } else {
+                        Toast.makeText(
+                            this@CreateEditFieldActivity,
+                            "Location not found!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                launch(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@CreateEditFieldActivity,
+                        "Error while trying to find the location! Please try again later",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                Log.e("Geocoder", "Search error: ${e.message}")
+            }
+        }
     }
 
     private fun setupUI() {
@@ -145,7 +209,7 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             if (imageFile.exists()) {
                 Glide.with(this).load(imageFile).into(binding.ivFieldPhoto)
             } else {
-                Log.d("CreateFieldActivity", "Local file is not found at path: $path")
+                Log.d("CreateEditFieldActivity", "Local file is not found at path: $path")
                 Glide.with(this).load(R.drawable.placeholder_200x100).into(binding.ivFieldPhoto)
             }
         } ?: run {
@@ -153,7 +217,7 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun setupMap(){
+    private fun setupMap() {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map_fragment_container) as? SupportMapFragment
 
@@ -183,9 +247,19 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isCompassEnabled = true
+        mMap.uiSettings.isRotateGesturesEnabled = true
+        mMap.uiSettings.isZoomGesturesEnabled = true
+        mMap.uiSettings.isScrollGesturesEnabled = true
+        mMap.uiSettings.isScrollGesturesEnabledDuringRotateOrZoom = true
 
         mMap.setOnMapClickListener { latLng ->
             placeMarker(latLng)
+        }
+
+        mMap.setOnCameraMoveStartedListener { reason ->
+            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                binding.root.requestDisallowInterceptTouchEvent(true)
+            }
         }
 
         if (isEditMode && selectedLatLng != null && selectedAddress != null) {
@@ -195,12 +269,6 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             checkLocationPermissionAndCenterMap()
         }
-
-//        if (selectedLatLng != null) {
-//            placeMarker(selectedLatLng!!)
-//        } else {
-//            placeMarker(DEFAULT_LOCATION)
-//        }
     }
 
     private fun checkLocationPermissionAndCenterMap() {
@@ -211,15 +279,12 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             mMap.isMyLocationEnabled = true
             getDeviceLocationAndCenterMap()
         } else {
-            // Permission is NOT granted, request it from the user
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
-            // Fallback: If permission is denied, use the DEFAULT_LOCATION
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 10f))
-//            placeMarker(DEFAULT_LOCATION)
         }
     }
 
@@ -236,16 +301,13 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         ).addOnSuccessListener { location: Location? ->
             if (location != null) {
                 val currentLatLng = LatLng(location.latitude, location.longitude)
-                // Center camera on GPS location and place initial marker
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
                 placeMarker(currentLatLng)
             } else {
-                // If current location is null (e.g., GPS off), use the default location
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 10f))
                 placeMarker(DEFAULT_LOCATION)
             }
         }.addOnFailureListener {
-            // If fetching location fails, use the default location
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 10f))
             placeMarker(DEFAULT_LOCATION)
         }
@@ -257,10 +319,8 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, re-run the check (which will now succeed)
                 checkLocationPermissionAndCenterMap()
             } else {
-                // Permission denied, inform the user
                 Toast.makeText(
                     this,
                     "Location permission denied. Using default map location.",
@@ -281,28 +341,41 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
 
         val geocoder = Geocoder(this, Locale.getDefault())
-        try {
-            @Suppress("DEPRECATION") val addresses: List<Address>? =
-                geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-            if (!addresses.isNullOrEmpty()) {
-                val address: Address = addresses[0]
-                val addressBuilder = StringBuilder()
-                for (i in 0..address.maxAddressLineIndex) {
-                    addressBuilder.append(address.getAddressLine(i)).append("\n")
-                }
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                launch(Dispatchers.Main) {
+                    if (!addresses.isNullOrEmpty()) {
+                        val address = addresses[0]
+                        val fullAddress = address.getAddressLine(0)
 
-                selectedAddress = addressBuilder.toString().trim()
-                binding.tvSelectedFieldLocation.text = selectedAddress
-//                    String.format(
-//                    Locale("id", "ID"),
-//                    "Lat: %.4f, Lng: %.4f",
-//                    latLng.latitude,
-//                    latLng.longitude
-//                )
+                        selectedAddress = fullAddress
+                        binding.tvSelectedFieldLocation.text = selectedAddress
+
+                        binding.searchViewLocation.setQuery(fullAddress, false)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("Geocoder", "Reverse geocode error")
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
         }
+        //        val geocoder = Geocoder(this, Locale.getDefault())
+//        try {
+//            @Suppress("DEPRECATION") val addresses: List<Address>? =
+//                geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+//            if (!addresses.isNullOrEmpty()) {
+//                val address: Address = addresses[0]
+//                val addressBuilder = StringBuilder()
+//                for (i in 0..address.maxAddressLineIndex) {
+//                    addressBuilder.append(address.getAddressLine(i)).append("\n")
+//                }
+//
+//                selectedAddress = addressBuilder.toString().trim()
+//                binding.tvSelectedFieldLocation.text = selectedAddress
+//            }
+//        } catch (e: IOException) {
+//            e.printStackTrace()
+//        }
     }
 
     private fun saveImageLocally(context: Context, imageUri: Uri): String? {
@@ -324,30 +397,47 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun validateAndSaveField() {
         val fieldName = binding.tietFieldNameField.text.toString().trim()
-        val areaStr = binding.tietAreaField.text.toString().trim()
+        val fieldArea = binding.tietAreaField.text.toString().trim()
         val oilPalmType = binding.tietPalmOilTypeField.text.toString().trim()
-        val ageStr = binding.tietAverageAgeField.text.toString().trim()
+        val fieldAverageAge = binding.tietAverageAgeField.text.toString().trim()
         val fieldDesc = binding.tietDescriptionField.text.toString().trim()
         val locationAddress = binding.tvSelectedFieldLocation.text.toString().trim()
 
         var isValid = true
 
         if (fieldName.isEmpty()) {
-            binding.tilFieldNameField.error = "Field Name is required!"
+            binding.tilFieldNameField.error = "Field name is required!"
             isValid = false
         } else {
             binding.tilFieldNameField.error = null
         }
 
-        if (selectedLatLng == null || selectedAddress == null) {
+        if (fieldArea.isEmpty() || fieldArea.isNullOrBlank()) {
+            binding.tilAreaField.error = "Field's area is required!"
+            isValid = false
+        } else if (fieldArea.toDouble() <= 0.0) {
+            binding.tilAreaField.error = "Field's area can't possibly be 0 or less!"
+            isValid = false
+        } else {
+            binding.tilAreaField.error = null
+        }
+
+        if (fieldAverageAge.isEmpty() || fieldAverageAge.isNullOrBlank()) {
+            binding.tilAverageAgeField.error = "Average palm oil's age is required!"
+            isValid = false
+        } else if (fieldAverageAge.toDouble() <= 0.0) {
+            binding.tilAverageAgeField.error = "Average palm oil's age can't possibly be 0 or less!"
+            isValid = false
+        } else {
+            binding.tilAverageAgeField.error = null
+        }
+
+        if (selectedLatLng == null || selectedAddress == null || locationAddress.isEmpty()) {
             Toast.makeText(this, "Please select a location in the map!", Toast.LENGTH_SHORT).show()
             isValid = false
         }
 
-        val fieldArea = areaStr.toDoubleOrNull()
-        val avgOilPalmAge = ageStr.toIntOrNull()
-
-        if (!isValid || fieldArea == null || avgOilPalmAge == null) {
+        if (!isValid) {
             Toast.makeText(
                 this, "Please fill all the required fields correctly!", Toast.LENGTH_LONG
             ).show()
@@ -356,11 +446,9 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (selectedImageUri != null) {
             finalImagePath = saveImageLocally(this, selectedImageUri!!)
-            Log.d("CreateFieldActivity", "validateAndSaveField: $finalImagePath")
-            if (finalImagePath == null) {
-                Toast.makeText(this, "Failed saving the image file!", Toast.LENGTH_SHORT).show()
-                return
-            }
+            Log.d("CreateEditFieldActivity", "validateAndSaveField: $finalImagePath")
+        } else if (isEditMode) {
+            finalImagePath = currentField?.fieldPhotoPath
         }
 
         val fieldLocation = FieldLocation(
@@ -369,21 +457,12 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             address = selectedAddress!!
         )
 
-        val finalFieldId = if (isEditMode) {
-            currentField!!.fieldId
-        } else {
-            ""
-        }
-
         val fieldToSave = Field(
-            fieldId = finalFieldId,
+            fieldId = if (isEditMode) currentField!!.fieldId else "",
             fieldName = fieldName,
-            fieldArea = fieldArea,
+            fieldArea = fieldArea.toDoubleOrNull() ?: 0.0,
             fieldLocation = fieldLocation,
-//            latitude = selectedLatLng!!.latitude,
-//            longitude = selectedLatLng!!.longitude,
-//            fieldLocationName = locationName,
-            avgOilPalmAgeInMonths = avgOilPalmAge,
+            avgOilPalmAgeInMonths = fieldAverageAge.toIntOrNull() ?: 0,
             oilPalmType = oilPalmType,
             fieldDesc = fieldDesc,
             fieldPhotoPath = finalImagePath
@@ -404,7 +483,7 @@ class CreateFieldActivity : AppCompatActivity(), OnMapReadyCallback {
                         when (event) {
                             is FieldViewModel.Event.ShowMessage -> {
                                 Toast.makeText(
-                                    this@CreateFieldActivity, event.message, Toast.LENGTH_LONG
+                                    this@CreateEditFieldActivity, event.message, Toast.LENGTH_LONG
                                 ).show()
                             }
 

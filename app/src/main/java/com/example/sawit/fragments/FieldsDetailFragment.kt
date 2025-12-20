@@ -1,107 +1,161 @@
 package com.example.sawit.fragments
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.bumptech.glide.Glide
 import com.example.sawit.R
+import com.example.sawit.activities.CreateEditFieldActivity
+import com.example.sawit.adapters.FieldsFieldsAdapter
+import com.example.sawit.adapters.FieldsPagerAdapter
+import com.example.sawit.databinding.FragmentFieldsDetailBinding
 import com.example.sawit.models.Field
-import com.example.sawit.utils.FieldsTabView
 import com.example.sawit.viewmodels.FieldViewModel
-import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class FieldsDetailFragment : Fragment(R.layout.fragment_fields_detail) {
-    private val fieldViewModel: FieldViewModel by viewModels()
+    private var _binding: FragmentFieldsDetailBinding? = null
+    private val binding get() = _binding!!
+    private val fieldViewModel: FieldViewModel by activityViewModels()
     private var currentField: Field? = null
+    private lateinit var fieldsAdapter: FieldsFieldsAdapter
     private var fieldId: String? = null
-    private lateinit var layoutDetails: View
-    private lateinit var layoutStatistics: View
+    private var fieldName: String? = null
 
     companion object {
         private const val ARG_FIELD_ID = "fieldId"
+        private const val ARG_FIELD_NAME = "fieldName"
 
-        fun newInstance(fieldId: String?) = FieldsDetailFragment().apply {
+        fun newInstance(fieldId: String?, fieldName: String?) = FieldsDetailFragment().apply {
             arguments = Bundle().apply {
                 putString(ARG_FIELD_ID, fieldId)
+                putString(ARG_FIELD_NAME, fieldName)
             }
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val view = inflater.inflate(R.layout.fragment_fields_detail, container, false)
-
-        layoutDetails = view.findViewById(R.id.layout_details)
-        layoutStatistics = view.findViewById(R.id.layout_statistics)
-        val ftvFields = view.findViewById<FieldsTabView>(R.id.ftv_fields)
-        val ivBack = view.findViewById<ImageView>(R.id.iv_back)
-        val tvFieldName = view.findViewById<TextView>(R.id.tv_field_name)
-
-        showDetails()
-
-        ftvFields.onTabSelectedListener = { index ->
-            when (index) {
-                0 -> showDetails()
-                1 -> showStatistics()
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            fieldViewModel.fieldsData.collectLatest { fields ->
-                currentField = fields.find { it.fieldId == fieldId }
-                currentField?.let { field ->
-                    tvFieldName.text = field.fieldName
-                }
-            }
-        }
-
-        ivBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
-
-        return view
-    }
-
-    private fun showDetails() {
-        layoutDetails.visibility = View.VISIBLE
-        layoutStatistics.visibility = View.GONE
-    }
-
-    private fun showStatistics() {
-        layoutDetails.visibility = View.GONE
-        layoutStatistics.visibility = View.VISIBLE
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        fieldId = arguments?.getString(ARG_FIELD_ID)
+        fieldName = arguments?.getString(ARG_FIELD_NAME)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val btnAddData = view.findViewById<MaterialButton>(R.id.mb_add_data_btn)
-        val btnEditData = view.findViewById<MaterialButton>(R.id.mb_edit_data_btn)
+        _binding = FragmentFieldsDetailBinding.bind(view)
 
-        btnAddData.setOnClickListener {
-            val addFieldDataFragment = AddFieldDataFragment()
-            Log.d("FieldsDetailFragment", "tes")
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fl_scroll_view_content, addFieldDataFragment)
-                .addToBackStack(null)
-                .commit()
+        fieldId = arguments?.getString("fieldId") ?: return
+        fieldName = arguments?.getString("fieldName") ?: return
+
+        setupNavigation()
+        setupDeleteBtn()
+        setupViewPager(fieldId!!)
+        observeFieldHeader(fieldId!!)
+        observeLoadingState()
+    }
+
+    private fun setupDeleteBtn() {
+        binding.btnDeleteField.setOnClickListener {
+            val fieldToDelete = currentField ?: return@setOnClickListener
+            val dialog = MaterialAlertDialogBuilder(
+                requireContext(),
+                R.style.DeleteDialogTheme
+            )
+                .setTitle("Delete Field")
+                .setMessage("Are you sure you want to delete '${fieldToDelete.fieldName}'?")
+                .setPositiveButton("Delete") { dialog, _ ->
+                    fieldViewModel.deleteField(fieldToDelete, requireContext())
+                    dialog.dismiss()
+                }
+                .setBackground(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.dialog_background
+                    )
+                )
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setCancelable(true)
+                .create()
+
+            dialog.show()
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                ?.setTextColor(resources.getColor(R.color.text_fiery_red_sunset_600, null))
+
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+                ?.setTextColor(resources.getColor(R.color.text_500, null))
+        }
+    }
+
+    private fun setupViewPager(id: String) {
+        val fieldsPagerAdapter = FieldsPagerAdapter(this, id, fieldName!!)
+        binding.vpFieldDetail.adapter = fieldsPagerAdapter
+
+        TabLayoutMediator(binding.tlFieldsDetails, binding.vpFieldDetail) { tab, position ->
+            tab.text = if (position == 0) "Details" else "Logs"
+        }.attach()
+    }
+
+    private fun setupNavigation() {
+        binding.toolbar.setNavigationOnClickListener {
+            parentFragmentManager.popBackStack()
         }
 
-        btnEditData.setOnClickListener {
-            val editFieldDataFragment = EditFieldDataFragment()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.cl_fragments_fields_detail, EditFieldDataFragment())
-                .addToBackStack(null)
-                .commit()
+        binding.btnEditField.setOnClickListener {
+            val fieldToEdit = currentField ?: return@setOnClickListener
+            val intent = Intent(requireContext(), CreateEditFieldActivity::class.java).apply {
+                putExtra(CreateEditFieldActivity.EXTRA_FIELD, fieldToEdit)
+            }
+            startActivity(intent)
         }
+    }
+
+    private fun observeLoadingState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                fieldViewModel.isLoading.collect { isLoading ->
+                    binding.loadingOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
+                }
+            }
+        }
+    }
+
+    private fun observeFieldHeader(id: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                fieldViewModel.fieldsData.collectLatest { fields ->
+                    val field = fields.find { it.fieldId == id }
+                    if (field != null){
+                        currentField = field
+                        binding.tvDetailName.text = field.fieldName
+
+                        field.fieldPhotoPath?.let { path ->
+                            Glide.with(this@FieldsDetailFragment)
+                                .load(path)
+                                .placeholder(R.drawable.placeholder_200x100)
+                                .into(binding.ivDetailPhoto)
+                        }
+                    } else {
+                        parentFragmentManager.popBackStack()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -6,18 +6,13 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.viewpager2.widget.ViewPager2
 import com.example.sawit.R
-import com.example.sawit.activities.CreateEditActivity
+import com.example.sawit.activities.CreateEditActivityActivity
 import com.example.sawit.activities.LoginActivity
-import com.example.sawit.adapters.ActivitiesAdapter
 import com.example.sawit.adapters.ActivitiesPagerAdapter
 import com.example.sawit.databinding.FragmentActivitiesBinding
 import com.example.sawit.viewmodels.ActivityViewModel
 import com.example.sawit.viewmodels.UserViewModel
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
@@ -71,7 +66,7 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
 
     private fun setupFab() {
         binding.fabAddActivity.setOnClickListener {
-            val intent = Intent(requireActivity(), CreateEditActivity::class.java)
+            val intent = Intent(requireActivity(), CreateEditActivityActivity::class.java)
             startActivity(intent)
         }
     }

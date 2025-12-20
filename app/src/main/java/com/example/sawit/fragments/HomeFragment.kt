@@ -1,7 +1,6 @@
 package com.example.sawit.fragments
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -22,10 +21,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.sawit.R
-import com.example.sawit.activities.CreateFieldActivity
+import com.example.sawit.activities.CreateEditFieldActivity
+import com.example.sawit.activities.DetailBottomSheetActivity
 import com.example.sawit.activities.MainActivity
-import com.example.sawit.adapters.ActivitiesTimelineAdapter
 import com.example.sawit.adapters.FieldsDashboardAdapter
+import com.example.sawit.databinding.ActivityDetailBottomSheetBinding
 import com.example.sawit.databinding.FragmentHomeBinding
 import com.example.sawit.models.ActivityStatus
 import com.example.sawit.models.ActivityTimelineItem
@@ -49,8 +49,6 @@ class HomeFragment : Fragment() {
     private val fieldViewModel: FieldViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
     private val activityViewModel: ActivityViewModel by activityViewModels()
-//    private lateinit var activitiesAdapter: ActivitiesTimelineAdapter
-//    private lateinit var fullName: String
     private val notificationViewModel: NotificationViewModel by activityViewModels()
     private lateinit var createFieldLauncher: ActivityResultLauncher<Intent>
 
@@ -93,10 +91,22 @@ class HomeFragment : Fragment() {
 
         val adapter = FieldsDashboardAdapter(
             onClick = { field ->
-                Toast.makeText(context, "clicked: ${field.fieldName}", Toast.LENGTH_SHORT).show()
+                val detailsFragment =
+                    FieldsDetailFragment.newInstance(field.fieldId, field.fieldName)
+
+                parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_in_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_in_right
+                    )
+                    .replace(R.id.fl_scroll_view_content, detailsFragment)
+                    .addToBackStack(null)
+                    .commit()
             },
             onAddClick = {
-                val intent = Intent(requireContext(), CreateFieldActivity::class.java)
+                val intent = Intent(requireContext(), CreateEditFieldActivity::class.java)
                 createFieldLauncher.launch(intent)
             }
         )
@@ -120,7 +130,7 @@ class HomeFragment : Fragment() {
                 activitiesFlow
                     .map { it.toTimelineItem() }
                     .sortedWith(compareBy<ActivityTimelineItem> {
-                        when(it.status) {
+                        when (it.status) {
                             ActivityStatus.UPCOMING -> 0
                             ActivityStatus.TODAY -> 1
                             ActivityStatus.COMPLETED -> 2
@@ -134,7 +144,23 @@ class HomeFragment : Fragment() {
                 ActivityTimelineList(
                     items = timelineItems,
                     onItemClick = { item ->
-                        Toast.makeText(requireContext(), "Clicked on ${item.activityTitle}", Toast.LENGTH_SHORT).show()
+                        val originalActivity = activitiesFlow.find { it.id == item.id }
+
+                        if (originalActivity != null) {
+                            val bottomSheet = DetailBottomSheetActivity(originalActivity)
+                            bottomSheet.show(parentFragmentManager, "ActivityDetailBottomSheet")
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Activity details not found!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        //                        Toast.makeText(
+//                            requireContext(),
+//                            "Clicked on ${item.activityTitle}",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
                     }
                 )
             }

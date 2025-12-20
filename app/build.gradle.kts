@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.compose.compiler)
     id("kotlin-parcelize")
-    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.devtools.ksp")
 }
 
@@ -52,6 +52,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         viewBinding = true
         compose = true
     }
@@ -64,6 +65,7 @@ composeCompiler {
 dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.runtime)
     val room_version = "2.8.4"
     implementation("com.google.android.libraries.places:places:5.1.1")
     implementation("androidx.room:room-runtime:$room_version")

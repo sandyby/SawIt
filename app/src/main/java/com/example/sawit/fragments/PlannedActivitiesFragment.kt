@@ -5,14 +5,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sawit.R
-import com.example.sawit.activities.CreateEditActivity
+import com.example.sawit.activities.CreateEditActivityActivity
 import com.example.sawit.adapters.ActivitiesAdapter
 import com.example.sawit.adapters.ActivitiesFooterAdapter
 import com.example.sawit.databinding.FragmentActivitiesListBinding
@@ -46,8 +45,8 @@ class PlannedActivitiesFragment : Fragment(R.layout.fragment_activities_list) {
                 viewModel.updateActivityStatus(activity.id!!, newStatus)
             },
             onEditClicked = { activity ->
-                val intent = Intent(requireContext(), CreateEditActivity::class.java).apply {
-                    putExtra(CreateEditActivity.EXTRA_ACTIVITY, activity)
+                val intent = Intent(requireContext(), CreateEditActivityActivity::class.java).apply {
+                    putExtra(CreateEditActivityActivity.EXTRA_ACTIVITY, activity)
                 }
                 startActivity(intent)
             },

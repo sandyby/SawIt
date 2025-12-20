@@ -70,7 +70,14 @@
     <style name="DeleteDialogTheme" parent="Theme.Material3.DayNight.Dialog">
         <item name="android:textColorPrimary">@color/text_primary_900</item>
         <item name="android:textColorSecondary">@color/text_900</item>
-        <item name="colorSurface">@color/white</item>
+        <item name="colorSurface">@color/bg_secondary_900</item>
+    </style>
+
+    <style name="MapSearchTheme" parent="Theme.MaterialComponents.Light">
+        <item name="android:editTextColor">@color/text_primary_900</item>
+        <item name="android:textColorHint">@color/text_500</item>
+        <item name="android:textSize">16sp</item>
+        <item name="tint">@color/bg_primary_500</item>
     </style>
 
     <style name="form_card_custom_corners" parent="">

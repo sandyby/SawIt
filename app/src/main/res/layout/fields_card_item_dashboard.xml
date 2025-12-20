@@ -7,7 +7,7 @@
     android:layout_marginEnd="8dp"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
+    app:cardElevation="2dp"
     app:strokeColor="@color/bg_primary_500"
     app:strokeWidth="1dp">
 
@@ -62,7 +62,7 @@
                         android:fontFamily="@font/lato_bold"
                         android:textColor="@color/white"
                         android:textSize="10sp"
-                        tools:text="130.0 Ha" />
+                        tools:text="130.0 ha" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

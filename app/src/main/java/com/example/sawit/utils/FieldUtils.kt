@@ -20,7 +20,7 @@ fun Int?.formatOilPalmAge(): String {
 fun Double?.formatFieldArea(): String {
     val area = this
     if (area == null || area <= 0.0) return "N/A"
-    return String.format(Locale.getDefault(), "%.1f Ha", area)
+    return String.format(Locale.getDefault(), "%.1f ha", area)
 }
 
 fun String?.formatFieldPalmOilType(): String {

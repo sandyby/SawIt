@@ -33,7 +33,7 @@
             android:value="${GOOGLE_MAPS_API_KEY}" />
 
         <activity
-            android:name=".activities.CreateFieldActivity"
+            android:name=".activities.CreateEditFieldActivity"
             android:exported="false"
             android:label="Create Field Activity" />
         <activity
@@ -58,7 +58,7 @@
             android:name=".activities.LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activities.CreateEditActivity" />
+        <activity android:name=".activities.CreateEditActivityActivity" />
         <activity
             android:name=".activities.EditProfileActivity"
             android:windowSoftInputMode="adjustPan" />

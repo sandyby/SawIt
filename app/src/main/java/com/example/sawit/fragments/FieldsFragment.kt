@@ -6,14 +6,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sawit.R
-import com.example.sawit.activities.CreateFieldActivity
+import com.example.sawit.activities.CreateEditFieldActivity
 import com.example.sawit.activities.LoginActivity
 import com.example.sawit.adapters.FieldsFieldsAdapter
 import com.example.sawit.adapters.FieldsFooterAdapter
@@ -62,7 +62,7 @@ class FieldsFragment : Fragment() {
 
         adapter = FieldsFieldsAdapter(
             onClick = { field ->
-                val action = FieldsDetailFragment.newInstance(field.fieldId)
+                val action = FieldsDetailFragment.newInstance(field.fieldId, field.fieldName)
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fl_scroll_view_content, action)
                     .addToBackStack(null)
@@ -72,13 +72,14 @@ class FieldsFragment : Fragment() {
                 val dialog = MaterialAlertDialogBuilder(
                     requireContext(),
                     R.style.DeleteDialogTheme
-                ) // 💡 Pass the theme here
+                )
                     .setTitle("Delete Field")
                     .setMessage("Are you sure you want to delete '${field.fieldName}'?")
                     .setPositiveButton("Delete") { dialog, _ ->
                         fieldViewModel.deleteField(field, requireContext())
                         dialog.dismiss()
                     }
+                    .setBackground(ContextCompat.getDrawable(requireContext(),R.drawable.dialog_background))
                     .setNegativeButton("Cancel") { dialog, _ ->
                         dialog.dismiss()
                     }
@@ -90,19 +91,7 @@ class FieldsFragment : Fragment() {
                     ?.setTextColor(resources.getColor(R.color.text_fiery_red_sunset_600, null))
 
                 dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
-                    ?.setTextColor(resources.getColor(R.color.bg_primary_500, null))
-                //                MaterialAlertDialogBuilder(requireContext())
-//                    .setTitle("Delete Field")
-//                    .setMessage("Are you sure you want to delete '${field.fieldName}'?")
-//                    .setPositiveButton("Delete") { dialog, _ ->
-//                        fieldViewModel.deleteField(field, requireContext())
-//                        dialog.dismiss()
-//                    }
-//                    .setNegativeButton("Cancel") { dialog, _ ->
-//                        dialog.dismiss()
-//                    }
-//                    .setCancelable(true)
-//                    .show()
+                    ?.setTextColor(resources.getColor(R.color.text_500, null))
             }
         )
 
@@ -111,7 +100,7 @@ class FieldsFragment : Fragment() {
         val concatAdapter = ConcatAdapter(adapter, footerAdapter)
 
         binding.fabFields.setOnClickListener { _ ->
-            val intent = Intent(requireContext(), CreateFieldActivity::class.java)
+            val intent = Intent(requireContext(), CreateEditFieldActivity::class.java)
             startActivity(intent)
         }
 

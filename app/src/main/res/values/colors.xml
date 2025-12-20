@@ -3,6 +3,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="bg_primary_500">#7D8657</color>
     <color name="bg_primary_overlay_2">#8A8B83</color>
+    <color name="bg_primary_overlay_3">#F1F8E9</color>
     <color name="bg_primary_400">#A4AC85</color>
     <color name="bg_secondary_900">#FEFADF</color>
     <color name="bg_secondary_overlay_2">#D4D4D4</color>

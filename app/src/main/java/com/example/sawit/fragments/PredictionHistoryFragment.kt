@@ -6,14 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sawit.R
 import com.example.sawit.adapters.PredictionHistoryAdapter
+import com.example.sawit.adapters.PredictionsFooterAdapter
 import com.example.sawit.databinding.FragmentPredictionHistoryBinding
 import com.example.sawit.viewmodels.PredictionHistoryViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -24,8 +25,9 @@ class PredictionHistoryFragment : Fragment(R.layout.fragment_prediction_history)
     private var _binding: FragmentPredictionHistoryBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: PredictionHistoryViewModel by activityViewModels()
+    private val viewModel: PredictionHistoryViewModel by viewModels()
     private lateinit var historyAdapter: PredictionHistoryAdapter
+    private lateinit var footerAdapter: PredictionsFooterAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +41,10 @@ class PredictionHistoryFragment : Fragment(R.layout.fragment_prediction_history)
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPredictionHistoryBinding.bind(view)
 
+        binding.root.post {
+            binding.root.scrollTo(0, 0)
+        }
+
         setupRecyclerView()
         setupListeners()
         observeViewModel()
@@ -47,16 +53,38 @@ class PredictionHistoryFragment : Fragment(R.layout.fragment_prediction_history)
     private fun setupRecyclerView() {
         historyAdapter = PredictionHistoryAdapter()
 
+        footerAdapter = PredictionsFooterAdapter()
+
+        val concatAdapter = ConcatAdapter(historyAdapter, footerAdapter)
+
+        historyAdapter.onItemClicked = { history ->
+            navigateToResult(history)
+        }
+
         binding.recyclerViewHistory.apply {
-            adapter = historyAdapter
+            adapter = concatAdapter
             layoutManager = LinearLayoutManager(context)
         }
+    }
+
+    private fun navigateToResult(history: com.example.sawit.models.PredictionHistory) {
+        val fragment =
+            if (history.predictionType?.contains("Condition", ignoreCase = true) == true) {
+                PredictionConditionResultFragment.newInstance(history, isFromHistory = true)
+            } else {
+                PredictionYieldResultFragment.newInstance(history, isFromHistory = true)
+            }
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fl_scroll_view_content, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun setupListeners() {
         binding.fabPredict.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fl_scroll_view_content, PredictFragment())
+                .replace(R.id.fl_scroll_view_content, PredictionFragment())
                 .addToBackStack(null)
                 .commit()
         }
@@ -66,8 +94,12 @@ class PredictionHistoryFragment : Fragment(R.layout.fragment_prediction_history)
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.predictionHistoriesData.collect { histories ->
-                        historyAdapter.submitList(histories)
+                    viewModel.predictionHistoriesData.collectLatest { histories ->
+                        historyAdapter.submitList(histories) {
+                            if (histories.isNotEmpty()) {
+                                binding.recyclerViewHistory.scrollToPosition(0)
+                            }
+                        }
                         binding.clEmptyStatePredictionHistories.visibility =
                             if (histories.isEmpty()) View.VISIBLE else View.GONE
                         binding.recyclerViewHistory.visibility =

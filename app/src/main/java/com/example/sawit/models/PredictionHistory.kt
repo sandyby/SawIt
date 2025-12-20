@@ -3,13 +3,15 @@ package com.example.sawit.models
 import android.os.Parcelable
 import com.google.firebase.firestore.DocumentId
 import kotlinx.parcelize.Parcelize
+import java.util.Date
 
 @Parcelize
 data class PredictionHistory(
     @DocumentId
     var id: String? = null,
     val userId: String? = null,
-    val date: Long = System.currentTimeMillis(),
+    val date: Date = Date(),
+    val fieldId: String? = null,
     val fieldName: String? = null,
     val predictionType: String? = null,
     val predictedYield: Float = 0f,
