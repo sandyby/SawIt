@@ -1,6 +1,7 @@
 package com.example.sawit.fragments
 
 import android.os.Bundle
+import android.util.Log // Ditambahkan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
     private var hasAutoSelected = false
 
     companion object {
+        private const val TAG = "SAWIT_ML" // Tag untuk Logcat
         const val ARG_CONDITION_LABEL = "condition_label"
         const val ARG_PREDICTED_YIELD = "predicted_yield"
         const val ARG_ACTUAL_YIELD = "actual_yield"
@@ -197,20 +199,25 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
 
         if (tempMax == null) {
             binding.tilMaxTemperature.error = "Max. temperature is required!"
-//            binding.tilMaxTemperature.isHelperTextEnabled = false
             isValid = false
         } else if (tempMax < 10 || tempMax > 40) {
-//            binding.tilMaxTemperature.isHelperTextEnabled = false
             binding.tilMaxTemperature.error = "Max. temperature must be between 10 and 40°C!"
             isValid = false
         } else {
-//            binding.tilMaxTemperature.isHelperTextEnabled = true
             binding.tilMaxTemperature.error = null
         }
 
-        if (!isValid) return
+        if (!isValid) {
+            Log.w(TAG, "Validation failed: Some fields are incorrect.") // Log Warning
+            return
+        }
 
         val selectedFieldId = fieldIdMap[fieldName]
+
+        // --- LOG INPUT ---
+        Log.d(TAG, "--- START PREDICTION ---")
+        Log.d(TAG, "Input Data: Field=$fieldName, Area=$harvestArea, Rain=$rainfall, Actual=$actualYield, Tmin=$tempMin, Tmax=$tempMax")
+
         predictionViewModel.predictPlantCondition(
             fieldId = selectedFieldId!!,
             fieldName = fieldName,
@@ -231,6 +238,10 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
                             val actualYield =
                                 binding.tietActualYield.text.toString().toFloatOrNull() ?: 0f
 
+                            // --- LOG HASIL ---
+                            Log.i(TAG, "Prediction SUCCESS")
+                            Log.i(TAG, "Result: Label=${it.conditionLabel}, Predicted=${it.predictedYield}, Gap=${it.gapPercentage}%")
+
                             val resultFragment = PredictionConditionResultFragment().apply {
                                 arguments = Bundle().apply {
                                     putString("condition_label", it.conditionLabel)
@@ -250,15 +261,17 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
                     predictionViewModel.events.collect { event ->
                         when (event) {
                             is PredictionViewModel.Event.ShowError -> {
+                                Log.e(TAG, "Error Event: ${event.message}") // Log Error
                                 Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                             }
 
                             is PredictionViewModel.Event.ShowMessage -> {
+                                Log.d(TAG, "Message Event: ${event.message}")
                                 Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                             }
 
                             is PredictionViewModel.Event.PredictionSaved -> {
-                                //
+                                Log.d(TAG, "Prediction saved to database.")
                             }
                         }
                     }
@@ -266,6 +279,7 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
 
                 launch {
                     predictionViewModel.isLoading.collect { isLoading ->
+                        Log.v(TAG, "Loading state: $isLoading") // Log Verbose
                         binding.btnPredict.isEnabled = !isLoading
                         binding.btnPredict.text =
                             if (isLoading) "PREDICTING..." else "PREDICT"
