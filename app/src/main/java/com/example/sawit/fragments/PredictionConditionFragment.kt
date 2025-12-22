@@ -205,6 +205,12 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
             binding.tilMaxTemperature.error = null
         }
 
+        if (binding.tilMinTemperature.error == null && binding.tilMaxTemperature.error == null && tempMin!! > tempMax!!) {
+            binding.tilMinTemperature.error = "Invalid min. temperature!"
+            isValid = false
+        }
+
+
         if (!isValid) return
 
         val selectedFieldId = fieldIdMap[fieldName]

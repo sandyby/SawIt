@@ -98,6 +98,7 @@
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:background="@android:color/transparent"
+                android:textColor="@color/text_primary_900"
                 app:buttonCompat="@drawable/activity_item_checkbox_animated"
                 app:buttonTint="@null"
                 app:layout_constraintBottom_toBottomOf="parent"

@@ -248,40 +248,41 @@
                         android:textColor="@color/btn_text"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginVertical="24sp"
-                        android:alpha="0.5"
-                        android:fontFamily="@font/lato_bold"
-                        android:text="or register with"
-                        android:textColor="@color/text_primary_500"
-                        android:textSize="13sp" />
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginVertical="24sp"-->
+<!--                        android:alpha="0.5"-->
+<!--                        android:fontFamily="@font/lato_bold"-->
+<!--                        android:text="or register with"-->
+<!--                        android:textColor="@color/text_primary_500"-->
+<!--                        android:textSize="13sp" />-->
+
+<!--                    <LinearLayout-->
+<!--                        android:id="@+id/ll_socialMediaBtn"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginBottom="16dp"-->
+<!--                        android:gravity="center"-->
+<!--                        android:orientation="horizontal">-->
+
+<!--                        <ImageButton-->
+<!--                            android:id="@+id/btn_google"-->
+<!--                            android:layout_width="48dp"-->
+<!--                            android:layout_height="48dp"-->
+<!--                            android:background="@drawable/bg_social_media_icon"-->
+<!--                            android:contentDescription="Google Account"-->
+<!--                            android:padding="8dp"-->
+<!--                            android:scaleType="centerInside"-->
+<!--                            android:src="@drawable/ic_google_logo" />-->
+
+<!--                    </LinearLayout>-->
 
                     <LinearLayout
-                        android:id="@+id/ll_socialMediaBtn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <ImageButton
-                            android:id="@+id/btn_google"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="@drawable/bg_social_media_icon"
-                            android:contentDescription="Google Account"
-                            android:padding="8dp"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_google_logo" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginVertical="24dp"
                         android:layout_gravity="center"
                         android:orientation="horizontal">
 

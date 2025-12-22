@@ -68,6 +68,8 @@ class HomeFragment : Fragment() {
     private val weatherViewModel: WeatherViewModel by activityViewModels()
     private lateinit var createFieldLauncher: ActivityResultLauncher<Intent>
     private var wasLocationPermissionGranted = false
+    private var lastManualRefreshTime: Long = 0
+    private val MANUAL_REFRESH_COOLDOWN = 30000L
     private val requestLocationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -136,7 +138,15 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.srlHomeRefresh.setOnRefreshListener {
-            fetchLocationAndWeather(forceRefresh = true)
+            val currentTime = System.currentTimeMillis()
+
+            if (currentTime - lastManualRefreshTime < MANUAL_REFRESH_COOLDOWN) {
+                binding.srlHomeRefresh.isRefreshing = false
+                Log.d("HomeFragment", "on cooldown")
+            } else {
+                lastManualRefreshTime = currentTime
+                fetchLocationAndWeather(forceRefresh = true)
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -306,14 +316,6 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
-
-        //            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-//                if (location != null) {
-//                    weatherViewModel.fetchWeather(location.latitude, location.longitude, forceRefresh)
-//                } else {
-//                    requestFreshLocation(fusedLocationClient, forceRefresh)
-//                }
-//            }
         } else {
             if (forceRefresh) {
                 requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -321,7 +323,6 @@ class HomeFragment : Fragment() {
             } else {
                 weatherViewModel.fetchWeather(-6.2088   , 106.8456, false)
             }
-        //            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
     }
 
@@ -336,19 +337,9 @@ class HomeFragment : Fragment() {
                 if (freshLocation != null) {
                     weatherViewModel.fetchWeather(freshLocation.latitude, freshLocation.longitude, forceRefresh)
                 } else {
-                    // Fallback
                     weatherViewModel.fetchWeather(-6.2088, 106.8456, forceRefresh)
                 }
             }
-
-    //        client.getCurrentLocation(currentRequestBuilder, null)
-//            .addOnSuccessListener { freshLocation ->
-//                if (freshLocation != null) {
-//                    weatherViewModel.fetchWeather(freshLocation.latitude, freshLocation.longitude)
-//                } else {
-//                    weatherViewModel.fetchWeather(-6.2088, 106.8456)
-//                }
-//            }
     }
 
     private fun checkAndRequestNotificationPermission() {
