@@ -15,12 +15,13 @@ class PredictionFragment : Fragment(R.layout.fragment_predictions) {
     private lateinit var viewPager: ViewPager2
 
     companion object {
-        fun newInstance(fieldId: String? = null, fieldName: String? = null) = PredictionFragment().apply {
-            arguments = Bundle().apply {
-                putString("fieldId", fieldId)
-                putString("fieldName", fieldName)
+        fun newInstance(fieldId: String? = null, fieldName: String? = null) =
+            PredictionFragment().apply {
+                arguments = Bundle().apply {
+                    putString("fieldId", fieldId)
+                    putString("fieldName", fieldName)
+                }
             }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -29,7 +30,7 @@ class PredictionFragment : Fragment(R.layout.fragment_predictions) {
         tabLayout = view.findViewById(R.id.tl_predictions)
         viewPager = view.findViewById(R.id.vp_predictions)
 
-        val adapter = PredictionsPagerAdapter(requireActivity())
+        val adapter = PredictionsPagerAdapter(this)
         viewPager.adapter = adapter
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -40,6 +41,12 @@ class PredictionFragment : Fragment(R.layout.fragment_predictions) {
             }
         }.attach()
 
+        if (arguments?.getString("fieldId") != null) {
+            viewPager.post {
+                viewPager.setCurrentItem(1, false)
+            }
+        }
+
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.let { viewPager.currentItem = it.position }
@@ -48,9 +55,5 @@ class PredictionFragment : Fragment(R.layout.fragment_predictions) {
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
-
-        if (arguments?.getString("fieldId") != null) {
-            viewPager.post { viewPager.currentItem = 1 }
-        }
     }
 }

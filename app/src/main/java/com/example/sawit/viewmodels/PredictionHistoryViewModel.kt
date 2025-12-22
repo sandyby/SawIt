@@ -99,24 +99,34 @@ class PredictionHistoryViewModel : ViewModel() {
         }
     }
 
-    fun deleteHistory(id: String) {
-        _isLoading.value = true
-        databaseRef.child(id).removeValue()
-            .addOnSuccessListener {
-                _isLoading.value = false
-                viewModelScope.launch {
-                    _eventChannel.send(Event.ShowMessage("History deleted"))
+    fun deleteHistory(historyPredictionId: String) {
+        viewModelScope.launch {
+            databaseRef.child(historyPredictionId).removeValue()
+                .addOnSuccessListener {
+                    viewModelScope.launch {
+                        _eventChannel.send(Event.ShowMessage("Prediction deleted successfully!"))
+                    }
                 }
-            }
-            .addOnFailureListener {
-                _isLoading.value = false
-            }
+                .addOnFailureListener { e ->
+                    viewModelScope.launch {
+                        _eventChannel.send(Event.ShowMessage("Failed to delete: ${e.localizedMessage}"))
+                    }
+                }
+        }
+    }
+
+    fun insertHistory(history: PredictionHistory) {
+        history?.id?.let {
+            id ->
+            databaseRef.child(id).setValue(history)
+        }
     }
 
     override fun onCleared() {
         super.onCleared()
         if (isListenerInitialized) {
-            databaseRef.orderByChild("userId").equalTo(currentUserId).removeEventListener(historyListener)
+            databaseRef.orderByChild("userId").equalTo(currentUserId)
+                .removeEventListener(historyListener)
         }
     }
 }

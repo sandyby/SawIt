@@ -48,6 +48,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -76,6 +77,9 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         private val DEFAULT_LOCATION = LatLng(-0.789275, 113.921327)
         private const val LOCATION_PERMISSION_REQUEST_CODE = 100
     }
+
+    private val currentUserId: String
+        get() = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
     private lateinit var imagePickerLauncher: ActivityResultLauncher<String>
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -359,23 +363,6 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
                 Log.e("Geocoder", "Reverse geocode error")
             }
         }
-        //        val geocoder = Geocoder(this, Locale.getDefault())
-//        try {
-//            @Suppress("DEPRECATION") val addresses: List<Address>? =
-//                geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-//            if (!addresses.isNullOrEmpty()) {
-//                val address: Address = addresses[0]
-//                val addressBuilder = StringBuilder()
-//                for (i in 0..address.maxAddressLineIndex) {
-//                    addressBuilder.append(address.getAddressLine(i)).append("\n")
-//                }
-//
-//                selectedAddress = addressBuilder.toString().trim()
-//                binding.tvSelectedFieldLocation.text = selectedAddress
-//            }
-//        } catch (e: IOException) {
-//            e.printStackTrace()
-//        }
     }
 
     private fun saveImageLocally(context: Context, imageUri: Uri): String? {
@@ -457,6 +444,12 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             address = selectedAddress!!
         )
 
+        val fieldUserId = if (isEditMode) {
+            currentField?.userId ?: ""
+        } else {
+            currentUserId
+        }
+
         val fieldToSave = Field(
             fieldId = if (isEditMode) currentField!!.fieldId else "",
             fieldName = fieldName,
@@ -465,7 +458,8 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             avgOilPalmAgeInMonths = fieldAverageAge.toIntOrNull() ?: 0,
             oilPalmType = oilPalmType,
             fieldDesc = fieldDesc,
-            fieldPhotoPath = finalImagePath
+            fieldPhotoPath = finalImagePath,
+            userId = fieldUserId
         )
 
         if (isEditMode) {

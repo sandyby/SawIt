@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 class FieldsDetailFragment : Fragment(R.layout.fragment_fields_detail) {
     private var _binding: FragmentFieldsDetailBinding? = null
     private val binding get() = _binding!!
-    private val fieldViewModel: FieldViewModel by activityViewModels()
+        private val fieldViewModel: FieldViewModel by activityViewModels()
     private var currentField: Field? = null
     private lateinit var fieldsAdapter: FieldsFieldsAdapter
     private var fieldId: String? = null

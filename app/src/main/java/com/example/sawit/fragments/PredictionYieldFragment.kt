@@ -140,6 +140,19 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
             binding.tilMaxTemperature.error = null
         }
 
+        if (tmin != null && tmax != null && tmin > tmax) {
+            binding.tilMinTemperature.error = "Invalid min. temperature!"
+            binding.tilMaxTemperature.error = null
+            isValid = false
+        } else if (tmin != null && tmax != null && tmax < tmin) {
+            binding.tilMaxTemperature.error = "Invalid max. temperature!"
+            binding.tilMinTemperature.error = null
+            isValid = false
+        } else {
+            binding.tilMinTemperature.error = null
+            binding.tilMaxTemperature.error = null
+        }
+
         if (!isValid) return
 
         val selectedFieldId = fieldIdMap[fieldName]

@@ -63,7 +63,7 @@ class FieldLogsFragment : Fragment(R.layout.fragment_field_logs) {
 
     private fun setupAddDataBtn() {
         binding.tvCtaData.setOnClickListener {
-            val predictionFragment = PredictionFragment.newInstance(fieldId)
+            val predictionFragment = PredictionFragment.newInstance(fieldId, fieldName)
 
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fl_scroll_view_content, predictionFragment)

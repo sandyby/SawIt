@@ -66,11 +66,13 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
                     PredictionUtils.predictYield(getApplication(), tmin, tmax, rainfall, area)
                 }
 
+                val sanitizedYield = maxOf(0f, yield)
+
                 val history = PredictionHistory(
                     fieldId = fieldId,
                     fieldName = fieldName,
                     predictionType = "Total Yield",
-                    predictedYield = yield,
+                    predictedYield = sanitizedYield,
                     tmin = tmin,
                     tmax = tmax,
                     rainfall = rainfall,
@@ -105,8 +107,17 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
                     PredictionUtils.predictYield(getApplication(), tmin, tmax, rainfall, area)
                 }
 
+                val sanitizedPredictedYield = maxOf(0f, predictedYield)
+
                 val gap =
-                    if (predictedYield != 0f) ((actualYield - predictedYield) / predictedYield) * 100 else 0f
+                    if (sanitizedPredictedYield != 0f) {
+                        ((actualYield - sanitizedPredictedYield) / sanitizedPredictedYield) * 100
+                    } else if (actualYield > 0f) {
+                        100f
+                    } else {
+                        0f
+                    }
+
                 val label = when {
                     gap >= 15 -> "Good"
                     gap <= -15 -> "Bad"
@@ -117,7 +128,7 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
                     fieldId = fieldId,
                     fieldName = fieldName,
                     predictionType = "Condition",
-                    predictedYield = predictedYield,
+                    predictedYield = sanitizedPredictedYield,
                     actualYield = actualYield,
                     conditionLabel = label,
                     gapPercentage = gap,
@@ -129,7 +140,7 @@ class PredictionViewModel(application: Application) : AndroidViewModel(applicati
                 )
 
                 saveToDatabase(history)
-                _predictionResult.value = PredictionResult(predictedYield, label, gap)
+                _predictionResult.value = PredictionResult(sanitizedPredictedYield, label, gap)
 
             } catch (e: Exception) {
                 _eventChannel.send(Event.ShowError("Prediction Error: ${e.localizedMessage}"))

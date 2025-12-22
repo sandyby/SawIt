@@ -45,7 +45,6 @@ class FieldViewModel : ViewModel() {
     private var isListenerInitialized: Boolean = false
 
     init {
-//        populateData()
         listenForFieldsUpdates()
     }
 
@@ -53,7 +52,6 @@ class FieldViewModel : ViewModel() {
         _scrollToFieldId.value = fieldId
     }
 
-    // Function to clear the ID after scrolling
     fun clearScrollToFieldId() {
         _scrollToFieldId.value = null
     }
@@ -95,13 +93,11 @@ class FieldViewModel : ViewModel() {
         }
         fieldsByUserQuery.addValueEventListener(fieldListener)
         isListenerInitialized = true
-//        databaseRef.addValueEventListener(fieldListener)
         Log.d("FieldViewModel", "Firebase listener for fields was added")
     }
 
     override fun onCleared() {
         super.onCleared()
-//        databaseRef.removeEventListener(fieldListener)
         if (isListenerInitialized) {
             val fieldsByUserQuery = databaseRef.orderByChild("userId").equalTo(currentUserId)
             fieldsByUserQuery.removeEventListener(fieldListener)
@@ -148,6 +144,8 @@ class FieldViewModel : ViewModel() {
         }
 
         if (field.userId != currentUserId) {
+            Log.d("FieldViewModel", "updateField: ${field.userId}")
+            Log.d("FieldViewModel", "updateField: ${currentUserId}")
             viewModelScope.launch { _eventChannel.send(Event.ShowMessage("You don't have access to this field!")) }
             return
         }
@@ -187,6 +185,8 @@ class FieldViewModel : ViewModel() {
                 deleteLocalImageFile(field.fieldPhotoPath, context)
                 viewModelScope.launch {
                     _eventChannel.send(Event.ShowMessage("Successfully deleted field: ${field.fieldName}!"))
+                    delay(1250)
+                    _eventChannel.send(Event.FinishActivity)
                 }
                 _isLoading.value = false
             }

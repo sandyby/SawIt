@@ -28,6 +28,7 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
     private val fieldViewModel: FieldViewModel by viewModels()
     private val predictionViewModel: PredictionViewModel by viewModels()
     private var fieldIdMap: Map<String, String> = emptyMap()
+    private var hasAutoSelected = false
 
     companion object {
         const val ARG_CONDITION_LABEL = "condition_label"
@@ -56,10 +57,13 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
 
     private fun observeFields() {
         val targetFieldId = parentFragment?.arguments?.getString("fieldId")
+        val targetFieldName = parentFragment?.arguments?.getString("fieldName")
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 fieldViewModel.fieldsData.collectLatest { fields ->
+                    if (fields.isEmpty()) return@collectLatest
+
                     fieldIdMap = fields.associate { it.fieldName to it.fieldId }
                     val fieldNames = mutableListOf(FIELD_PLACEHOLDER)
                     fieldNames.addAll(fields.map { it.fieldName })
@@ -79,12 +83,13 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
                         )
                         setAdapter(adapter)
                     }
-                    if (targetFieldId != null) {
+                    if (targetFieldId != null && !hasAutoSelected) {
                         val selectedField = fields.find { it.fieldId == targetFieldId }
-                        selectedField?.let { field ->
-                            binding.actvField.setText(field.fieldName, false)
+                        selectedField?.let {
+                            binding.actvField.setText(it.fieldName, false)
+                            hasAutoSelected = true
                         }
-                    } else {
+                    } else if (!hasAutoSelected) {
                         binding.actvField.setText(FIELD_PLACEHOLDER, false)
                     }
                 }
@@ -162,15 +167,14 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
         if (!isValid) return
 
         val selectedFieldId = fieldIdMap[fieldName]
-
         predictionViewModel.predictPlantCondition(
-            selectedFieldId!!,
-            fieldName,
-            tempMin!!,
-            tempMax!!,
-            rainfall!!,
-            harvestArea!!,
-            actualYield!!
+            fieldId = selectedFieldId!!,
+            fieldName = fieldName,
+            tmin = tempMin ?: 0f,
+            tmax = tempMax ?: 0f,
+            rainfall = rainfall ?: 0f,
+            area = harvestArea ?: 0f,
+            actualYield = actualYield ?: 0f
         )
     }
 
@@ -185,10 +189,10 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
 
                             val resultFragment = PredictionConditionResultFragment().apply {
                                 arguments = Bundle().apply {
-                                    putString(ARG_CONDITION_LABEL, it.conditionLabel)
-                                    putFloat(ARG_PREDICTED_YIELD, it.predictedYield)
-                                    putFloat(ARG_GAP_PERCENTAGE, it.gapPercentage ?: 0f)
-                                    putFloat(ARG_ACTUAL_YIELD, actualYield)
+                                    putString("condition_label", it.conditionLabel)
+                                    putFloat("predicted_yield", it.predictedYield)
+                                    putFloat("actual_yield", actualYield)
+                                    putFloat("gap_percentage", it.gapPercentage ?: 0f)
                                     putBoolean(ARG_IS_FROM_HISTORY, false)
                                 }
                             }
