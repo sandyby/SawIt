@@ -70,20 +70,7 @@ class HomeFragment : Fragment() {
     private var wasLocationPermissionGranted = false
     private var lastManualRefreshTime: Long = 0
     private val MANUAL_REFRESH_COOLDOWN = 30000L
-    private val requestLocationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            fetchLocationAndWeather()
-        } else {
-            Toast.makeText(
-                requireContext(),
-                "Location denied. Showing default weather and location!",
-                Toast.LENGTH_SHORT
-            ).show()
-            weatherViewModel.fetchWeather(-6.2088, 106.8456)
-        }
-    }
+    private lateinit var requestLocationPermissionLauncher: ActivityResultLauncher<String>
     private val requestNotificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -108,6 +95,21 @@ class HomeFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val mainActivity = activity as? MainActivity
                 mainActivity?.navigateToFieldsFragment()
+            }
+        }
+
+        requestLocationPermissionLauncher =  registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                fetchLocationAndWeather()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Location denied. Showing default weather and location!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                weatherViewModel.fetchWeather(-6.2088, 106.8456)
             }
         }
     }
@@ -157,18 +159,16 @@ class HomeFragment : Fragment() {
             }
         }
 
-        if (weatherViewModel.isWeatherStale()) {
-            fetchLocationAndWeather()
-        } else {
-            Log.d("HomeFragment", "Weather is fresh. Skipping GPS/Network.")
-        }
-
         setupDashboardRecyclerView()
         setupTimeline()
         setupClickListeners()
         setupComposables()
 
-        fetchLocationAndWeather()
+        if (weatherViewModel.isWeatherStale()) {
+            fetchLocationAndWeather()
+        } else {
+            Log.d("HomeFragment", "Weather is fresh. Skipping GPS/Network.")
+        }
 
         fieldViewModel.listenForFieldsUpdates()
         activityViewModel.listenForActivitiesUpdate()
@@ -289,7 +289,6 @@ class HomeFragment : Fragment() {
             val weatherState by weatherViewModel.weatherState.collectAsState()
             WeatherCard(state = weatherState)
         }
-        weatherViewModel.fetchWeather(-0.026330, 109.342504)
     }
 
     private fun hasLocationPermission(): Boolean {

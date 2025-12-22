@@ -39,6 +39,7 @@ class PredictionHistoryViewModel : ViewModel() {
 
     private lateinit var historyListener: ValueEventListener
     private var isListenerInitialized: Boolean = false
+    private var listeningToUserId: String = ""
 
     sealed class Event {
         data class ShowMessage(val message: String) : Event()
@@ -50,7 +51,18 @@ class PredictionHistoryViewModel : ViewModel() {
     }
 
     fun listenForHistoryUpdates() {
-        if (isListenerInitialized || currentUserId.isEmpty()) return
+        val uid = currentUserId
+
+        if (uid.isEmpty()) return
+
+        if (isListenerInitialized && listeningToUserId == uid) return
+
+        if (isListenerInitialized) {
+            databaseRef.removeEventListener(historyListener)
+            isListenerInitialized = false
+        }
+
+//        if (isListenerInitialized || currentUserId.isEmpty()) return
 
         val historyByUserQuery = databaseRef.orderByChild("userId").equalTo(currentUserId)
 
@@ -76,6 +88,7 @@ class PredictionHistoryViewModel : ViewModel() {
         }
         historyByUserQuery.addValueEventListener(historyListener)
         isListenerInitialized = true
+        listeningToUserId = uid
     }
 
     fun savePrediction(prediction: PredictionHistory) {

@@ -41,6 +41,11 @@ class PredictionHistoryFragment : Fragment(R.layout.fragment_prediction_history)
     private lateinit var historyAdapter: PredictionHistoryAdapter
     private lateinit var footerAdapter: PredictionsFooterAdapter
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.listenForHistoryUpdates()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
