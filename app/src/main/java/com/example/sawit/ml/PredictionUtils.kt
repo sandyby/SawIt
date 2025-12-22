@@ -6,7 +6,7 @@ import ai.onnxruntime.*
 import java.nio.FloatBuffer
 
 object PredictionUtils {
-    private const val TAG = "ML_ENGINE" // Tag khusus untuk filtering
+    private const val TAG = "SAWIT_ML_DEBUG" // Tag khusus untuk filtering
     private const val INPUT_NAME = "float_input"
     private val INPUT_SHAPE = longArrayOf(1, 4)
 
