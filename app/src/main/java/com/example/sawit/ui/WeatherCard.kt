@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,11 +35,9 @@ import com.example.sawit.R
 import com.example.sawit.data.remote.WeatherResponse
 import com.example.sawit.viewmodels.WeatherState
 import java.util.Locale
-import java.util.Locale.getDefault
 
 @Composable
 fun WeatherCard(state: WeatherState) {
-    // Premium Gradient Background
     val gradientBrush = Brush.verticalGradient(
         colors = listOf(
             Color(0xFF709ED2),
@@ -53,7 +50,7 @@ fun WeatherCard(state: WeatherState) {
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight()
+            .height(200.dp)
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Box(
@@ -214,29 +211,22 @@ fun WeatherContent(data: WeatherResponse, province: String) {
     }
 }
 
-// Map OpenWeatherMap icon codes to your drawable resources
 fun getWeatherIcon(code: String): Int {
     return when (code) {
-        // Clear
         "01d" -> R.drawable.ic_clear_day_64
         "01n" -> R.drawable.ic_clear_night_64
 
-        // Clouds
         "02d", "03d", "04d" -> R.drawable.ic_cloudy_64
         "02n", "03n", "04n" -> R.drawable.ic_cloudy_1_night_64
 
-        // Rain
         "09d", "10d" -> R.drawable.ic_rainy_3_64
         "09n", "10n" -> R.drawable.ic_rainy_3_night_64
 
-        // Thunderstorm
         "11d", "11n" -> R.drawable.ic_thunderstorms_64
 
-        // Snow (Optional, unlikely in Indonesia but good to handle)
         "13d" -> R.drawable.ic_snowy_2_64
         "13n" -> R.drawable.ic_snowy_2_night_64
 
-        // Mist/Fog
         "50d", "50n" -> R.drawable.ic_fog_64
 
         else -> R.drawable.ic_cloudy_2_day_64

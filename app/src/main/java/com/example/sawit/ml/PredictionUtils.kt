@@ -29,8 +29,6 @@ object PredictionUtils {
         return outputIndex
     }
 
-
-    // Fungsi Prediksi Yield (Hasil Panen)
     fun predictYield(
         context: Context,
         tmin: Float,
@@ -38,16 +36,10 @@ object PredictionUtils {
         rainfall: Float,
         area: Float
     ): Float {
-
         val session = ORTSessionHelper.loadModel(context, "regressor_yield.onnx")
-
         val inputArray = floatArrayOf(tmin, tmax, rainfall, area)
-
-        // Membuat tensor dari FloatBuffer
         val tensor = OnnxTensor.createTensor(OrtEnvironment.getEnvironment(), FloatBuffer.wrap(inputArray), INPUT_SHAPE)
-
         val result = session.run(mapOf(INPUT_NAME to tensor))
-        // Output dari regressor model adalah FloatArray of [1, 1]
         val output = (result.get(0).value as Array<FloatArray>)[0][0]
 
         result.close()

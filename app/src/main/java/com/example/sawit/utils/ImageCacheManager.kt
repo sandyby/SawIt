@@ -39,15 +39,6 @@ object ImageCacheManager {
     }
 
     fun uriToBase64(context: Context, imageUri: Uri): String? {
-//        return try {
-//            context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
-//                val bytes = inputStream.readBytes()
-//                Base64.encodeToString(bytes, Base64.NO_WRAP)
-//            }
-//        } catch (e: Exception) {
-//            Log.e("ImageCacheManager", "Failed to convert URI to Base64", e)
-//            null
-//        }
         return try {
             val inputStream: InputStream? = context.contentResolver.openInputStream(imageUri)
             val bitmap = BitmapFactory.decodeStream(inputStream)
@@ -97,26 +88,12 @@ object ImageCacheManager {
             Log.e(TAG, "Error converting Base64 to local file", e)
             null
         }
-    //        val fileName = "fetch_${UUID.randomUUID()}.jpg"
-//        val file = File(context.filesDir, fileName)
-//
-//        return try {
-//            val imageBytes = Base64.decode(base64String, Base64.NO_WRAP)
-//            FileOutputStream(file).use { outputStream ->
-//                outputStream.write(imageBytes)
-//            }
-//            file.absolutePath
-//        } catch (e: Exception) {
-//            Log.e("ImageCacheManager", "Failed to decode Base64 and save locally", e)
-//            null
-//        }
     }
 
     fun isCached(localPath: String?): Boolean {
         if (localPath.isNullOrEmpty()) return false
         val file = File(localPath)
         return file.exists() && file.length() > 0
-    //        return path?.let { File(it).exists() } == true
     }
 
     fun deleteLocalFile(localPath: String?) {
@@ -125,8 +102,5 @@ object ImageCacheManager {
         if (file.exists()) {
             file.delete()
         }
-    //        if (path != null) {
-//            File(path).delete()
-//        }
     }
 }

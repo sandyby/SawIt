@@ -43,24 +43,6 @@ class ProfileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        editProfileResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-//            if (result.resultCode == Activity.RESULT_OK) {
-//                val data: Intent? = result.data
-//
-//                val newName = data?.getStringExtra("EXTRA_NEW_NAME")
-//                val newEmail = data?.getStringExtra("EXTRA_NEW_EMAIL")
-//
-//                if (newName != null && newEmail != null) {
-//                    tvUserName.text = newName
-//                    tvUserEmail.text = newEmail
-//                    Toast.makeText(
-//                        requireContext(),
-//                        "(temporary) update nama berhasil",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//            }
-//        }
     }
 
     override fun onCreateView(

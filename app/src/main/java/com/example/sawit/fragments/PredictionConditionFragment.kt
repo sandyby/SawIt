@@ -197,14 +197,11 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
 
         if (tempMax == null) {
             binding.tilMaxTemperature.error = "Max. temperature is required!"
-//            binding.tilMaxTemperature.isHelperTextEnabled = false
             isValid = false
         } else if (tempMax < 10 || tempMax > 40) {
-//            binding.tilMaxTemperature.isHelperTextEnabled = false
             binding.tilMaxTemperature.error = "Max. temperature must be between 10 and 40°C!"
             isValid = false
         } else {
-//            binding.tilMaxTemperature.isHelperTextEnabled = true
             binding.tilMaxTemperature.error = null
         }
 

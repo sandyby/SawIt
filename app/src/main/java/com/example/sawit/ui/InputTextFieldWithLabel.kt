@@ -36,7 +36,6 @@ fun InputTextWithLabel(
     isError: Boolean = false,
     errorMsg: String? = null,
     placeholderStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(
-//        fontSize = 12.sp,
         color = Text600
     ),
     modifier: Modifier = Modifier,

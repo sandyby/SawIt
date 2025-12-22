@@ -166,11 +166,4 @@
         <item name="windowSplashScreenIconBackgroundColor">@color/white</item>
     </style>
 
-    <!--    <style name="Theme.SawIt.SplashScreen" parent="Theme.SplashScreen">-->
-    <!--        <item name="windowSplashScreenIconBackgroundColor">@color/bg_primary_500</item>-->
-    <!--        <item name="windowSplashScreenBackground">@color/bg_primary_500</item>-->
-    <!--        <item name="windowSplashScreenAnimatedIcon">@drawable/sawit_logo_bottom_text_cropped</item>-->
-    <!--        <item name="postSplashScreenTheme">@style/Base.Theme.SawIt</item>-->
-    <!--    </style>-->
-
 </resources>

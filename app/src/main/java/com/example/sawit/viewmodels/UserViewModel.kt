@@ -130,7 +130,6 @@ class UserViewModel : ViewModel() {
                 val uid = authResult.user?.uid
                 if (uid != null) {
                     createNewUserProfile(uid, email, fullName)
-//                    saveNewUserProfile(uid, email, fullName)
                 } else {
                     _authEvents.value = AuthEvent.Error("Registration failed: no UID generated.")
                     _isLoading.value = false
@@ -215,7 +214,6 @@ class UserViewModel : ViewModel() {
             val existingUser = snapshot.getValue(User::class.java)
 
             if (existingUser != null) {
-                // Check if we are replacing an existing picture. If so, delete the old local file.
                 if (newProfilePhotoLocalPath != null || newProfilePhotoBase64 != null) {
                     // If a new picture is being saved, delete the old local file if it exists.
                     // NOTE: This deletion should optimally happen when the picture is successfully saved.
@@ -326,19 +324,6 @@ class UserViewModel : ViewModel() {
                     }
             }
         }
-        //        if (uid.isEmpty()) return
-//
-//        val pathUpdate = mapOf("profilePhotoLocalPath" to newLocalPath)
-//
-//        databaseRef.child(uid).updateChildren(
-//            pathUpdate
-//        )
-//            .addOnSuccessListener {
-//                Log.d("UserViewModel", "Updated new local path: $newLocalPath")
-//            }
-//            .addOnFailureListener { e ->
-//                Log.d("UserViewModel", "Failed to update the local path in the DB!")
-//            }
     }
 
     fun updatePassword(oldPassword: String, newPassword: String) = viewModelScope.launch {
@@ -368,7 +353,6 @@ class UserViewModel : ViewModel() {
                                 email = user.email ?: ""
                             )
                         )
-//                        refreshUserProfile()
                         Log.d("UserViewModel", "Password successfully updated.")
                         _isLoading.value = false
                     }

@@ -54,8 +54,6 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var tilPassword: TextInputLayout
     private lateinit var tilConfirmPassword: TextInputLayout
     private lateinit var mBtnRegister: MaterialButton
-
-    //    private lateinit var database: DatabaseReference
     private val userViewModel: UserViewModel by viewModels()
     private var isFullNameValid = false
     private var isEmailValid = false
@@ -92,10 +90,6 @@ class RegisterActivity : AppCompatActivity() {
         tietPassword.addTextChangedListener(PasswordWatcher())
         tietConfirmPassword.addTextChangedListener(ConfirmPasswordWatcher())
 
-//        database =
-//            FirebaseDatabase.getInstance("https://sawit-6876f-default-rtdb.asia-southeast1.firebasedatabase.app/").reference
-
-
         /*
         * untuk saat ini, kami lebih banyak menggunakan intent dan belum menggunakan jetpack nav atau
         * component navigation lainnya demi kepraktisan. namun kedepannya akan digunakan.
@@ -113,13 +107,8 @@ class RegisterActivity : AppCompatActivity() {
                 val email = tietEmail.text.toString().trim()
                 val password = tietPassword.text.toString().trim()
 
-                // Call the ViewModel for the secure registration logic
                 userViewModel.registerUser(email, password, fullName)
             }
-            //            val fullName = tietFullName.text.toString().trim()
-//            val email = tietEmail.text.toString().trim()
-//            val password = tietPassword.text.toString().trim()
-//            validateFieldsAndRegister(fullName, email, password)
         }
         observeViewModel()
     }
@@ -299,78 +288,4 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
     }
-
-//    private fun validateFieldsAndRegister(fullName: String, email: String, password: String) {
-//        mBtnRegister.isEnabled = false
-//
-//        database.child("users").orderByChild("email").equalTo(email)
-//            .get()
-//            .addOnSuccessListener { snapshot ->
-//                if (snapshot.exists()) {
-//                    tilEmail.error = "E-mail is already registered"
-//                    mBtnRegister.isEnabled = true
-//                } else {
-//                    tilEmail.error = null
-//                    registerUser(fullName, email, password)
-//                }
-//            }
-//            .addOnFailureListener {
-//                Log.d("RegisterActivity", "Error checking email: ${it.message}")
-//                mBtnRegister.isEnabled = true
-//            }
-//    }
-//
-//    private fun hashSHA256String(input: String): String {
-//        val HEX_CHARS = "0123456789ABCDEF"
-//        val bytes = MessageDigest
-//            .getInstance("SHA-256")
-//            .digest(input.toByteArray())
-//        return buildString {
-//            bytes.forEach {
-//                val i = it.toInt()
-//                append(HEX_CHARS[i shr 4 and 0x0f])
-//                append(HEX_CHARS[i and 0x0f])
-//            }
-//        }
-//    }
-//
-//    private fun registerUser(fullName: String, email: String, password: String) {
-//        val uid = database.child("users").push().key ?: return
-//        val currentTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault()).format(
-//            Date()
-//        )
-//
-//        val hashedPassword = hashSHA256String(password)
-//        val user = User(fullName, email, hashedPassword, currentTime)
-//
-//        /*
-//        * kondisi saat loading menunggu status register, dijalankan menggunakan coroutinescope, untuk
-//        * memanfaatkan fitur async dan juga lifecycle managementnya
-//        * */
-//        mBtnRegister.isEnabled = false
-//        CoroutineScope(Dispatchers.IO).launch {
-//            database.child("users").child(uid).setValue(user)
-//                .addOnSuccessListener {
-//                    runOnUiThread {
-//                        Toast.makeText(
-//                            this@RegisterActivity,
-//                            "Registration Successful!",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                        startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
-//                        finish()
-//                    }
-//                }
-//                .addOnFailureListener {
-//                    runOnUiThread {
-//                        Toast.makeText(
-//                            this@RegisterActivity,
-//                            "Error: ${it.message}",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                        mBtnRegister.isEnabled = true
-//                    }
-//                }
-//        }
-//    }
 }
