@@ -3,6 +3,8 @@ package com.example.sawit.activities
 import android.app.DatePickerDialog
 import android.os.Build
 import android.os.Bundle
+import android.text.InputType
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -74,6 +76,8 @@ class CreateEditActivityActivity : AppCompatActivity() {
 
         if (isEditMode) {
             currentActivity?.let { populateForm(it) }
+        } else {
+            updateDateInView()
         }
     }
 
@@ -83,6 +87,12 @@ class CreateEditActivityActivity : AppCompatActivity() {
             disableFieldSelection()
         } else {
             binding.tvHeaderTitle.text = "New Activity"
+        }
+
+        binding.editTextDate.apply {
+            isFocusable = false
+            isClickable = true
+            inputType = InputType.TYPE_NULL
         }
         binding.buttonSave.text = if (isEditMode) "SAVE" else "CREATE"
     }
@@ -105,6 +115,7 @@ class CreateEditActivityActivity : AppCompatActivity() {
             finish()
         }
         binding.editTextDate.setOnClickListener {
+            hideKeyboard()
             showDatePicker()
         }
         binding.buttonSave.setOnClickListener {
@@ -113,6 +124,8 @@ class CreateEditActivityActivity : AppCompatActivity() {
     }
 
     private fun validateAndSave() {
+        hideKeyboard()
+
         val fieldName = binding.autoCompleteField.text.toString().trim()
         val activityType = binding.autoCompleteActivityType.text.toString().trim()
         val dateStr = binding.editTextDate.text.toString().trim()
@@ -149,24 +162,23 @@ class CreateEditActivityActivity : AppCompatActivity() {
             binding.textFieldLayoutNotes.error = null
         }
 
+        if (!isValid) return
+
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val activityDate = dateFormat.parse(dateStr) ?: Date()
 
-        val today = Calendar.getInstance().apply {
+        val yesterdayLimit = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -1)
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }.time
 
-        if (activityDate.before(today)) {
-            binding.textFieldLayoutDate.error = "You cannot schedule activities in the past, duh!"
-            isValid = false
-        } else {
-            binding.textFieldLayoutDate.error = null
+        if (activityDate.before(yesterdayLimit)) {
+            binding.textFieldLayoutDate.error = "You can only backdate activities up to yesterday!"
+            return
         }
-
-        if (!isValid) return
 
         val activityData = Activity(
             id = currentActivity?.id,
@@ -183,6 +195,14 @@ class CreateEditActivityActivity : AppCompatActivity() {
             activityViewModel.updateActivity(activityData)
         } else {
             activityViewModel.createNewActivity(activityData)
+        }
+    }
+
+    private fun hideKeyboard() {
+        val view = this.currentFocus
+        if (view != null) {
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
 
@@ -303,7 +323,8 @@ class CreateEditActivityActivity : AppCompatActivity() {
             calendar.get(Calendar.DAY_OF_MONTH)
         )
 
-        datePicker.datePicker.minDate = System.currentTimeMillis()
+        val yesterday = System.currentTimeMillis() - 86400000L
+        datePicker.datePicker.minDate = yesterday
         datePicker.show()
     }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sawit.models.Activity
 import com.example.sawit.models.Field
 import com.example.sawit.models.FieldLocation
 import com.google.firebase.auth.FirebaseAuth
@@ -34,6 +35,7 @@ class FieldViewModel : ViewModel() {
 
     sealed class Event {
         data class ShowMessage(val message: String) : Event()
+        object UpdateSuccess: Event()
         object FinishActivity : Event()
     }
 
@@ -143,33 +145,58 @@ class FieldViewModel : ViewModel() {
             return
         }
 
-        if (field.userId != currentUserId) {
-            Log.d("FieldViewModel", "updateField: ${field.userId}")
-            Log.d("FieldViewModel", "updateField: ${currentUserId}")
-            viewModelScope.launch { _eventChannel.send(Event.ShowMessage("You don't have access to this field!")) }
-            return
-        }
-
         _isLoading.value = true
         val fieldId = field.fieldId
 
-        if (fieldId != "") {
+        if (fieldId.isNotEmpty()) {
             databaseRef.child(fieldId).setValue(field)
                 .addOnSuccessListener {
-                    viewModelScope.launch {
-                        _eventChannel.send(FieldViewModel.Event.ShowMessage("Successfully updated the field!"))
-                    }
                     _isLoading.value = false
+                    viewModelScope.launch {
+                        _eventChannel.send(Event.ShowMessage("Successfully updated the field!"))
+                        delay(1000)
+                        _eventChannel.send(Event.UpdateSuccess)
+                        _eventChannel.send(Event.FinishActivity)
+                        _isLoading.value = false
+                    }
                 }
                 .addOnFailureListener { e ->
-                    viewModelScope.launch {
-                        _eventChannel.send(FieldViewModel.Event.ShowMessage("Something went wrong while trying to update the field!"))
-                    }
                     _isLoading.value = false
+                    viewModelScope.launch {
+                        _eventChannel.send(Event.ShowMessage("Update failed: ${e.message}"))
+                    }
                 }
         } else {
             _isLoading.value = false
         }
+
+    //        if (field.userId != currentUserId) {
+//            Log.d("FieldViewModel", "updateField: ${field.userId}")
+//            Log.d("FieldViewModel", "updateField: ${currentUserId}")
+//            viewModelScope.launch { _eventChannel.send(Event.ShowMessage("You don't have access to this field!")) }
+//            return
+//        }
+//
+//        _isLoading.value = true
+//        val fieldId = field.fieldId
+//
+//        if (fieldId != "") {
+//            databaseRef.child(fieldId).setValue(field)
+//                .addOnSuccessListener {
+//                    viewModelScope.launch {
+//                        _eventChannel.send(FieldViewModel.Event.ShowMessage("Successfully updated the field!"))
+//                    }
+//                    _isLoading.value = false
+//                }
+//                .addOnFailureListener { e ->
+//                    viewModelScope.launch {
+//                        _eventChannel.send(FieldViewModel.Event.ShowMessage("Something went wrong while trying to update the field!"))
+//                    }
+//                    _isLoading.value = false
+//                }
+//        } else {
+//            _isLoading.value = false
+//        }
     }
 
     fun deleteField(field: Field, context: Context) {

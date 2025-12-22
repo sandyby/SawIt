@@ -51,8 +51,38 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
         _binding = FragmentPredictionYieldBinding.bind(view)
 
         setupListeners()
+        setupTextWatchers()
         observeFields()
         observePredictionEvents()
+    }
+
+    private fun setupTextWatchers() {
+        val fields = listOf(
+            binding.tietHarvestArea to binding.tilHarvestArea,
+            binding.tietRainfall to binding.tilRainfall,
+            binding.tietMinTemperature to binding.tilMinTemperature,
+            binding.tietMaxTemperature to binding.tilMaxTemperature
+        )
+
+        fields.forEach { (editText, layout) ->
+            editText.addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    if (layout.error != null) {
+                        layout.error = null
+                    }
+                }
+
+                override fun afterTextChanged(s: android.text.Editable?) {}
+            })
+        }
     }
 
     private fun observeFields() {
@@ -112,8 +142,8 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
         if (area == null) {
             binding.tilHarvestArea.error = "Harvest area is required!"
             isValid = false
-        } else if (area < 0) {
-            binding.tilHarvestArea.error = "Invalid harvest area!"
+        } else if (area <= 0 || area > 5000) {
+            binding.tilHarvestArea.error = "Harvest must be greater than 0 and at most 5000 ha!"
             isValid = false
         } else {
             binding.tilHarvestArea.error = null
@@ -122,12 +152,18 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
         if (rainfall == null) {
             binding.tilRainfall.error = "Rainfall is required!"
             isValid = false
+        } else if (rainfall < 0 || rainfall > 1000) {
+            binding.tilRainfall.error = "Rainfall must be between 0 and 1000 mm!"
+            isValid = false
         } else {
             binding.tilRainfall.error = null
         }
 
         if (tmin == null) {
             binding.tilMinTemperature.error = "Min. temperature is required!"
+            isValid = false
+        } else if (tmin < 10 || tmin > 40) {
+            binding.tilMinTemperature.error = "Min. temperature must be between 10 and 40°C!"
             isValid = false
         } else {
             binding.tilMinTemperature.error = null
@@ -136,21 +172,16 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
         if (tmax == null) {
             binding.tilMaxTemperature.error = "Max. temperature is required!"
             isValid = false
+        } else if (tmax < 10 || tmax > 40) {
+            binding.tilMaxTemperature.error = "Max. temperature must be between 10 and 40°C!"
+            isValid = false
         } else {
             binding.tilMaxTemperature.error = null
         }
 
-        if (tmin != null && tmax != null && tmin > tmax) {
-            binding.tilMinTemperature.error = "Invalid min. temperature!"
-            binding.tilMaxTemperature.error = null
+        if (binding.tilMinTemperature.error == null && binding.tilMaxTemperature.error == null && tmin!! > tmax!!) {
+            binding.tilMinTemperature.error = "Min > Max!"
             isValid = false
-        } else if (tmin != null && tmax != null && tmax < tmin) {
-            binding.tilMaxTemperature.error = "Invalid max. temperature!"
-            binding.tilMinTemperature.error = null
-            isValid = false
-        } else {
-            binding.tilMinTemperature.error = null
-            binding.tilMaxTemperature.error = null
         }
 
         if (!isValid) return
@@ -225,16 +256,17 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
     }
 
     private fun navigateToResult(fragment: Fragment) {
-        parentFragmentManager.beginTransaction()
-            .setCustomAnimations(
+        parentFragment?.parentFragmentManager?.beginTransaction()?.apply {
+            setCustomAnimations(
                 R.anim.slide_in_right,
                 R.anim.slide_in_left,
                 R.anim.slide_in_left,
                 R.anim.slide_in_right
             )
-            .replace(R.id.fl_scroll_view_content, fragment)
-            .addToBackStack(null)
-            .commit()
+            replace(R.id.fl_scroll_view_content, fragment)
+            addToBackStack(null)
+            commit()
+        }
     }
 
     override fun onDestroyView() {

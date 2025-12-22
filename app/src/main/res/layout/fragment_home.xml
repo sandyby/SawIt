@@ -72,97 +72,106 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </LinearLayout>
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/mcv_weather_information"
-            style="@style/CustomWeatherCardViewStyle"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/cv_weather_card"
             android:layout_width="match_parent"
             android:layout_height="176dp"
             android:layout_marginTop="16dp"
-            app:cardBackgroundColor="#709ED2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ll_welcome_msg_wrapper">
+            app:layout_constraintTop_toBottomOf="@id/ll_welcome_msg_wrapper" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp">
+        <!--        <com.google.android.material.card.MaterialCardView-->
+        <!--            android:id="@+id/mcv_weather_information"-->
+        <!--            style="@style/CustomWeatherCardViewStyle"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="176dp"-->
+        <!--            android:layout_marginTop="16dp"-->
+        <!--            app:cardBackgroundColor="#709ED2"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/ll_welcome_msg_wrapper">-->
 
-                <ImageView
-                    android:id="@+id/iv_weather_icon"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/sunny_weather"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+        <!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="match_parent"-->
+        <!--                android:padding="16dp">-->
 
-                <ImageView
-                    android:id="@+id/iv_location_icon"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="4dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_filled_location_on_24_white"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+        <!--                <ImageView-->
+        <!--                    android:id="@+id/iv_weather_icon"-->
+        <!--                    android:layout_width="96dp"-->
+        <!--                    android:layout_height="96dp"-->
+        <!--                    android:layout_marginEnd="16dp"-->
+        <!--                    android:src="@drawable/sunny_weather"-->
+        <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+        <!--                    app:layout_constraintTop_toTopOf="parent" />-->
 
-                <TextView
-                    android:id="@+id/tv_weather_temperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/lato_bold"
-                    android:text="30°C"
-                    android:textColor="@color/white"
-                    android:textSize="48sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/tv_weather_condition"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toStartOf="@id/iv_location_icon" />
+        <!--                <ImageView-->
+        <!--                    android:id="@+id/iv_location_icon"-->
+        <!--                    android:layout_width="56dp"-->
+        <!--                    android:layout_height="56dp"-->
+        <!--                    android:layout_marginTop="4dp"-->
+        <!--                    android:scaleType="centerCrop"-->
+        <!--                    android:src="@drawable/ic_filled_location_on_24_white"-->
+        <!--                    app:layout_constraintStart_toStartOf="parent"-->
+        <!--                    app:layout_constraintTop_toTopOf="parent" />-->
 
-                <TextView
-                    android:id="@+id/tv_weather_condition"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginBottom="2dp"
-                    android:fontFamily="@font/lato_regular"
-                    android:text="Sunny"
-                    android:textColor="@color/white"
-                    android:textSize="24sp"
-                    app:layout_constraintBottom_toBottomOf="@id/tv_weather_temperature"
-                    app:layout_constraintEnd_toStartOf="@id/iv_weather_icon"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@id/tv_weather_temperature" />
+        <!--                <TextView-->
+        <!--                    android:id="@+id/tv_weather_temperature"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:fontFamily="@font/lato_bold"-->
+        <!--                    android:text="30°C"-->
+        <!--                    android:textColor="@color/white"-->
+        <!--                    android:textSize="48sp"-->
+        <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--                    app:layout_constraintEnd_toStartOf="@+id/tv_weather_condition"-->
+        <!--                    app:layout_constraintHorizontal_bias="0.5"-->
+        <!--                    app:layout_constraintHorizontal_chainStyle="packed"-->
+        <!--                    app:layout_constraintStart_toStartOf="@id/iv_location_icon" />-->
 
-                <TextView
-                    android:id="@+id/tv_weather_location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/lato_bold"
-                    android:text="Ngabang"
-                    android:textColor="@color/white"
-                    android:textSize="32sp"
-                    app:layout_constraintBottom_toTopOf="@id/tv_weather_subtext_location"
-                    app:layout_constraintStart_toEndOf="@id/iv_location_icon"
-                    app:layout_constraintTop_toTopOf="@id/iv_location_icon" />
+        <!--                <TextView-->
+        <!--                    android:id="@+id/tv_weather_condition"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_marginStart="8dp"-->
+        <!--                    android:layout_marginBottom="2dp"-->
+        <!--                    android:fontFamily="@font/lato_regular"-->
+        <!--                    android:text="Sunny"-->
+        <!--                    android:textColor="@color/white"-->
+        <!--                    android:textSize="24sp"-->
+        <!--                    app:layout_constraintBottom_toBottomOf="@id/tv_weather_temperature"-->
+        <!--                    app:layout_constraintEnd_toStartOf="@id/iv_weather_icon"-->
+        <!--                    app:layout_constraintHorizontal_bias="0.5"-->
+        <!--                    app:layout_constraintStart_toEndOf="@id/tv_weather_temperature" />-->
 
-                <TextView
-                    android:id="@+id/tv_weather_subtext_location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/lato_regular"
-                    android:text="West Kalimantan"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_location_icon"
-                    app:layout_constraintStart_toStartOf="@+id/tv_weather_location"
-                    app:layout_constraintTop_toBottomOf="@id/tv_weather_location" />
+        <!--                <TextView-->
+        <!--                    android:id="@+id/tv_weather_location"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:fontFamily="@font/lato_bold"-->
+        <!--                    android:text="Ngabang"-->
+        <!--                    android:textColor="@color/white"-->
+        <!--                    android:textSize="32sp"-->
+        <!--                    app:layout_constraintBottom_toTopOf="@id/tv_weather_subtext_location"-->
+        <!--                    app:layout_constraintStart_toEndOf="@id/iv_location_icon"-->
+        <!--                    app:layout_constraintTop_toTopOf="@id/iv_location_icon" />-->
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
+        <!--                <TextView-->
+        <!--                    android:id="@+id/tv_weather_subtext_location"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:fontFamily="@font/lato_regular"-->
+        <!--                    android:text="West Kalimantan"-->
+        <!--                    android:textColor="@color/white"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    app:layout_constraintBottom_toBottomOf="@id/iv_location_icon"-->
+        <!--                    app:layout_constraintStart_toStartOf="@+id/tv_weather_location"-->
+        <!--                    app:layout_constraintTop_toBottomOf="@id/tv_weather_location" />-->
+
+        <!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
+        <!--        </com.google.android.material.card.MaterialCardView>-->
 
         <TextView
             android:id="@+id/tv_fields_label"
@@ -174,7 +183,7 @@
             android:textColor="@color/text_primary_900"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/mcv_weather_information" />
+            app:layout_constraintTop_toBottomOf="@id/cv_weather_card" />
 
         <TextView
             android:id="@+id/tv_fields_view_more"

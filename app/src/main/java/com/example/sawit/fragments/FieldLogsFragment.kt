@@ -2,7 +2,9 @@ package com.example.sawit.fragments;
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -10,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.sawit.R
 import com.example.sawit.activities.CreateEditFieldActivity
 import com.example.sawit.adapters.FieldsActivityAdapter
@@ -40,6 +43,7 @@ class FieldLogsFragment : Fragment(R.layout.fragment_field_logs) {
     private lateinit var predictionAdapter: FieldsPredictionHistoryAdapter
     private var fieldId: String? = null
     private var fieldName: String? = null
+    private var rootView: View? = null
 
     companion object {
         fun newInstance(fieldId: String, fieldName: String) = FieldLogsFragment().apply {
@@ -48,6 +52,18 @@ class FieldLogsFragment : Fragment(R.layout.fragment_field_logs) {
                 putString("fieldName", fieldName)
             }
         }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        if (rootView == null) {
+            _binding = FragmentFieldLogsBinding.inflate(inflater, container, false)
+            rootView = binding.root
+        }
+        return rootView!!
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,7 +96,9 @@ class FieldLogsFragment : Fragment(R.layout.fragment_field_logs) {
             adapter = activityAdapter
         }
 
-        predictionAdapter = FieldsPredictionHistoryAdapter()
+        predictionAdapter = FieldsPredictionHistoryAdapter().apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
         predictionAdapter.onItemClicked = { history ->
             navigateToResult(history)
         }
@@ -91,17 +109,24 @@ class FieldLogsFragment : Fragment(R.layout.fragment_field_logs) {
     }
 
     private fun navigateToResult(history: PredictionHistory) {
-        val fragment = if (history.predictionType?.contains("Condition", ignoreCase = true) == true) {
-            PredictionConditionResultFragment.newInstance(history, isFromHistory = true)
-        } else {
-            PredictionYieldResultFragment.newInstance(history, isFromHistory = true)
-        }
+        val fragment =
+            if (history.predictionType?.contains("Condition", ignoreCase = true) == true) {
+                PredictionConditionResultFragment.newInstance(history, isFromHistory = true)
+            } else {
+                PredictionYieldResultFragment.newInstance(history, isFromHistory = true)
+            }
 
-        parentFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_in_left, R.anim.slide_in_left, R.anim.slide_in_right)
-            .replace(R.id.fl_scroll_view_content, fragment)
-            .addToBackStack(null)
-            .commit()
+        parentFragment?.parentFragmentManager?.beginTransaction()?.apply {
+            setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_in_left,
+                R.anim.slide_in_left,
+                R.anim.slide_in_right
+            )
+            replace(R.id.fl_scroll_view_content, fragment)
+            addToBackStack(null)
+            commit()
+        }
     }
 
     private fun observeData() {
@@ -139,19 +164,16 @@ class FieldLogsFragment : Fragment(R.layout.fragment_field_logs) {
                 launch {
                     activityViewModel.activities.collectLatest { activities ->
                         val completed =
-                            activities.filter { it.fieldId == id && it.status == "completed" }
+                            activities.filter { it.fieldId == id && it.status?.lowercase() == "completed" }
 
                         if (completed.isEmpty()) {
                             binding.llEmptyActivities.visibility = View.VISIBLE
                             binding.rvCompletedActivities.visibility = View.GONE
-                            binding.tvViewAllActivities.visibility = View.GONE
                         } else {
                             binding.llEmptyActivities.visibility = View.GONE
                             binding.rvCompletedActivities.visibility = View.VISIBLE
-                            binding.tvViewAllActivities.visibility = View.VISIBLE
-                        }
-
                         activityAdapter.submitList(completed)
+                        }
                     }
                 }
             }
@@ -159,6 +181,10 @@ class FieldLogsFragment : Fragment(R.layout.fragment_field_logs) {
     }
 
     private fun setupChart(predictions: List<PredictionHistory>) {
+        if (binding.yieldChart.data != null && binding.yieldChart.data.entryCount == predictions.size) {
+            return
+        }
+
         val sortedData = predictions.sortedBy { it.date }
 
         val entries = sortedData.map {
@@ -207,6 +233,5 @@ class FieldLogsFragment : Fragment(R.layout.fragment_field_logs) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
     }
 }

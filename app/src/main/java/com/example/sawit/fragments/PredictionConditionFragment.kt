@@ -50,9 +50,40 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupTextWatchers()
         setupListeners()
         observeFields()
         observePredictionEvents()
+    }
+
+    private fun setupTextWatchers() {
+        val fields = listOf(
+            binding.tietHarvestArea to binding.tilHarvestArea,
+            binding.tietRainfall to binding.tilRainfall,
+            binding.tietActualYield to binding.tilActualYield,
+            binding.tietMinTemperature to binding.tilMinTemperature,
+            binding.tietMaxTemperature to binding.tilMaxTemperature
+        )
+
+        fields.forEach { (editText, layout) ->
+            editText.addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    if (layout.error != null) {
+                        layout.error = null
+                    }
+                }
+
+                override fun afterTextChanged(s: android.text.Editable?) {}
+            })
+        }
     }
 
     private fun observeFields() {
@@ -126,8 +157,9 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
         if (harvestArea == null) {
             binding.tilHarvestArea.error = "Harvest area is required!"
             isValid = false
-        } else if (harvestArea <= 0) {
-            binding.tilHarvestArea.error = "Invalid harvest area!"
+        } else if (harvestArea <= 0 || harvestArea > 5000) {
+            binding.tilHarvestArea.error =
+                "Harvest area must be greater than 0 and at most 5000 ha!"
             isValid = false
         } else {
             binding.tilHarvestArea.error = null
@@ -146,6 +178,9 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
         if (rainfall == null) {
             binding.tilRainfall.error = "Rainfall is required!"
             isValid = false
+        } else if (rainfall < 0 || rainfall > 1000) {
+            binding.tilRainfall.error = "Rainfall must be between 0 and 1000 mm!"
+            isValid = false
         } else {
             binding.tilRainfall.error = null
         }
@@ -153,14 +188,23 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
         if (tempMin == null) {
             binding.tilMinTemperature.error = "Min. temperature is required!"
             isValid = false
+        } else if (tempMin < 10 || tempMin > 40) {
+            binding.tilMinTemperature.error = "Min. temperature must be between 10 and 40°C!"
+            isValid = false
         } else {
             binding.tilMinTemperature.error = null
         }
 
         if (tempMax == null) {
             binding.tilMaxTemperature.error = "Max. temperature is required!"
+//            binding.tilMaxTemperature.isHelperTextEnabled = false
+            isValid = false
+        } else if (tempMax < 10 || tempMax > 40) {
+//            binding.tilMaxTemperature.isHelperTextEnabled = false
+            binding.tilMaxTemperature.error = "Max. temperature must be between 10 and 40°C!"
             isValid = false
         } else {
+//            binding.tilMaxTemperature.isHelperTextEnabled = true
             binding.tilMaxTemperature.error = null
         }
 
@@ -232,16 +276,17 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
     }
 
     private fun navigateToResult(fragment: Fragment) {
-        parentFragmentManager.beginTransaction()
-            .setCustomAnimations(
+        parentFragment?.parentFragmentManager?.beginTransaction()?.apply {
+            setCustomAnimations(
                 R.anim.slide_in_right,
                 R.anim.slide_in_left,
                 R.anim.slide_in_left,
                 R.anim.slide_in_right
             )
-            .replace(R.id.fl_scroll_view_content, fragment)
-            .addToBackStack(null)
-            .commit()
+            replace(R.id.fl_scroll_view_content, fragment)
+            addToBackStack(null)
+            commit()
+        }
     }
 
     override fun onDestroyView() {

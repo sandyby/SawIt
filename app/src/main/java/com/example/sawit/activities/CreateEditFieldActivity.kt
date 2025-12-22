@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -19,6 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -31,6 +33,7 @@ import com.example.sawit.R
 import com.example.sawit.databinding.ActivityCreateEditFieldBinding
 import com.example.sawit.models.Field
 import com.example.sawit.models.FieldLocation
+import com.example.sawit.viewmodels.ActivityViewModel
 import com.example.sawit.viewmodels.FieldViewModel
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -63,6 +66,7 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityCreateEditFieldBinding
     private val fieldViewModel: FieldViewModel by viewModels()
+    private val activityViewModel: ActivityViewModel by viewModels()
 
     private var currentField: Field? = null
     private var isEditMode = false
@@ -188,6 +192,31 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun captureMapSnapshot(onComplete: (String?) -> Unit) {
+        mMap.snapshot { bitmap ->
+            if (bitmap != null) {
+                val path = saveBitmapLocally(bitmap)
+                onComplete(path)
+            } else {
+                onComplete(null)
+            }
+        }
+    }
+
+    private fun saveBitmapLocally(bitmap: android.graphics.Bitmap): String? {
+        val fileName = "map_placeholder_${UUID.randomUUID()}.jpg"
+        val file = File(filesDir, fileName)
+        return try {
+            FileOutputStream(file).use { out ->
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+            }
+            file.absolutePath
+        } catch (e: IOException) {
+            Log.e("MapSnapshot", "Failed to save snapshot", e)
+            null
+        }
+    }
+
     private fun setupUI() {
         binding.tvHeaderTitle.text = if (isEditMode) "Edit Field" else "New Field"
         binding.buttonSave.text = if (isEditMode) "SAVE" else "CREATE"
@@ -243,6 +272,19 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.buttonSave.setOnClickListener { validateAndSaveField() }
         binding.mBtnSelectProfile.setOnClickListener {
             imagePickerLauncher.launch("image/*")
+        }
+
+        binding.fabMapType.setOnClickListener {
+            if (mMap.mapType == GoogleMap.MAP_TYPE_NORMAL) {
+                mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
+                binding.fabMapType.setImageResource(R.drawable.ic_filled_road_24_black)
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.text_primary_900))
+            } else {
+                mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+                binding.fabMapType.setImageResource(R.drawable.ic_outline_satelite_24_black)
+            }
+            binding.fabMapType.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(this, R.color.text_primary_900))
         }
     }
 
@@ -342,7 +384,7 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         )
 
         selectedLatLng = latLng
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
 
         val geocoder = Geocoder(this, Locale.getDefault())
         lifecycleScope.launch(Dispatchers.IO) {
@@ -431,12 +473,30 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        if (selectedImageUri != null) {
-            finalImagePath = saveImageLocally(this, selectedImageUri!!)
-            Log.d("CreateEditFieldActivity", "validateAndSaveField: $finalImagePath")
-        } else if (isEditMode) {
-            finalImagePath = currentField?.fieldPhotoPath
+        showLoading(true)
+
+        when {
+            selectedImageUri != null -> {
+                val path = saveImageLocally(this, selectedImageUri!!)
+                proceedToSave(path)
+            }
+            isEditMode && !currentField?.fieldPhotoPath.isNullOrEmpty() -> {
+                proceedToSave(currentField?.fieldPhotoPath)
+            }
+            else -> {
+                captureMapSnapshot { mapPath ->
+                    proceedToSave(mapPath)
+                }
+            }
         }
+    }
+
+    private fun proceedToSave(imagePath: String?) {
+        val fieldName = binding.tietFieldNameField.text.toString().trim()
+        val fieldArea = binding.tietAreaField.text.toString().toDoubleOrNull() ?: 0.0
+        val oilPalmType = binding.tietPalmOilTypeField.text.toString().trim()
+        val fieldAverageAge = binding.tietAverageAgeField.text.toString().toIntOrNull() ?: 0
+        val fieldDesc = binding.tietDescriptionField.text.toString().trim()
 
         val fieldLocation = FieldLocation(
             latitude = selectedLatLng!!.latitude,
@@ -444,22 +504,16 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             address = selectedAddress!!
         )
 
-        val fieldUserId = if (isEditMode) {
-            currentField?.userId ?: ""
-        } else {
-            currentUserId
-        }
-
         val fieldToSave = Field(
             fieldId = if (isEditMode) currentField!!.fieldId else "",
             fieldName = fieldName,
-            fieldArea = fieldArea.toDoubleOrNull() ?: 0.0,
+            fieldArea = fieldArea,
             fieldLocation = fieldLocation,
-            avgOilPalmAgeInMonths = fieldAverageAge.toIntOrNull() ?: 0,
+            avgOilPalmAgeInMonths = fieldAverageAge,
             oilPalmType = oilPalmType,
             fieldDesc = fieldDesc,
-            fieldPhotoPath = finalImagePath,
-            userId = fieldUserId
+            fieldPhotoPath = imagePath,
+            userId = if (isEditMode) currentField!!.userId else currentUserId
         )
 
         if (isEditMode) {
@@ -469,9 +523,16 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun observeViewModelEvents() {
+        private fun observeViewModelEvents() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    fieldViewModel.isLoading.collect { isLoading ->
+                        updateButtonState(isLoading)
+                        showLoading(isLoading)
+                    }
+                }
+
                 launch {
                     fieldViewModel.events.collect { event ->
                         when (event) {
@@ -481,16 +542,17 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
                                 ).show()
                             }
 
+                            is FieldViewModel.Event.UpdateSuccess -> {
+                                val newName = binding.tietFieldNameField.text.toString()
+                                val fieldId = intent.getStringExtra("fieldId") ?: ""
+                                activityViewModel.updateActivitiesFieldName(fieldId, newName)
+                            }
+
                             is FieldViewModel.Event.FinishActivity -> {
-                                setResult(Activity.RESULT_OK)
+                                setResult(RESULT_OK)
                                 finish()
                             }
                         }
-                    }
-                }
-                launch {
-                    fieldViewModel.isLoading.collect { isLoading ->
-                        updateButtonState(isLoading)
                     }
                 }
             }

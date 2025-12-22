@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,9 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
@@ -74,38 +77,39 @@ class PredictionConditionResultFragment : Fragment(R.layout.fragment_prediction_
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         val conditionLabel = arguments?.getString("condition_label") ?: "N/A"
         val predictedYield = arguments?.getFloat("predicted_yield") ?: 0.0f
         val actualYield = arguments?.getFloat("actual_yield") ?: 0.0f
         val gapPercentage = arguments?.getFloat("gap_percentage") ?: 0.0f
+        val isFromHistory = arguments?.getBoolean(ARG_IS_FROM_HISTORY) ?: false
 
         val safePredicted = maxOf(0f, predictedYield)
         val safeActual = maxOf(0f, actualYield)
 
-        val safeGap = if (safePredicted == 0f && safeActual > 0f) 100f
+        val safeGap = if (safePredicted == 0f && safeActual > 0f) -100f
         else if (safePredicted == 0f && safeActual == 0f) 0f
         else gapPercentage
 
         binding.tvConditionLabel.text = conditionLabel
+        binding.tvYieldGapValue.text = "${"%.2f".format(safeGap)} %"
+        binding.tvActualYieldValue.text = "${"%.2f".format(safeActual)} kg"
+        binding.tvPredictedYieldValue.text = "${"%.2f".format(safePredicted)} kg"
 
-        val colorInt = when (conditionLabel) {
-            "Good" -> "#7D8657".toColorInt()
-            "Moderate" -> "#ADB6BD".toColorInt()
-            "Bad" -> "#d00000".toColorInt()
+        val colorInt = when (conditionLabel.lowercase()) {
+            "good" -> "#7D8657".toColorInt()
+            "moderate" -> "#ADB6BD".toColorInt()
+            "bad" -> "#D00000".toColorInt()
             else -> android.graphics.Color.GRAY
         }
         binding.cardConditionResult.setCardBackgroundColor(colorInt)
 
-        binding.tvYieldGapValue.text = "${"%.2f".format(safeGap)} %"
-        binding.tvActualYieldValue.text = "${"%.2f".format(actualYield)} kg"
-        binding.tvPredictedYieldValue.text = "${"%.2f".format(predictedYield)} kg"
-
         binding.composeViewChart.setContent {
-            YieldComparisonChart(safePredicted, safeActual)
+            if (safePredicted > 0f || safeActual > 0f) {
+                YieldComparisonChart(safePredicted, safeActual)
+            } else {
+                NoDataPlaceholder()
+            }
         }
-
-        val isFromHistory = arguments?.getBoolean(ARG_IS_FROM_HISTORY) ?: false
 
         binding.btnContinue.setOnClickListener {
             if (isFromHistory) {
@@ -118,12 +122,19 @@ class PredictionConditionResultFragment : Fragment(R.layout.fragment_prediction_
     }
 
     @Composable
+    fun NoDataPlaceholder() {
+        Box(modifier = Modifier.fillMaxWidth().height(250.dp), contentAlignment = Alignment.Center) {
+            Text(text = "No yield data available", color = colorResource(R.color.text_primary_900), fontSize = 14.sp)
+        }
+    }
+
+    @Composable
     fun YieldComparisonChart(predicted: Float, actual: Float) {
 
-        val chartPredicted = maxOf(0f, predicted)
-        val chartActual = maxOf(0f, actual)
+        val maxYValue = maxOf(predicted, actual)
+        val calculatedMax = if (maxYValue < 10f) 10.0 else (maxYValue * 1.25).toDouble()
 
-        val predictedColor = Color("#14ff4b".toColorInt())
+        val predictedColor = Color("#14FF4B".toColorInt())
         val actualColor = Color("#2196F3".toColorInt())
 
         val chartData = remember {
@@ -133,7 +144,7 @@ class PredictionConditionResultFragment : Fragment(R.layout.fragment_prediction_
                     values = listOf(
                         Bars.Data(
                             label = "Predicted",
-                            value = chartPredicted.toDouble(),
+                            value = predicted.toDouble(),
                             color = Brush.verticalGradient(
                                 listOf(
                                     predictedColor,
@@ -143,7 +154,7 @@ class PredictionConditionResultFragment : Fragment(R.layout.fragment_prediction_
                         ),
                         Bars.Data(
                             label = "Actual",
-                            value = chartActual.toDouble(),
+                            value = actual.toDouble(),
                             color = Brush.verticalGradient(
                                 listOf(
                                     actualColor,
@@ -151,8 +162,8 @@ class PredictionConditionResultFragment : Fragment(R.layout.fragment_prediction_
                                 )
                             )
                         )
-                    ),
-                ),
+                    )
+                )
             )
         }
 
@@ -177,6 +188,7 @@ class PredictionConditionResultFragment : Fragment(R.layout.fragment_prediction_
                     .fillMaxSize()
                     .padding(horizontal = 22.dp),
                 minValue = 0.0,
+                maxValue = calculatedMax,
                 data = chartData,
                 barProperties = BarProperties(
                     thickness = 20.dp,

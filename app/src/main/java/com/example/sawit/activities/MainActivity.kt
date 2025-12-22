@@ -1,10 +1,12 @@
 package com.example.sawit.activities
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -18,6 +20,7 @@ import com.example.sawit.fragments.HomeFragment
 import com.example.sawit.fragments.PredictionHistoryFragment
 import com.example.sawit.fragments.ProfileFragment
 import com.example.sawit.fragments.TopHeaderFragment
+import com.example.sawit.viewmodels.NotificationViewModel
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,6 +48,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var activitiesFragmment: ActivitiesFragment
     private lateinit var predictionsFragment: PredictionHistoryFragment
     private lateinit var profileFragment: ProfileFragment
+    private val notificationViewModel: NotificationViewModel by viewModels()
+
+    override fun onStart() {
+        super.onStart()
+        notificationViewModel.listenForNotifications()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        notificationViewModel.stopListening()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +77,8 @@ class MainActivity : AppCompatActivity() {
         activitiesFragmment = ActivitiesFragment()
         predictionsFragment = PredictionHistoryFragment()
         profileFragment = ProfileFragment()
+
+        notificationViewModel.listenForNotifications()
 
         show(homeFragment)
 
@@ -131,7 +147,20 @@ class MainActivity : AppCompatActivity() {
                 //
             }
         })
+        handleNotificationIntent(intent)
+    }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleNotificationIntent(intent)
+    }
+
+    private fun handleNotificationIntent(intent: Intent?) {
+        if (intent?.getBooleanExtra("OPEN_NOTIFICATIONS", false) == true) {
+            bottomBar.selectTabById(R.id.tab_activity, true)
+            intent.removeExtra("OPEN_NOTIFICATIONS")
+        }
     }
 
     private fun showLoading(show: Boolean) {

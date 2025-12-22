@@ -41,6 +41,8 @@ class UserViewModel : ViewModel() {
     val currentUser: StateFlow<FirebaseUser?> = _currentUser
     private val _userProfile = MutableStateFlow<User?>(null)
     val userProfile: StateFlow<User?> = _userProfile.asStateFlow()
+    private val _isAuthReady = MutableStateFlow(false)
+    val isAuthReady: StateFlow<Boolean> = _isAuthReady
     private lateinit var userListener: ValueEventListener
     private var isListenerInitialized: Boolean = false
 
@@ -56,6 +58,7 @@ class UserViewModel : ViewModel() {
     init {
         auth.addAuthStateListener { firebaseAuth ->
             _currentUser.value = firebaseAuth.currentUser
+            _isAuthReady.value = true
         }
     }
 

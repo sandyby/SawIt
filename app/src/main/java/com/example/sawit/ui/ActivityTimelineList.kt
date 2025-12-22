@@ -1,40 +1,37 @@
 package com.example.sawit.ui.components
 
-import android.text.TextUtils
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import androidx.room.util.copy
 import com.example.sawit.R
 import com.example.sawit.models.ActivityStatus
 import com.example.sawit.models.ActivityTimelineItem
-import com.github.vipulasri.timelineview.TimelineView
-import com.pushpal.jetlime.EventPointAnimation
 import com.pushpal.jetlime.EventPointType
 import com.pushpal.jetlime.ItemsList
 import com.pushpal.jetlime.JetLimeColumn
@@ -134,7 +131,6 @@ fun ActivityTimelineList(
             else -> null
         }
 
-
         JetLimeEvent(
             style = JetLimeEventDefaults.eventStyle(
                 pointColor = backgroundColor,
@@ -166,6 +162,7 @@ private fun ActivityTimelineCard(
     val textColor = when (item.status) {
         ActivityStatus.UPCOMING -> colorResource(id = R.color.text_100)
         ActivityStatus.COMPLETED -> colorResource(id = R.color.white)
+        ActivityStatus.TODAY -> colorResource(id = R.color.white)
         else -> colorResource(id = R.color.text_primary_900)
     }
 
@@ -225,76 +222,3 @@ private fun ActivityTimelineCard(
         }
     }
 }
-
-//@Composable
-//fun ActivityTimelineCard(
-//    item: ActivityTimelineItem,
-//    lineColor: Color,
-//    onItemClick: (ActivityTimelineItem) -> Unit
-//) {
-//    val cardColor = when (item.status) {
-//        ActivityStatus.UPCOMING -> colorResource(id = TimelineColors.Upcoming)
-//        ActivityStatus.TODAY -> colorResource(id = TimelineColors.CardToday)
-//        ActivityStatus.COMPLETED -> colorResource(id = TimelineColors.CardCompleted)
-//    }
-//
-//    // The Row content from your old custom Composable, adjusted for JetLime's layout flow
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        // A. Date Column (Moved outside the card)
-//        Text(
-//            text = item.date,
-//            modifier = Modifier.width(72.dp),
-//            fontFamily = FontFamily(Font(R.font.lato_bold)),
-//            fontSize = 12.sp
-//        )
-//
-//        Spacer(modifier = Modifier.width(8.dp))
-//
-//        // B. Activity Card
-//        Card(
-//            // Card style setup
-//            colors = CardDefaults.cardColors(containerColor = cardColor),
-//            modifier = Modifier
-//                .weight(1f)
-//                .clickable { onItemClick(item) }
-//        ) {
-//            // Card inner content (your field name, activity name, and icon)
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(8.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                // Text content column
-//                Column(
-//                    modifier = Modifier
-//                        .weight(1f)
-//                        .padding(horizontal = 8.dp, vertical = 8.dp)
-//                ) {
-//                    Text(
-//                        text = item.fieldName,
-//                        color = Color.White.copy(alpha = 0.8f),
-//                        fontSize = 14.sp
-//                    )
-//                    Text(
-//                        text = item.activityTitle,
-//                        color = colorResource(id = R.color.bg_secondary_900),
-//                        fontSize = 20.sp
-//                    )
-//                }
-//                // View Details Icon
-//                Icon(
-//                    painter = painterResource(id = R.drawable.ic_filled_chevron_right_36_white),
-//                    contentDescription = "View Details",
-//                    tint = Color.White,
-//                    modifier = Modifier.size(36.dp)
-//                )
-//            }
-//        }
-//    }
-//}

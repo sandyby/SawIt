@@ -6,6 +6,9 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.sawit.R
 import com.example.sawit.activities.CreateEditActivityActivity
 import com.example.sawit.activities.LoginActivity
@@ -14,6 +17,8 @@ import com.example.sawit.databinding.FragmentActivitiesBinding
 import com.example.sawit.viewmodels.ActivityViewModel
 import com.example.sawit.viewmodels.UserViewModel
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
     /**
@@ -48,6 +53,33 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
             setupViewPager()
         }
         setupFab()
+        observeUser()
+    }
+
+    private fun observeUser(){
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                combine(userViewModel.currentUser, userViewModel.isAuthReady) { user, ready ->
+                    Pair(user, ready)
+                }.collect { (user, ready) ->
+                    if (ready) {
+                        if (user != null) {
+                            activityViewModel.listenForActivitiesUpdate()
+                            setupViewPager()
+                        } else {
+                            navigateToLogin()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLogin() {
+        val intent = Intent(requireContext(), LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
     }
 
     private fun setupViewPager() {

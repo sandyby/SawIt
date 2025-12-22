@@ -1,36 +1,147 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp"
     android:background="@drawable/rounded_top_corners_24">
 
-    <View
-        android:layout_width="40dp"
-        android:layout_height="4dp"
-        android:layout_gravity="center"
-        android:background="@drawable/chip_background"
-        android:layout_marginBottom="16dp"/>
-
-    <TextView
-        android:id="@+id/tv_modal_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/lato_bold"
-        android:textSize="22sp"
-        android:textColor="@color/text_primary_900" />
-
-    <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/compose_timer_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/tv_modal_notes"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Notes: ..."
-        android:textColor="@color/text_700" />
-</LinearLayout>
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:background="@drawable/chip_background" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/tv_modal_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lato_bold"
+                android:text="Fertilizing"
+                android:textColor="@color/text_primary_900"
+                android:textSize="22sp" />
+
+            <TextView
+                android:id="@+id/tv_status_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/chip_background"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:text="PLANNED"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_timer_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#EEEEEE"
+            app:strokeWidth="1dp">
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_snackbar_rounded"
+            android:elevation="2dp"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv_detail_field_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_filled_location_on_24_text_primary_900"
+                android:drawablePadding="12dp"
+                android:drawableTint="@color/white"
+                android:text="Block A - North Sector"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/tv_detail_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:drawableStart="@drawable/outline_calendar_month_24"
+                android:drawablePadding="12dp"
+                android:drawableTint="@color/white"
+                android:text="Monday, 22 Dec 2025"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/lato_bold"
+            android:text="Notes"
+            android:textColor="@color/text_primary_900" />
+
+        <TextView
+            android:id="@+id/tv_modal_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="4dp"
+            android:text="Apply NPK fertilizer evenly around the base of the trees."
+            android:textColor="@color/text_600" />
+
+        <LinearLayout
+            android:id="@+id/layout_actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_reschedule"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/bg_primary_overlay_2"
+                android:fontFamily="@font/lato_bold"
+                android:paddingVertical="4dp"
+                android:text="RESCHEDULE"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_complete_task"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/bg_primary_500"
+                android:fontFamily="@font/lato_bold"
+                android:paddingVertical="4dp"
+                android:text="COMPLETE"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

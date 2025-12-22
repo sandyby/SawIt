@@ -43,7 +43,7 @@ class FieldsFieldsAdapter(
             if (field.fieldPhotoPath != null) {
                 val imageFile = File(field.fieldPhotoPath)
                 Log.d("FieldsFieldsAdapter", "imageFile: ${imageFile.absolutePath}")
-                Glide.with(itemView.context).load(imageFile).fitCenter()
+                Glide.with(itemView.context).load(imageFile).override(800, 400).centerCrop()
                     .placeholder(R.drawable.placeholder_200x100)
                     .error(R.drawable.placeholder_200x100).into(ivFieldPhoto)
             } else {

@@ -4,6 +4,7 @@
     <color name="bg_primary_500">#7D8657</color>
     <color name="bg_primary_overlay_2">#8A8B83</color>
     <color name="bg_primary_overlay_3">#F1F8E9</color>
+    <color name="bg_primary_overlay_4">#DFEBD7</color>
     <color name="bg_primary_400">#A4AC85</color>
     <color name="bg_secondary_900">#FEFADF</color>
     <color name="bg_secondary_overlay_2">#D4D4D4</color>
@@ -19,6 +20,7 @@
     <color name="text_200">#E8ECEF</color>
     <color name="text_100">#F8F9FB</color>
     <color name="text_error_900">#dd4336</color>
+    <color name="text_warning_900">#fccf03</color>
     <color name="text_fiery_red_sunset_600">#d00000</color>
     <color name="text_disabled">#CCCCCC</color>
     <color name="text_item_selected">@color/white</color>

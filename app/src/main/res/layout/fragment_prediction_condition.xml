@@ -50,6 +50,7 @@
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxStrokeColor="@color/box_stroke_color_selector"
+                app:errorEnabled="true"
                 app:boxStrokeErrorColor="@color/text_error_900"
                 app:hintEnabled="false">
 
@@ -58,8 +59,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:dropDownSelector="@drawable/autocomplete_background"
-                    android:inputType="none"
                     android:hint="Choose a field"
+                    android:inputType="none"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:textColor="@color/text_primary_900" />
@@ -107,10 +108,15 @@
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
+
                         app:boxStrokeColor="@color/box_stroke_color_selector"
                         app:boxStrokeErrorColor="@color/text_error_900"
                         app:cursorColor="@color/text_primary_900"
                         app:cursorErrorColor="@color/text_fiery_red_sunset_600"
+                        app:errorEnabled="true"
+                        app:helperText="Max: 5000 ha"
+                        app:helperTextEnabled="true"
+                        app:helperTextTextColor="@color/text_600"
                         app:hintEnabled="false">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -174,10 +180,14 @@
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
+                        app:errorEnabled="true"
                         app:boxStrokeColor="@color/box_stroke_color_selector"
                         app:boxStrokeErrorColor="@color/text_error_900"
                         app:cursorColor="@color/text_primary_900"
                         app:cursorErrorColor="@color/text_fiery_red_sunset_600"
+                        app:helperText="Max: 1000 mm"
+                        app:helperTextEnabled="true"
+                        app:helperTextTextColor="@color/text_600"
                         app:hintEnabled="false">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -244,6 +254,7 @@
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="@color/box_stroke_color_selector"
                     app:boxStrokeErrorColor="@color/text_error_900"
+                    app:errorEnabled="true"
                     app:cursorColor="@color/text_primary_900"
                     app:cursorErrorColor="@color/text_fiery_red_sunset_600"
                     app:hintEnabled="false">
@@ -253,9 +264,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="70.4"
+                        android:imeOptions="actionNext"
                         android:inputType="text"
                         android:nextFocusDown="@id/tiet_min_temperature"
-                        android:imeOptions="actionNext"
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp"
                         android:textColor="@color/text_primary_900"
@@ -310,6 +321,7 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="128dp"
                         android:layout_height="wrap_content"
+                        app:errorEnabled="true"
                         android:layout_marginEnd="8dp"
                         app:boxBackgroundColor="@color/white"
                         app:boxCornerRadiusBottomEnd="12dp"
@@ -320,6 +332,9 @@
                         app:boxStrokeErrorColor="@color/text_error_900"
                         app:cursorColor="@color/text_primary_900"
                         app:cursorErrorColor="@color/text_fiery_red_sunset_600"
+                        app:helperText="10°C - 40°C"
+                        app:helperTextEnabled="true"
+                        app:helperTextTextColor="@color/text_600"
                         app:hintEnabled="false">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -327,10 +342,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="22"
-                            android:inputType="text"
-                            android:paddingStart="12dp"
-                            android:nextFocusRight="@id/tiet_max_temperature"
                             android:imeOptions="actionNext"
+                            android:inputType="text"
+                            android:nextFocusRight="@id/tiet_max_temperature"
+                            android:paddingStart="12dp"
                             android:paddingEnd="12dp"
                             android:textColor="@color/text_primary_900"
                             android:textSize="16sp" />
@@ -383,11 +398,15 @@
                         app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
+                        app:errorEnabled="true"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxStrokeColor="@color/box_stroke_color_selector"
                         app:boxStrokeErrorColor="@color/text_error_900"
                         app:cursorColor="@color/text_primary_900"
                         app:cursorErrorColor="@color/text_fiery_red_sunset_600"
+                        app:helperText="10°C - 40°C"
+                        app:helperTextEnabled="true"
+                        app:helperTextTextColor="@color/text_600"
                         app:hintEnabled="false">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -395,9 +414,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="34"
+                            android:imeOptions="actionDone"
                             android:inputType="text"
                             android:paddingStart="12dp"
-                            android:imeOptions="actionDone"
                             android:paddingEnd="12dp"
                             android:textColor="@color/text_primary_900"
                             android:textSize="16sp" />

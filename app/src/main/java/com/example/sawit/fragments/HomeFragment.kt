@@ -2,6 +2,7 @@ package com.example.sawit.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,16 +12,19 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.sawit.R
+import com.example.sawit.activities.CreateEditActivityActivity
 import com.example.sawit.activities.CreateEditFieldActivity
 import com.example.sawit.activities.DetailBottomSheetActivity
 import com.example.sawit.activities.MainActivity
@@ -31,6 +35,7 @@ import com.example.sawit.models.ActivityStatus
 import com.example.sawit.models.ActivityTimelineItem
 import com.example.sawit.models.Field
 import com.example.sawit.ui.NotificationIconWithBadge
+import com.example.sawit.ui.WeatherCard
 import com.example.sawit.ui.components.ActivityTimelineList
 import com.example.sawit.utils.HorizontalSpaceItemDecoration
 import com.example.sawit.utils.ImageCacheManager
@@ -39,6 +44,10 @@ import com.example.sawit.viewmodels.ActivityViewModel
 import com.example.sawit.viewmodels.FieldViewModel
 import com.example.sawit.viewmodels.NotificationViewModel
 import com.example.sawit.viewmodels.UserViewModel
+import com.example.sawit.viewmodels.WeatherViewModel
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
@@ -50,7 +59,24 @@ class HomeFragment : Fragment() {
     private val userViewModel: UserViewModel by activityViewModels()
     private val activityViewModel: ActivityViewModel by activityViewModels()
     private val notificationViewModel: NotificationViewModel by activityViewModels()
+    private val weatherViewModel: WeatherViewModel by activityViewModels()
     private lateinit var createFieldLauncher: ActivityResultLauncher<Intent>
+    private val requestNotificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Log.d("NotificationPermission", "Permission granted")
+        } else {
+            Toast.makeText(requireContext(),
+                "Reminders will not show unless notifications are enabled.",
+                Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        notificationViewModel.listenForNotifications()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,18 +96,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
-        binding.cvNotification.setContent {
-            val notificationCount by notificationViewModel.notificationCount.observeAsState(0)
-
-            NotificationIconWithBadge(
-                count = notificationCount,
-                onClick = {
-                    notificationViewModel.increment()
-                    Log.d("HomeFragment", "Notification icon clicked — count = $notificationCount")
-                }
-            )
-        }
 
         return binding.root
     }
@@ -145,22 +159,27 @@ class HomeFragment : Fragment() {
                     items = timelineItems,
                     onItemClick = { item ->
                         val originalActivity = activitiesFlow.find { it.id == item.id }
-
                         if (originalActivity != null) {
-                            val bottomSheet = DetailBottomSheetActivity(originalActivity)
-                            bottomSheet.show(parentFragmentManager, "ActivityDetailBottomSheet")
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Activity details not found!",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            if (item.status == ActivityStatus.OVERDUE) {
+                                MaterialAlertDialogBuilder(requireContext())
+                                    .setTitle("Activity Overdue")
+                                    .setMessage("Would you like to reschedule this task or view details?")
+                                    .setPositiveButton("Reschedule") { _, _ ->
+                                        val intent = Intent(requireContext(), CreateEditActivityActivity::class.java).apply {
+                                            putExtra(CreateEditActivityActivity.EXTRA_ACTIVITY, originalActivity)
+                                        }
+                                        startActivity(intent)
+                                    }
+                                    .setNegativeButton("View Details") { _, _ ->
+                                        val bottomSheet = DetailBottomSheetActivity(originalActivity)
+                                        bottomSheet.show(parentFragmentManager, "ActivityDetailBottomSheet")
+                                    }
+                                    .show()
+                            } else {
+                                val bottomSheet = DetailBottomSheetActivity(originalActivity)
+                                bottomSheet.show(parentFragmentManager, "ActivityDetailBottomSheet")
+                            }
                         }
-                        //                        Toast.makeText(
-//                            requireContext(),
-//                            "Clicked on ${item.activityTitle}",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
                     }
                 )
             }
@@ -173,56 +192,72 @@ class HomeFragment : Fragment() {
         val spacingInPx = resources.getDimensionPixelSize(R.dimen.horizontal_item_spacing)
         binding.rvFieldsOverview.addItemDecoration(HorizontalSpaceItemDecoration(spacingInPx))
 
+        binding.cvNotification.setContent {
+            val count by notificationViewModel.notificationCount.observeAsState(0)
+
+            NotificationIconWithBadge(
+                count = count,
+                onClick = {
+                    notificationViewModel.markAllAsRead()
+                }
+            )
+        }
+
+        binding.cvWeatherCard.setContent {
+            val state by weatherViewModel.weatherState.collectAsState()
+            WeatherCard(state)
+        }
+
+        if (hasLocationPermission()) {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+            // 1. Try last location first (fastest, zero battery cost)
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    weatherViewModel.fetchWeather(location.latitude, location.longitude)
+                } else {
+                    // 2. If last location is null, request a fresh COARSE fix once
+                    val currentRequestBuilder = com.google.android.gms.location.CurrentLocationRequest.Builder()
+                        .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY) // Use Wi-Fi/Cell, not GPS
+                        .setDurationMillis(5000) // Timeout after 5 seconds
+                        .build()
+
+                    fusedLocationClient.getCurrentLocation(currentRequestBuilder, null)
+                        .addOnSuccessListener { freshLocation ->
+                            freshLocation?.let {
+                                weatherViewModel.fetchWeather(it.latitude, it.longitude)
+                            }
+                        }
+                }
+            }
+        }
+
         fieldViewModel.listenForFieldsUpdates()
         activityViewModel.listenForActivitiesUpdate()
         userViewModel.listenForUserUpdates()
-//        setupActivitiesTimeline()
         observeViewModel(adapter)
+        checkAndRequestNotificationPermission()
     }
 
-//    private fun setupActivitiesTimeline() {
-//        activitiesAdapter = ActivitiesTimelineAdapter { item ->
-//            Toast.makeText(requireContext(), "Clicked on ${item.activityTitle}", Toast.LENGTH_SHORT)
-//                .show()
-//        }
-//
-//        binding.rvActivitiesTimeline.adapter = activitiesAdapter
-//        binding.rvActivitiesTimeline.isNestedScrollingEnabled = false
-//
-////        val dummyData = listOf(
-////            ActivityTimelineItem(
-////                "1",
-////                "Lahan Manjur Sukses",
-////                "Harvesting Crops",
-////                "27/10/2025",
-////                ActivityStatus.UPCOMING
-////            ),
-////            ActivityTimelineItem("2", "Lahan 1", "Watering Crops", "07/10/2025", ActivityStatus.TODAY),
-////            ActivityTimelineItem("3", "Lahan Manjur Sukses", "Fertilizing", "20/09/2025", ActivityStatus.COMPLETED),
-////            ActivityTimelineItem("4", "Lahan 2", "Soil Testing", "15/09/2025", ActivityStatus.COMPLETED)
-////        )
-////        activitiesAdapter.submitList(dummyData)
-//    }
+    private fun checkAndRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED -> {
+                    //
+                }
+                else -> {
+                    requestNotificationPermissionLauncher.launch(
+                        android.Manifest.permission.POST_NOTIFICATIONS
+                    )
+                }
+            }
+        }
+    }
 
     private fun observeViewModel(adapter: FieldsDashboardAdapter) {
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            activityViewModel.activities.collectLatest { activityList ->
-//                val filteredList = activityList
-//                    .filter { it.status.lowercase() != "completed" }
-//
-//                val sortedList = filteredList.sortedBy { it.date }
-//
-//                val dashboardList = sortedList.take(3)
-//
-//                val timelineItems = dashboardList.map { it.toTimelineItem() }
-//
-//                activitiesAdapter.submitList(timelineItems)
-//
-//                binding.rvActivitiesTimeline.visibility =
-//                    if (timelineItems.isEmpty()) View.GONE else View.VISIBLE
-//            }
-//        }
-
         viewLifecycleOwner.lifecycleScope.launch {
             userViewModel.userProfile.collectLatest { user ->
                 val placeholderId = R.drawable.placeholder_64
@@ -247,10 +282,6 @@ class HomeFragment : Fragment() {
             fieldViewModel.fieldsData.collectLatest { fields ->
                 val dashboardList = fields.take(2)
                 val finalDashboardList = if (dashboardList.size < 2) {
-                    // This assumes your Field model has a special, distinguishable object
-                    // (e.g., Field.ADD_PLACEHOLDER) that the FieldsDashboardAdapter
-                    // recognizes in getItemViewType() to draw the button.
-                    // If you don't have this, you MUST create it!
                     dashboardList + Field.ADD_PLACEHOLDER
                 } else {
                     dashboardList
@@ -269,6 +300,15 @@ class HomeFragment : Fragment() {
                 binding.rvFieldsOverview.visibility = View.VISIBLE
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            weatherViewModel.weatherData.collectLatest {
+                weather ->
+                weather?.let {
+                    updateWeatherUI(it)
+                }
+            }
+        }
     }
 
     private fun loadProfilePicture(
@@ -277,8 +317,6 @@ class HomeFragment : Fragment() {
         placeholderId: Int,
         onCacheSuccess: (String) -> Unit
     ) {
-        val placeholderId = R.drawable.placeholder_64
-
         if (ImageCacheManager.isCached(localPath)) {
             Glide.with(this)
                 .load(File(localPath!!))

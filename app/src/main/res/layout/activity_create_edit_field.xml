@@ -182,7 +182,20 @@
                         android:id="@+id/map_fragment_container"
                         android:name="com.google.android.gms.maps.SupportMapFragment"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent">
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/fab_map_type"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="16dp"
+                            android:src="@drawable/ic_outline_satelite_24_black"
+                            app:backgroundTint="@color/text_primary_900"
+                            app:fabSize="mini"
+                            app:layout_anchor="@id/map_fragment_container"
+                            app:layout_anchorGravity="end|center_vertical"
+                            app:tint="@color/white" />
+                    </fragment>
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/mcv_search_container"
@@ -198,8 +211,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             app:iconifiedByDefault="false"
-                            app:queryHint="Search for field location..."
-                            app:queryBackground="@android:color/transparent" />
+                            app:queryBackground="@android:color/transparent"
+                            app:queryHint="Search for field location..." />
 
                     </com.google.android.material.card.MaterialCardView>
                 </FrameLayout>
