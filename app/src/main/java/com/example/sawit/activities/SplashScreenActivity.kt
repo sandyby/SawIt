@@ -63,14 +63,6 @@ class SplashScreenActivity : AppCompatActivity() {
         }
     }
 
-//    private fun simAppInit() {
-//        lifecycleScope.launch {
-//            delay(1000L)
-//            isReadyToProceed = true
-//            startInitPage()
-//        }
-//    }
-
     private fun goToActivity(destination: Class<*>) {
         val intent = Intent(this, destination)
         startActivity(intent)

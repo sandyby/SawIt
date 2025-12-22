@@ -2,8 +2,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <corners android:radius="12dp" />
-    <!-- The solid color must be transparent because the CardView handles the inner background -->
     <solid android:color="@android:color/transparent" />
-    <!-- Error State: Uses your error color (TextError900 or input_error) with a thicker border -->
     <stroke android:width="2dp" android:color="@color/text_error_900" />
 </shape>

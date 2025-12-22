@@ -1,7 +1,7 @@
 package com.example.sawit.ml
 
 import android.content.Context
-import ai.onnxruntime.* // Mengaktifkan ONNX Runtime
+import ai.onnxruntime.*
 
 object ORTSessionHelper {
 

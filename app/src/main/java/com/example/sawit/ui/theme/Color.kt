@@ -14,7 +14,6 @@ val BgSecondary900 = Color(0xFFFEFADF)
 val BgSecondaryOverlay2 = Color(0xFFD4D4D4)
 val BgSecondaryOverlay3 = Color(0xFFD9D9D9)
 
-// Text - Primary
 val TextPrimary900 = Color(0xFF273617)
 val TextPrimary500 = Color(0xFF7D8657)
 

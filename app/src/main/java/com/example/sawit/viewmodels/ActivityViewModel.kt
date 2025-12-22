@@ -71,7 +71,7 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
                 }
 
                 viewModelScope.launch {
-                    _activities.value = activitiesList // Update StateFlow with live data
+                    _activities.value = activitiesList
                 }
             }
 
@@ -307,7 +307,7 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
                 id = "3",
                 fieldName = "Lahan 1",
                 activityType = "Pruning",
-                date = Date(System.currentTimeMillis() - 86400000 * 2), // 2 hari yang lalu
+                date = Date(System.currentTimeMillis() - 86400000 * 2),
                 notes = "Pelepasan pelepah kering telah selesai.",
                 status = "completed"
             ),
@@ -315,7 +315,7 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
                 id = "4",
                 fieldName = "Kebun Belakang",
                 activityType = "Scouting",
-                date = Date(System.currentTimeMillis() - 86400000 * 5), // 5 hari yang lalu
+                date = Date(System.currentTimeMillis() - 86400000 * 5),
                 notes = "Pengecekan hama dan penyakit, tidak ditemukan anomali.",
                 status = "completed"
             )

@@ -180,7 +180,7 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
         }
 
         if (binding.tilMinTemperature.error == null && binding.tilMaxTemperature.error == null && tmin!! > tmax!!) {
-            binding.tilMinTemperature.error = "Min > Max!"
+            binding.tilMinTemperature.error = "Invalid min. temperature!"
             isValid = false
         }
 

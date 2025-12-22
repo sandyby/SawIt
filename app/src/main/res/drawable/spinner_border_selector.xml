@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Focused/Pressed State: Uses your primary color (BgPrimary500) with a thicker border -->
     <item android:state_focused="true">
         <shape android:shape="rectangle">
             <corners android:radius="12dp" />
-            <!-- The solid color must be transparent because the CardView handles the inner background -->
             <solid android:color="@android:color/transparent" />
             <stroke android:width="2dp" android:color="@color/bg_primary_500" />
         </shape>
@@ -17,7 +15,6 @@
         </shape>
     </item>
 
-    <!-- Default State: Uses your input default color (InputStrokeDefault) with a thinner border -->
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="12dp" />

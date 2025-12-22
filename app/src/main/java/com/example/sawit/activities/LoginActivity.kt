@@ -105,39 +105,7 @@ class LoginActivity : AppCompatActivity() {
         * memutuskan untuk meningkatkan UX dari segi session control, dan juga keamanan seperti session timeout, dsb
         * */
         val authSharedPref = getSharedPreferences("AuthSession", MODE_PRIVATE)
-//        val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         val isRememberMeOn = authSharedPref.getBoolean("rememberMe", false)
-//        if (isRememberMeOn && authSharedPref.contains("userId")) {
-//            val intent = Intent(this, MainActivity::class.java)
-//            Log.d("INFO", "Langsung login")
-//            Log.d("INFO", userSharedPref.toString())
-//            Log.d("INFO", "uid " + (userSharedPref.getString("uid", "tes1") ?: "tes1"))
-//            Log.d("INFO", "email " + (userSharedPref.getString("email", "tes") ?: "tes"))
-//            Log.d(
-//                "INFO",
-//                "fullName " + (userSharedPref.getString("fullName", "tes2") ?: "tes2")
-//            )
-//            startActivity(intent)
-//            finish()
-//        }
-
-//        val email = userSharedPref.getString("email", null)
-//        val fullName = userSharedPref.getString("fullName", null)
-//        val uid = userSharedPref.getString("uid", null)
-//
-//        if (uid != null && email != null && fullName != null) {
-//            val intent = Intent(this, MainActivity::class.java)
-//            Log.d("INFO", "Langsung login")
-//            Log.d("INFO", userSharedPref.toString())
-//            Log.d("INFO", "uid " + (userSharedPref.getString("uid", "tes1") ?: "tes1"))
-//            Log.d("INFO", "email " + (userSharedPref.getString("email", "tes") ?: "tes"))
-//            Log.d(
-//                "INFO",
-//                "fullName " + (userSharedPref.getString("fullName", "tes2") ?: "tes2")
-//            )
-//            startActivity(intent)
-//            finish()
-//        }
 
         /*
         * initialize komponen Ui berupa texteditinputtexts dan juga textinputlayouts dari layout xml activity_login, seperti yang diset
@@ -167,18 +135,9 @@ class LoginActivity : AppCompatActivity() {
                         startMainActivity()
                         finish()
                     }
-                    //                    repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                        userViewModel.userProfile.collect { user ->
-//                            if (user != null) {
-//                                startMainActivity()
-//                            }
-//                        }
-//                    }
                 }
             } else {
                 userViewModel.logout()
-//                Toast.makeText(this, "Session expired! Please log in again!", Toast.LENGTH_LONG)
-//                    .show()
             }
         } else {
         }
@@ -281,30 +240,6 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-//    private fun userLogin(email: String, password: String) {
-//        mBtnLogin.isEnabled = false
-//        tvLoginErrorMsg.visibility = View.GONE
-//
-//        auth.signInWithEmailAndPassword(email, password)
-//            .addOnSuccessListener { authResult ->
-//                val user = authResult.user
-//                val uid = user?.uid
-//
-//                if (uid != null) {
-//                    fetchAndStoreUserData(uid)
-//                } else {
-//                    Log.e("LoginActivity", "Login failed, user data isn't available!")
-//                    tvLoginErrorMsg.visibility = View.VISIBLE
-//                    mBtnLogin.isEnabled = true
-//                }
-//            }
-//            .addOnFailureListener { e ->
-//                Log.e("LoginActivity", ("Login failed: ${e.localizedMessage}") ?: "Login failed")
-//                tvLoginErrorMsg.visibility = View.VISIBLE
-//                mBtnLogin.isEnabled = true
-//            }
-//    }
-
     private fun startMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
@@ -365,7 +300,7 @@ class LoginActivity : AppCompatActivity() {
                             }
 
                             null -> {
-                                // Event consumed
+                                // event consumed
                             }
                         }
                     }
@@ -373,74 +308,4 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-
-    //        val hashedPassword = hashSHA256String(password)
-
-    /*
-    * retrieve instance dan referensi dengan realtime database dari firebase, sehingga menjalankan query dengan aman
-    *
-    * untuk url dari database itu sendiri awalnya kami ingin simpan ke dalam file yang aman, entah itu local.properties
-    * ataupun secrets, tetapi setelah membaca saran dari beberapa user di forum, seperti tidak terlalu bermasalah 'jika' memang
-    * terlanjur dipush secara publik
-    * */
-//        FirebaseDatabase.getInstance(applicationContext.getString(R.string.firebase_database_reference_url))
-//            .getReference("users").orderByChild("email").equalTo(email).get()
-//            .addOnSuccessListener { snapshot ->
-//                Log.d("LoginActivity", "snapshot: $snapshot")
-//                if (snapshot.exists()) {
-//                    snapshot.children.forEach { data ->
-//                        val storedPassword = data.child("password").getValue(String::class.java)
-//
-//                        /*
-//                        * di bagian ini sharedpreferences disimpan setelah user berhasil login.
-//                        *
-//                        * session tersebut akan expired atau time out jika user menghapus cache atau data dari
-//                        * aplikasi secara lokal
-//                        * */
-//                        if (storedPassword == hashedPassword) {
-//                            val uid = data.key
-//                            val authSharedPref =
-//                                getSharedPreferences("AuthSession", Context.MODE_PRIVATE)
-//                            authSharedPref.edit {
-//                                putString("userId", uid)
-//                                if (smRememberMe.isChecked) {
-//                                    putBoolean("rememberMe", true)
-//                                } else {
-//                                    putBoolean("rememberMe", false)
-//                                }
-//                                apply()
-//                            }
-//
-//                            val email = data.child("email").getValue(String::class.java)
-//                            val fullName = data.child("fullName").getValue(String::class.java)
-//                            val userSharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-//                            userSharedPref.edit {
-//                                putString("fullName", fullName)
-//                                putString("email", email)
-//                                apply()
-//                            }
-//                            Log.d("LoginActivity", "tes1")
-//                            Toast.makeText(this, "Successfully logged in!", Toast.LENGTH_SHORT)
-//                                .show()
-//
-//                            val intent = Intent(this, MainActivity::class.java)
-//                            startActivity(intent)
-//                            Log.d("LoginActivity", "tes2")
-//                            finish()
-//                            return@addOnSuccessListener
-//                        }
-//                    }
-//                    Log.d("LoginActivity", "tes3")
-//                    tvLoginErrorMsg.visibility = View.VISIBLE
-//                    mBtnLogin.isEnabled = true
-//                } else {
-//                    Log.d("LoginActivity", "tes4")
-//                    tvLoginErrorMsg.visibility = View.VISIBLE
-//                    mBtnLogin.isEnabled = true
-//                }
-//            }.addOnFailureListener {
-//                Log.d("LoginActivity", "Error")
-//                mBtnLogin.isEnabled = true
-//            }
-//    }
 }

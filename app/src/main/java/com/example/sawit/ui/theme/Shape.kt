@@ -24,9 +24,6 @@ val TopHeaderCardCorners = RoundedCornerShape(
     bottomEnd = 32.dp
 )
 
-// -------------------------------------------------------------------
-// Material3 Shapes
-// -------------------------------------------------------------------
 val AppShapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp),
     small = RoundedCornerShape(8.dp),

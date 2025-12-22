@@ -62,7 +62,6 @@ class EditPasswordActivity : AppCompatActivity() {
             finish()
         }
 
-        // Change Password button
         binding.btnConfirmChangePassword.setOnClickListener {
             validateAndUpdatePassword()
         }
@@ -140,8 +139,6 @@ class EditPasswordActivity : AppCompatActivity() {
                                     Toast.LENGTH_LONG
                                 ).show()
 
-                                // setResult(RESULT_OK)
-
                                 finish()
                                 userViewModel.consumeAuthEvent()
                             }
@@ -149,11 +146,6 @@ class EditPasswordActivity : AppCompatActivity() {
                             is UserViewModel.AuthEvent.Error -> {
                                 Log.e("EditPasswordActivity", "Error: ${event.message}")
                                 binding.tilCurrentPassword.error = "Incorrect credential! Please check again, or try to contact the developer if this error persists!"
-//                                Toast.makeText(
-//                                    this@EditPasswordActivity,
-//                                    "Something went wrong while trying to update your password!",
-//                                    Toast.LENGTH_LONG
-//                                ).show()
                                 userViewModel.consumeAuthEvent()
                             }
 

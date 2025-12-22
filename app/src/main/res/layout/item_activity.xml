@@ -98,6 +98,7 @@
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:background="@android:color/transparent"
+                android:textColor="@color/text_primary_900"
                 app:buttonCompat="@drawable/activity_item_checkbox_animated"
                 app:buttonTint="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -147,109 +148,3 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
-
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-    <!--<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--    xmlns:tools="http://schemas.android.com/tools"-->
-    <!--    android:layout_width="match_parent"-->
-    <!--    android:layout_height="wrap_content"-->
-    <!--    android:layout_marginHorizontal="8dp"-->
-    <!--    android:layout_marginVertical="4dp"-->
-    <!--    app:cardCornerRadius="8dp"-->
-    <!--    app:cardElevation="2dp">-->
-
-    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:padding="16dp"-->
-    <!--        android:background="@color/white">-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/textViewFieldName"-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginEnd="8dp"-->
-    <!--            android:ellipsize="end"-->
-    <!--            android:maxLines="1"-->
-    <!--            android:textAppearance="?attr/textAppearanceTitleMedium"-->
-    <!--            android:textColor="@android:color/black"-->
-    <!--            app:layout_constraintEnd_toStartOf="@+id/textViewDate"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toTopOf="parent"-->
-    <!--            tools:text="Lahan Manjur Sukses" />-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/textViewDate"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:textAppearance="?attr/textAppearanceBodySmall"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintTop_toTopOf="@+id/textViewFieldName"-->
-    <!--            tools:text="19/10/2025" />-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/textViewActivityType"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginTop="4dp"-->
-    <!--            android:background="@drawable/chip_background"-->
-    <!--            android:paddingHorizontal="8dp"-->
-    <!--            android:paddingVertical="4dp"-->
-    <!--            android:textAppearance="?attr/textAppearanceLabelSmall"-->
-    <!--            android:textColor="@color/white"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toBottomOf="@+id/textViewFieldName"-->
-    <!--            tools:text="Harvest" />-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/textViewNotes"-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginTop="8dp"-->
-    <!--            android:textAppearance="?attr/textAppearanceBodyMedium"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toBottomOf="@+id/textViewActivityType"-->
-    <!--            tools:text="Pemanenan di blok A-3, fokus pada buah yang sudah matang." />-->
-
-    <!--        <LinearLayout-->
-    <!--            android:id="@+id/actionsLayout"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginTop="12dp"-->
-    <!--            android:orientation="horizontal"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintTop_toBottomOf="@+id/textViewNotes">-->
-
-    <!--            <ImageButton-->
-    <!--                android:id="@+id/buttonEdit"-->
-    <!--                android:layout_width="32dp"-->
-    <!--                android:layout_height="32dp"-->
-    <!--                android:background="?attr/selectableItemBackgroundBorderless"-->
-    <!--                android:src="@drawable/ic_outline_clipboard_text_edit_24_text_primary_900"-->
-    <!--                tools:ignore="ContentDescription" />-->
-
-    <!--            <ImageButton-->
-    <!--                android:id="@+id/buttonDelete"-->
-    <!--                android:layout_width="32dp"-->
-    <!--                android:layout_height="32dp"-->
-    <!--                android:layout_marginStart="8dp"-->
-    <!--                android:background="?attr/selectableItemBackgroundBorderless"-->
-    <!--                android:src="@drawable/ic_filled_delete_24_text_primary_900"-->
-    <!--                tools:ignore="ContentDescription" />-->
-
-    <!--        </LinearLayout>-->
-
-    <!--        <CheckBox-->
-    <!--            android:id="@+id/checkboxStatus"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="Completed"-->
-    <!--            app:layout_constraintBottom_toBottomOf="@+id/actionsLayout"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toTopOf="@+id/actionsLayout" />-->
-
-    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
-
-    <!--</com.google.android.material.card.MaterialCardView>-->

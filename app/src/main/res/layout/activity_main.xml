@@ -27,65 +27,6 @@
         app:layout_constraintBottom_toTopOf="@id/abb_bottom_bar"
         app:layout_constraintTop_toBottomOf="@id/fl_top_header" />
 
-    <!--    <FrameLayout-->
-    <!--        android:id="@+id/fl_top_header"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent">-->
-
-    <!--        <com.google.android.material.card.MaterialCardView-->
-    <!--            style="@style/CustomTopHeaderCardViewStyle"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="120dp"-->
-    <!--            app:cardBackgroundColor="@color/bg_primary_500">-->
-
-    <!--            <LinearLayout-->
-    <!--                android:id="@+id/ll_top_header_card"-->
-    <!--                android:layout_width="match_parent"-->
-    <!--                android:layout_height="match_parent"-->
-    <!--                android:layout_margin="0dp"-->
-    <!--                android:gravity="center"-->
-    <!--                android:orientation="vertical">-->
-
-    <!--                <ImageView-->
-    <!--                    android:layout_width="124dp"-->
-    <!--                    android:layout_height="32dp"-->
-    <!--                    android:src="@drawable/sawit_cropped"-->
-    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
-    <!--                    app:layout_constraintStart_toStartOf="parent"-->
-    <!--                    app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--                <TextView-->
-    <!--                    android:id="@+id/tv_dashboard"-->
-    <!--                    android:layout_width="match_parent"-->
-    <!--                    android:layout_height="wrap_content"-->
-    <!--                    android:fontFamily="@font/lato_bold"-->
-    <!--                    android:gravity="center"-->
-    <!--                    android:text="Dashboard"-->
-    <!--                    android:textColor="@color/white"-->
-    <!--                    android:textSize="32sp"-->
-    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
-    <!--                    app:layout_constraintStart_toStartOf="parent"-->
-    <!--                    app:layout_constraintTop_toTopOf="parent" />-->
-    <!--            </LinearLayout>-->
-
-    <!--        </com.google.android.material.card.MaterialCardView>-->
-
-    <!--    </FrameLayout>-->
-
-    <!--    <androidx.core.widget.NestedScrollView-->
-    <!--        android:id="@+id/nsv_dashboard"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="0dp"-->
-    <!--        app:layout_constraintBottom_toTopOf="@id/abb_bottom_bar"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/fl_top_header">-->
-
-    <!--    </androidx.core.widget.NestedScrollView>-->
-
     <View
         android:id="@+id/cpi_loading_overlay"
         android:layout_width="match_parent"

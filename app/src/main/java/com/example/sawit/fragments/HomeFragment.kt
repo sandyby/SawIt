@@ -47,8 +47,10 @@ import com.example.sawit.viewmodels.ActivityViewModel
 import com.example.sawit.viewmodels.FieldViewModel
 import com.example.sawit.viewmodels.NotificationViewModel
 import com.example.sawit.viewmodels.UserViewModel
+import com.example.sawit.viewmodels.WeatherState
 import com.example.sawit.viewmodels.WeatherViewModel
 import com.google.android.gms.location.CurrentLocationRequest
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -65,13 +67,20 @@ class HomeFragment : Fragment() {
     private val notificationViewModel: NotificationViewModel by activityViewModels()
     private val weatherViewModel: WeatherViewModel by activityViewModels()
     private lateinit var createFieldLauncher: ActivityResultLauncher<Intent>
+    private var wasLocationPermissionGranted = false
+    private var lastManualRefreshTime: Long = 0
+    private val MANUAL_REFRESH_COOLDOWN = 30000L
     private val requestLocationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
             fetchLocationAndWeather()
         } else {
-            Toast.makeText(requireContext(), "Location denied. Showing default weather and location!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Location denied. Showing default weather and location!",
+                Toast.LENGTH_SHORT
+            ).show()
             weatherViewModel.fetchWeather(-6.2088, 106.8456)
         }
     }
@@ -92,6 +101,7 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        wasLocationPermissionGranted = hasLocationPermission()
         createFieldLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -100,6 +110,18 @@ class HomeFragment : Fragment() {
                 mainActivity?.navigateToFieldsFragment()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val isCurrentlyGranted = hasLocationPermission()
+
+        if (!wasLocationPermissionGranted && isCurrentlyGranted) {
+            Log.d("HomeFragment", "Permission granted while in background. Refreshing...")
+            fetchLocationAndWeather(forceRefresh = true)
+        }
+
+        wasLocationPermissionGranted = isCurrentlyGranted
     }
 
     override fun onCreateView(
@@ -114,6 +136,32 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.srlHomeRefresh.setOnRefreshListener {
+            val currentTime = System.currentTimeMillis()
+
+            if (currentTime - lastManualRefreshTime < MANUAL_REFRESH_COOLDOWN) {
+                binding.srlHomeRefresh.isRefreshing = false
+                Log.d("HomeFragment", "on cooldown")
+            } else {
+                lastManualRefreshTime = currentTime
+                fetchLocationAndWeather(forceRefresh = true)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            weatherViewModel.weatherState.collectLatest { state ->
+                if (state !is WeatherState.Loading) {
+                    binding.srlHomeRefresh.isRefreshing = false
+                }
+            }
+        }
+
+        if (weatherViewModel.isWeatherStale()) {
+            fetchLocationAndWeather()
+        } else {
+            Log.d("HomeFragment", "Weather is fresh. Skipping GPS/Network.")
+        }
 
         setupDashboardRecyclerView()
         setupTimeline()
@@ -198,18 +246,31 @@ class HomeFragment : Fragment() {
                         val originalActivity = activitiesFlow.find { it.id == item.id }
                         if (originalActivity != null) {
                             if (item.status == ActivityStatus.OVERDUE) {
-                                MaterialAlertDialogBuilder(requireContext(), R.style.CustomAlertDialogTheme)
+                                MaterialAlertDialogBuilder(
+                                    requireContext(),
+                                    R.style.CustomAlertDialogTheme
+                                )
                                     .setTitle("Activity Overdue")
                                     .setMessage("Would you like to reschedule this task or view details?")
                                     .setPositiveButton("Reschedule") { _, _ ->
-                                        val intent = Intent(requireContext(), CreateEditActivityActivity::class.java).apply {
-                                            putExtra(CreateEditActivityActivity.EXTRA_ACTIVITY, originalActivity)
+                                        val intent = Intent(
+                                            requireContext(),
+                                            CreateEditActivityActivity::class.java
+                                        ).apply {
+                                            putExtra(
+                                                CreateEditActivityActivity.EXTRA_ACTIVITY,
+                                                originalActivity
+                                            )
                                         }
                                         startActivity(intent)
                                     }
                                     .setNegativeButton("View Details") { _, _ ->
-                                        val bottomSheet = DetailBottomSheetActivity(originalActivity)
-                                        bottomSheet.show(parentFragmentManager, "ActivityDetailBottomSheet")
+                                        val bottomSheet =
+                                            DetailBottomSheetActivity(originalActivity)
+                                        bottomSheet.show(
+                                            parentFragmentManager,
+                                            "ActivityDetailBottomSheet"
+                                        )
                                     }
                                     .show()
                             } else {
@@ -224,16 +285,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupComposables() {
-//        binding.cvNotification.setContent {
-//            val count by notificationViewModel.notificationCount.observeAsState(0)
-//            NotificationIconWithBadge(
-//                count = count,
-//                onClick = {
-//                    notificationViewModel.markAllAsRead()
-//                }
-//            )
-//        }
-
         binding.cvWeatherCard.setContent {
             val weatherState by weatherViewModel.weatherState.collectAsState()
             WeatherCard(state = weatherState)
@@ -249,35 +300,46 @@ class HomeFragment : Fragment() {
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    private fun fetchLocationAndWeather() {
+    private fun fetchLocationAndWeather(forceRefresh: Boolean = false) {
         if (hasLocationPermission()) {
-            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+            val fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(requireActivity())
 
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                if (location != null) {
-                    weatherViewModel.fetchWeather(location.latitude, location.longitude)
-                } else {
-                    val currentRequestBuilder = CurrentLocationRequest.Builder()
-                        .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
-                        .setDurationMillis(5000)
-                        .build()
-
-                    fusedLocationClient.getCurrentLocation(currentRequestBuilder, null)
-                        .addOnSuccessListener { freshLocation ->
-                            if (freshLocation != null) {
-                                weatherViewModel.fetchWeather(freshLocation.latitude, freshLocation.longitude)
-                            } else {
-                                weatherViewModel.fetchWeather(-6.2088, 106.8456)
-                            }
-                        }
-                        .addOnFailureListener {
-                            weatherViewModel.fetchWeather(-6.2088, 106.8456)
-                        }
+            if (forceRefresh) {
+                requestFreshLocation(fusedLocationClient, forceRefresh)
+            } else {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        weatherViewModel.fetchWeather(location.latitude, location.longitude, forceRefresh)
+                    } else {
+                        requestFreshLocation(fusedLocationClient, forceRefresh)
+                    }
                 }
             }
         } else {
-            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+            if (forceRefresh) {
+                requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                binding.srlHomeRefresh.isRefreshing = false
+            } else {
+                weatherViewModel.fetchWeather(-6.2088   , 106.8456, false)
+            }
         }
+    }
+
+    private fun requestFreshLocation(client: FusedLocationProviderClient, forceRefresh: Boolean) {
+        val currentRequestBuilder = CurrentLocationRequest.Builder()
+            .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+            .setDurationMillis(5000)
+            .build()
+
+        client.getCurrentLocation(currentRequestBuilder, null)
+            .addOnSuccessListener { freshLocation ->
+                if (freshLocation != null) {
+                    weatherViewModel.fetchWeather(freshLocation.latitude, freshLocation.longitude, forceRefresh)
+                } else {
+                    weatherViewModel.fetchWeather(-6.2088, 106.8456, forceRefresh)
+                }
+            }
     }
 
     private fun checkAndRequestNotificationPermission() {
@@ -289,6 +351,7 @@ class HomeFragment : Fragment() {
                 ) == PackageManager.PERMISSION_GRANTED -> {
                     //
                 }
+
                 else -> {
                     requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
@@ -349,57 +412,6 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-
-    //        viewLifecycleOwner.lifecycleScope.launch {
-//            userViewModel.userProfile.collectLatest { user ->
-//                val placeholderId = R.drawable.placeholder_64
-//                if (user != null) {
-//                    binding.tvFullName.text = user.fullName
-//                    loadProfilePicture(
-//                        user.profilePhotoLocalPath,
-//                        user.profilePhotoBase64,
-//                        placeholderId,
-//                        onCacheSuccess = { newLocalPath ->
-//                            userViewModel.updateImageLocalPath(newLocalPath)
-//                        }
-//                    )
-//                } else {
-//                    binding.tvFullName.text = "User"
-//                    binding.civDashboardProfilePicture.setImageResource(placeholderId)
-//                }
-//            }
-//        }
-//
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            fieldViewModel.fieldsData.collectLatest { fields ->
-//                val dashboardList = fields.take(2)
-//                val finalDashboardList = if (dashboardList.size < 2) {
-//                    dashboardList + Field.ADD_PLACEHOLDER
-//                } else {
-//                    dashboardList
-//                }
-//
-//                val wasEmptyBefore = adapter.currentList.isEmpty() && fields.isNotEmpty()
-//
-//                adapter.submitList(finalDashboardList) {
-//                    if (dashboardList.isNotEmpty()) {
-//                        binding.rvFieldsOverview.scrollToPosition(0)
-//                    }
-//                    if (wasEmptyBefore) {
-//                        binding.rvFieldsOverview.requestLayout()
-//                    }
-//                }
-//                binding.rvFieldsOverview.visibility = View.VISIBLE
-//            }
-//        }
-//
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            weatherViewModel.weatherData.collectLatest { weather ->
-//                weather?.let {
-//                    updateWeatherUI(it)
-//                }
-//            }
-//        }
     }
 
     private fun loadProfilePicture(

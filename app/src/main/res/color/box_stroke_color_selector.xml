@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Focused state: use your primary color -->
     <item android:color="@color/bg_primary_500" android:state_focused="true"/>
-    <!-- Default state: use a grey color -->
     <item android:color="@color/text_primary_900"/>
 </selector>

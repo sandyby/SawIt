@@ -35,16 +35,10 @@ class ActivitiesTimelineAdapter(
         val tvActivityTitle: TextView = view.findViewById(R.id.tv_activity_timeline_activity_name)
         val mcvActivityCard: MaterialCardView = view.findViewById(R.id.mcv_activity_card)
         val ibViewDetails: ImageButton = view.findViewById(R.id.iv_activity_view_more_btn)
-
-        init {
-//            timelineView.initLine(viewType)
-        }
-
         fun bind(item: ActivityTimelineItem) {
             tvActivityDate.text = item.date
             tvFieldName.text = item.fieldName
             tvActivityTitle.text = item.activityTitle
-
             val context = itemView.context
             val upcomingColor = ContextCompat.getColor(context, R.color.bg_primary_400)
             val todayColor = ContextCompat.getColor(context, R.color.bg_primary_500)
@@ -58,9 +52,6 @@ class ActivitiesTimelineAdapter(
                 ActivityStatus.UPCOMING -> {
                     timelineView.marker =
                         ContextCompat.getDrawable(context, R.drawable.timeline_marker_ring_upcoming)
-//                    timelineView.setEndLineColor(
-//                        upcomingColor, upcomingColor
-//                    )
                     timelineView.setLineStyle(TimelineView.LineStyle.DASHED)
                     mcvActivityCard.setCardBackgroundColor(
                         ContextCompat.getColor(
@@ -77,12 +68,6 @@ class ActivitiesTimelineAdapter(
                     timelineView.setStartLineStyle(TimelineView.LineStyle.DASHED)
                     desiredEndLineColor = todayColor
                     timelineView.setEndLineStyle(TimelineView.LineStyle.NORMAL)
-//                    timelineView.setStartLineColor(
-//                        upcomingColor, upcomingColor
-//                    )
-//                    timelineView.setEndLineColor(
-//                        todayColor, todayColor
-//                    )
                     mcvActivityCard.setCardBackgroundColor(
                         ContextCompat.getColor(
                             context,
@@ -99,12 +84,6 @@ class ActivitiesTimelineAdapter(
                     timelineView.setLineStyle(TimelineView.LineStyle.NORMAL)
                     desiredStartLineColor = completedColor
                     desiredEndLineColor = completedColor
-//                    timelineView.setStartLineColor(
-//                        completedColor, completedColor
-//                    )
-//                    timelineView.setEndLineColor(
-//                        completedColor, completedColor
-//                    )
                     mcvActivityCard.setCardBackgroundColor(
                         ContextCompat.getColor(
                             context,
@@ -137,7 +116,7 @@ class ActivitiesTimelineAdapter(
                 }
 
                 VIEW_TYPE_MIDDLE -> {
-//
+                    //
                 }
             }
 
@@ -170,7 +149,6 @@ class ActivitiesTimelineAdapter(
             position == itemCount - 1 -> VIEW_TYPE_END
             else -> VIEW_TYPE_MIDDLE
         }
-//        return TimelineView.getTimeLineViewType(position, itemCount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -181,9 +159,5 @@ class ActivitiesTimelineAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
-//        val isFirstItem = position == 0
-//        val isLastItem = position == itemCount - 1
-//        val timelineView = holder.itemView.findViewById<TimelineView>(R.id.timeline_view)
-//        timelineView.initLine(getItemViewType())
     }
 }

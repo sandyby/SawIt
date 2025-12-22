@@ -211,6 +211,13 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
             Log.w(TAG, "Validation failed: Some fields are incorrect.") // Log Warning
             return
         }
+        if (binding.tilMinTemperature.error == null && binding.tilMaxTemperature.error == null && tempMin!! > tempMax!!) {
+            binding.tilMinTemperature.error = "Invalid min. temperature!"
+            isValid = false
+        }
+
+
+        if (!isValid) return
 
         val selectedFieldId = fieldIdMap[fieldName]
 
@@ -261,7 +268,6 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
                     predictionViewModel.events.collect { event ->
                         when (event) {
                             is PredictionViewModel.Event.ShowError -> {
-                                Log.e(TAG, "Error Event: ${event.message}") // Log Error
                                 Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                             }
 

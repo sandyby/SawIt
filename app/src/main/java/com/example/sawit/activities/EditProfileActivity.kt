@@ -42,15 +42,11 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var currentEmailAddress: String
     private var selectedImageUri: Uri? = null
     private val userViewModel: UserViewModel by viewModels()
-
-    // Launcher untuk memilih gambar dari gallery
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             if (uri != null) {
                 selectedImageUri = uri
                 binding.ivProfilePictureEdit.setImageURI(uri)
-                //                binding.ivProfilePictureEdit.setImageURI(uri)
-//                saveProfilePicToPreferences(uri.toString())
             }
         }
 
@@ -63,18 +59,6 @@ class EditProfileActivity : AppCompatActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
-//        ivProfilePic = findViewById(R.id.iv_profile_picture_edit)
-//        val btnEditProfilePic = findViewById<ImageButton>(R.id.btn_edit_profile_pic)
-//        val tilFullName = findViewById<TextInputLayout>(R.id.til_full_name_field)
-//        val tietFullName = findViewById<TextInputEditText>(R.id.tiet_full_name_field)
-//        val tietEmailAddress = findViewById<TextInputEditText>(R.id.tiet_email_address_field)
-//        val btnSave = findViewById<Button>(R.id.btn_save_profile)
-//        val ivBack = findViewById<ImageView>(R.id.iv_back)
-
-
-        // Load stored image (optional)
-//        loadProfilePic()
-
         currentFullName = intent.getStringExtra("EXTRA_INITIAL_NAME") ?: "John Doe"
         currentEmailAddress = intent.getStringExtra("EXTRA_INITIAL_EMAIL") ?: "john.doe@gmail.com"
 
@@ -84,39 +68,6 @@ class EditProfileActivity : AppCompatActivity() {
         setupListeners()
 
         userViewModel.listenForUserUpdates()
-        observeViewModel()
-
-//        binding.ivBack.setOnClickListener {
-//            finish()
-//        }
-//
-//        binding.btnEditProfilePic.setOnClickListener {
-//            Log.d("EditProfile", "btn_edit_profile_pic clicked")
-//            pickImageLauncher.launch("image/*")
-//        }
-//
-//        binding.btnSaveProfile.setOnClickListener {
-//            val newName = binding.tietFullNameField.text.toString().trim()
-//
-//            if (newName.isEmpty()) {
-//                binding.tietFullNameField.error = "Full name can't be empty!"
-//                return@setOnClickListener
-//            }
-//
-//            Toast.makeText(this, "Profile successfully changed!", Toast.LENGTH_SHORT).show()
-//
-//            val currentUser = userViewModel.currentUser.value!!
-//
-//            userViewModel.saveNewUserProfile(currentUser.uid, currentEmailAddress, newName)
-//
-////            val resultIntent = Intent()
-////            resultIntent.putExtra("EXTRA_NEW_NAME", newName)
-////            resultIntent.putExtra("EXTRA_NEW_EMAIL", currentEmailAddress)
-//
-////            setResult(Activity.RESULT_OK, resultIntent)
-//            finish()
-//        }
-
         observeViewModel()
     }
 
@@ -196,15 +147,6 @@ class EditProfileActivity : AppCompatActivity() {
             apply()
         }
     }
-//
-//    private fun loadProfilePic() {
-//        val prefs = getSharedPreferences("AUTH_PREFS", Context.MODE_PRIVATE)
-//        val uri = prefs.getString("PROFILE_PIC_URI", null)
-//
-//        if (uri != null) {
-//            ivProfilePic.setImageURI(Uri.parse(uri))
-//        }
-//    }
 
     override fun onSupportNavigateUp(): Boolean {
         finish()
@@ -289,7 +231,7 @@ class EditProfileActivity : AppCompatActivity() {
                             }
 
                             null -> {
-                                // Event consumed
+                                // event consumed
                             }
                         }
                     }

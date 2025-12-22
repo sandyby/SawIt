@@ -24,6 +24,7 @@ sealed class WeatherState {
         val data: WeatherResponse,
         val province: String
     ) : WeatherState()
+
     data class Error(val message: String) : WeatherState()
 }
 
@@ -32,35 +33,46 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     val weatherState: StateFlow<WeatherState> = _weatherState
 
     private val API_KEY = BuildConfig.OPENWEATHERMAP_API_KEY
+    private var lastFetchTimestamp: Long = 0
+    private val CACHE_DURATION = 30 * 60 * 1000L
 
-    fun fetchWeather(lat: Double, lon: Double) {
+    fun isWeatherStale(): Boolean {
+        val currentTime = System.currentTimeMillis()
+        val isDataMissing = _weatherState.value !is WeatherState.Success
+        val isTimeExpired = (currentTime - lastFetchTimestamp) > CACHE_DURATION
+
+        return isDataMissing || isTimeExpired
+    }
+
+    fun fetchWeather(lat: Double, lon: Double, forceRefresh: Boolean = false) {
+//        if (!isWeatherStale()) {
+//            Log.d("WeatherViewModel", "Using cached data. Skipping API call.")
+//            return
+//        }
+
+        if (!forceRefresh && !isWeatherStale()) {
+            Log.d("WeatherViewModel", "Using cached data. Skipping API call.")
+            return
+        }
         viewModelScope.launch {
             try {
                 _weatherState.value = WeatherState.Loading
                 withContext(Dispatchers.IO) {
-                    // 1. Fetch Weather from Network
-                    val weatherResponse = RetrofitClient.weatherService.getCurrentWeather(lat, lon, "metric", API_KEY)
-
-                    // 2. Fetch Province from Geocoder (Local Android System)
+                    val weatherResponse =
+                        RetrofitClient.weatherService.getCurrentWeather(lat, lon, API_KEY, "metric")
                     var provinceName = ""
                     try {
                         val geocoder = Geocoder(application, Locale.getDefault())
-                        // getFromLocation returns a list of addresses
                         val addresses = geocoder.getFromLocation(lat, lon, 1)
                         if (!addresses.isNullOrEmpty()) {
-                            // adminArea is usually the Province/State
                             provinceName = addresses[0].adminArea ?: ""
                         }
+                        _weatherState.value = WeatherState.Success(weatherResponse, provinceName)
+                        lastFetchTimestamp = System.currentTimeMillis()
                     } catch (e: Exception) {
                         Log.e("WeatherVM", "Geocoder failed", e)
                     }
-
-                    // 3. Post Success
-                    _weatherState.value = WeatherState.Success(weatherResponse, provinceName)
                 }
-
-//                val response = RetrofitClient.weatherService.getCurrentWeather(lat, lon, API_KEY, "metric")
-//                _weatherState.value = WeatherState.Success(response)
             } catch (e: Exception) {
                 Log.e("WeatherViewModel", "Error fetching weather", e)
                 _weatherState.value = WeatherState.Error("Failed to load weather")

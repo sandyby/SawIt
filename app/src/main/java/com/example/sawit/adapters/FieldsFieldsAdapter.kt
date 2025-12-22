@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.sawit.R
 import com.example.sawit.models.Field
+import com.example.sawit.utils.ImageCacheManager
 import com.example.sawit.utils.formatFieldArea
 import com.example.sawit.utils.formatFieldPalmOilType
 import com.example.sawit.utils.formatOilPalmAge
@@ -40,12 +41,29 @@ class FieldsFieldsAdapter(
             tvFieldAgeBadge.text = field.avgOilPalmAgeInMonths.formatOilPalmAge()
             tvFieldPalmOilTypeBadge.text = field.oilPalmType.formatFieldPalmOilType()
             tvFieldDesc.text = field.fieldDesc
-            if (field.fieldPhotoPath != null) {
-                val imageFile = File(field.fieldPhotoPath)
-                Log.d("FieldsFieldsAdapter", "imageFile: ${imageFile.absolutePath}")
-                Glide.with(itemView.context).load(imageFile).override(800, 400).centerCrop()
+            if (field.fieldPhotoPath != null && File(field.fieldPhotoPath!!).exists()) {
+                Glide.with(itemView.context)
+                    .load(File(field.fieldPhotoPath!!))
+                    .override(800, 400)
+                    .centerCrop()
                     .placeholder(R.drawable.placeholder_200x100)
-                    .error(R.drawable.placeholder_200x100).into(ivFieldPhoto)
+                    .into(ivFieldPhoto)
+            } else if (!field.fieldPhotoBase64.isNullOrEmpty()) {
+                val newLocalPath = ImageCacheManager.base64ToLocalCache(itemView.context, field.fieldPhotoBase64)
+
+                if (newLocalPath != null) {
+                    field.fieldPhotoPath = newLocalPath
+
+                    Glide.with(itemView.context)
+                        .load(File(newLocalPath))
+                        .override(800, 400)
+                        .centerCrop()
+                        .placeholder(R.drawable.placeholder_200x100)
+                        .into(ivFieldPhoto)
+                } else {
+                    Glide.with(itemView.context).load(R.drawable.placeholder_200x100).into(ivFieldPhoto)
+                }
+
             } else {
                 Glide.with(itemView.context).load(R.drawable.placeholder_200x100).into(ivFieldPhoto)
             }
