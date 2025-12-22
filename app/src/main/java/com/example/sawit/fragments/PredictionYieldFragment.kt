@@ -188,6 +188,15 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
 
         val selectedFieldId = fieldIdMap[fieldName]
 
+        android.util.Log.d("SAWIT_ML_DEBUG", """
+        [SENDING TO VM]
+        Field: $fieldName ($selectedFieldId)
+        TMin: $tmin
+        TMax: $tmax
+        Rainfall: $rainfall
+        Area: $area
+    """.trimIndent())
+
         predictionViewModel.predictTotalYield(
             selectedFieldId!!,
             fieldName,
@@ -201,16 +210,22 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
     private fun observePredictionEvents() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+                // 1. Log Hasil Prediksi dari Model ML
                 launch {
                     predictionViewModel.predictionResult.collect { result ->
                         result?.let {
                             val area = binding.tietHarvestArea.text.toString().toFloatOrNull() ?: 0f
-                            val rainfall =
-                                binding.tietRainfall.text.toString().toFloatOrNull() ?: 0f
-                            val tmin =
-                                binding.tietMinTemperature.text.toString().toFloatOrNull() ?: 0f
-                            val tmax =
-                                binding.tietMaxTemperature.text.toString().toFloatOrNull() ?: 0f
+                            val rainfall = binding.tietRainfall.text.toString().toFloatOrNull() ?: 0f
+                            val tmin = binding.tietMinTemperature.text.toString().toFloatOrNull() ?: 0f
+                            val tmax = binding.tietMaxTemperature.text.toString().toFloatOrNull() ?: 0f
+
+                            // === LOG DEBUG UNTUK MEMBUKTIKAN ML BEKERJA ===
+                            android.util.Log.d("SAWIT_ML_DEBUG", "--------------------------------------------")
+                            android.util.Log.d("SAWIT_ML_DEBUG", "HASIL PREDIKSI DITERIMA")
+                            android.util.Log.d("SAWIT_ML_DEBUG", "Model Output (Yield): ${it.predictedYield} kg/Ha")
+                            android.util.Log.d("SAWIT_ML_DEBUG", "Data Input UI - Tmin: $tmin, Tmax: $tmax, Rain: $rainfall, Area: $area")
+                            android.util.Log.d("SAWIT_ML_DEBUG", "--------------------------------------------")
 
                             val resultFragment = PredictionYieldResultFragment().apply {
                                 arguments = Bundle().apply {
@@ -228,25 +243,31 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
                     }
                 }
 
+                // 2. Log Event (Error/Pesan)
                 launch {
                     predictionViewModel.events.collect { event ->
                         when (event) {
-                            is PredictionViewModel.Event.ShowError ->
+                            is PredictionViewModel.Event.ShowError -> {
+                                android.util.Log.e("SAWIT_ML_DEBUG", "EVENT ERROR: ${event.message}")
                                 Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                            }
 
                             is PredictionViewModel.Event.PredictionSaved -> {
-                                //
+                                android.util.Log.i("SAWIT_ML_DEBUG", "EVENT: Prediction successfully saved to database")
                             }
 
                             is PredictionViewModel.Event.ShowMessage -> {
+                                android.util.Log.i("SAWIT_ML_DEBUG", "EVENT MESSAGE: ${event.message}")
                                 Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                             }
                         }
                     }
                 }
 
+                // 3. Log Status Loading
                 launch {
                     predictionViewModel.isLoading.collect { isLoading ->
+                        android.util.Log.d("SAWIT_ML_DEBUG", "STATUS: Is Loading = $isLoading")
                         binding.btnPredict.isEnabled = !isLoading
                         binding.btnPredict.text = if (isLoading) "PREDICTING..." else "PREDICT"
                     }
