@@ -208,7 +208,6 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
         }
 
         if (!isValid) {
-            Log.w(TAG, "Validation failed: Some fields are incorrect.") // Log Warning
             return
         }
         if (binding.tilMinTemperature.error == null && binding.tilMaxTemperature.error == null && tempMin!! > tempMax!!) {
@@ -221,9 +220,8 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
 
         val selectedFieldId = fieldIdMap[fieldName]
 
-        // --- LOG INPUT ---
-        Log.d(TAG, "--- START PREDICTION ---")
-        Log.d(TAG, "Input Data: Field=$fieldName, Area=$harvestArea, Rain=$rainfall, Actual=$actualYield, Tmin=$tempMin, Tmax=$tempMax")
+        Log.d("SAWIT_ML_DEBUG", "--- START PREDICTION ---")
+        Log.d("SAWIT_ML_DEBUG", "Input Data: Field=$fieldName, Area=$harvestArea, Rain=$rainfall, Actual=$actualYield, Tmin=$tempMin, Tmax=$tempMax")
 
         predictionViewModel.predictPlantCondition(
             fieldId = selectedFieldId!!,
