@@ -32,7 +32,7 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
     private var hasAutoSelected = false
 
     companion object {
-        private const val TAG = "SAWIT_ML" // Tag untuk Logcat
+        private const val TAG = "SAWIT_ML_DEBUG"
         const val ARG_CONDITION_LABEL = "condition_label"
         const val ARG_PREDICTED_YIELD = "predicted_yield"
         const val ARG_ACTUAL_YIELD = "actual_yield"
