@@ -317,6 +317,7 @@ class CreateEditActivityActivity : AppCompatActivity() {
 
         val datePicker = DatePickerDialog(
             this,
+            R.style.CustomDatePickerTheme,
             dateSetListener,
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),

@@ -13,7 +13,8 @@ data class Field(
     @PrimaryKey
     var fieldId: String = "",
     val userId: String = "",
-    val fieldPhotoPath: String? = null,
+    var fieldPhotoPath: String? = null,
+    val fieldPhotoBase64: String? = null,
     val fieldName: String = "",
     val fieldArea: Double? = null,
     val fieldLocation: FieldLocation = FieldLocation(),

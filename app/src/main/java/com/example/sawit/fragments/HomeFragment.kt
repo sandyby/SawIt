@@ -1,7 +1,9 @@
 package com.example.sawit.fragments
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -45,6 +48,7 @@ import com.example.sawit.viewmodels.FieldViewModel
 import com.example.sawit.viewmodels.NotificationViewModel
 import com.example.sawit.viewmodels.UserViewModel
 import com.example.sawit.viewmodels.WeatherViewModel
+import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -61,15 +65,23 @@ class HomeFragment : Fragment() {
     private val notificationViewModel: NotificationViewModel by activityViewModels()
     private val weatherViewModel: WeatherViewModel by activityViewModels()
     private lateinit var createFieldLauncher: ActivityResultLauncher<Intent>
+    private val requestLocationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            fetchLocationAndWeather()
+        } else {
+            Toast.makeText(requireContext(), "Location denied. Showing default weather and location!", Toast.LENGTH_SHORT).show()
+            weatherViewModel.fetchWeather(-6.2088, 106.8456)
+        }
+    }
     private val requestNotificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
             Log.d("NotificationPermission", "Permission granted")
         } else {
-            Toast.makeText(requireContext(),
-                "Reminders will not show unless notifications are enabled.",
-                Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Reminders disabled!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -103,6 +115,22 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupDashboardRecyclerView()
+        setupTimeline()
+        setupClickListeners()
+        setupComposables()
+
+        fetchLocationAndWeather()
+
+        fieldViewModel.listenForFieldsUpdates()
+        activityViewModel.listenForActivitiesUpdate()
+        userViewModel.listenForUserUpdates()
+
+        observeViewModelData()
+        checkAndRequestNotificationPermission()
+    }
+
+    private fun setupDashboardRecyclerView() {
         val adapter = FieldsDashboardAdapter(
             onClick = { field ->
                 val detailsFragment =
@@ -110,10 +138,8 @@ class HomeFragment : Fragment() {
 
                 parentFragmentManager.beginTransaction()
                     .setCustomAnimations(
-                        R.anim.slide_in_right,
-                        R.anim.slide_in_left,
-                        R.anim.slide_in_left,
-                        R.anim.slide_in_right
+                        R.anim.slide_in_right, R.anim.slide_in_left,
+                        R.anim.slide_in_left, R.anim.slide_in_right
                     )
                     .replace(R.id.fl_scroll_view_content, detailsFragment)
                     .addToBackStack(null)
@@ -127,6 +153,15 @@ class HomeFragment : Fragment() {
 
         adapter.submitList(emptyList())
 
+        binding.rvFieldsOverview.apply {
+            this.adapter = adapter
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        }
+        val spacingInPx = resources.getDimensionPixelSize(R.dimen.horizontal_item_spacing)
+        binding.rvFieldsOverview.addItemDecoration(HorizontalSpaceItemDecoration(spacingInPx))
+    }
+
+    private fun setupClickListeners() {
         binding.tvFieldsViewMore.setOnClickListener {
             val mainActivity = activity as? MainActivity
             mainActivity?.navigateToFieldsFragment()
@@ -136,7 +171,9 @@ class HomeFragment : Fragment() {
             val mainActivity = activity as? MainActivity
             mainActivity?.navigateToActivitiesFragment()
         }
+    }
 
+    private fun setupTimeline() {
         binding.cvActivitiesTimeline.setContent {
             val activitiesFlow by activityViewModel.activities.collectAsState(initial = emptyList())
 
@@ -161,7 +198,7 @@ class HomeFragment : Fragment() {
                         val originalActivity = activitiesFlow.find { it.id == item.id }
                         if (originalActivity != null) {
                             if (item.status == ActivityStatus.OVERDUE) {
-                                MaterialAlertDialogBuilder(requireContext())
+                                MaterialAlertDialogBuilder(requireContext(), R.style.CustomAlertDialogTheme)
                                     .setTitle("Activity Overdue")
                                     .setMessage("Would you like to reschedule this task or view details?")
                                     .setPositiveButton("Reschedule") { _, _ ->
@@ -184,59 +221,63 @@ class HomeFragment : Fragment() {
                 )
             }
         }
+    }
 
-        binding.rvFieldsOverview.apply {
-            this.adapter = adapter
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        }
-        val spacingInPx = resources.getDimensionPixelSize(R.dimen.horizontal_item_spacing)
-        binding.rvFieldsOverview.addItemDecoration(HorizontalSpaceItemDecoration(spacingInPx))
-
-        binding.cvNotification.setContent {
-            val count by notificationViewModel.notificationCount.observeAsState(0)
-
-            NotificationIconWithBadge(
-                count = count,
-                onClick = {
-                    notificationViewModel.markAllAsRead()
-                }
-            )
-        }
+    private fun setupComposables() {
+//        binding.cvNotification.setContent {
+//            val count by notificationViewModel.notificationCount.observeAsState(0)
+//            NotificationIconWithBadge(
+//                count = count,
+//                onClick = {
+//                    notificationViewModel.markAllAsRead()
+//                }
+//            )
+//        }
 
         binding.cvWeatherCard.setContent {
-            val state by weatherViewModel.weatherState.collectAsState()
-            WeatherCard(state)
+            val weatherState by weatherViewModel.weatherState.collectAsState()
+            WeatherCard(state = weatherState)
         }
+        weatherViewModel.fetchWeather(-0.026330, 109.342504)
+    }
 
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private fun fetchLocationAndWeather() {
         if (hasLocationPermission()) {
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-            // 1. Try last location first (fastest, zero battery cost)
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
                     weatherViewModel.fetchWeather(location.latitude, location.longitude)
                 } else {
-                    // 2. If last location is null, request a fresh COARSE fix once
-                    val currentRequestBuilder = com.google.android.gms.location.CurrentLocationRequest.Builder()
-                        .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY) // Use Wi-Fi/Cell, not GPS
-                        .setDurationMillis(5000) // Timeout after 5 seconds
+                    val currentRequestBuilder = CurrentLocationRequest.Builder()
+                        .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+                        .setDurationMillis(5000)
                         .build()
 
                     fusedLocationClient.getCurrentLocation(currentRequestBuilder, null)
                         .addOnSuccessListener { freshLocation ->
-                            freshLocation?.let {
-                                weatherViewModel.fetchWeather(it.latitude, it.longitude)
+                            if (freshLocation != null) {
+                                weatherViewModel.fetchWeather(freshLocation.latitude, freshLocation.longitude)
+                            } else {
+                                weatherViewModel.fetchWeather(-6.2088, 106.8456)
                             }
+                        }
+                        .addOnFailureListener {
+                            weatherViewModel.fetchWeather(-6.2088, 106.8456)
                         }
                 }
             }
+        } else {
+            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
-
-        fieldViewModel.listenForFieldsUpdates()
-        activityViewModel.listenForActivitiesUpdate()
-        userViewModel.listenForUserUpdates()
-        observeViewModel(adapter)
-        checkAndRequestNotificationPermission()
     }
 
     private fun checkAndRequestNotificationPermission() {
@@ -244,20 +285,20 @@ class HomeFragment : Fragment() {
             when {
                 ContextCompat.checkSelfPermission(
                     requireContext(),
-                    android.Manifest.permission.POST_NOTIFICATIONS
-                ) == android.content.pm.PackageManager.PERMISSION_GRANTED -> {
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
                     //
                 }
                 else -> {
-                    requestNotificationPermissionLauncher.launch(
-                        android.Manifest.permission.POST_NOTIFICATIONS
-                    )
+                    requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
             }
         }
     }
 
-    private fun observeViewModel(adapter: FieldsDashboardAdapter) {
+    private fun observeViewModelData() {
+        val adapter = binding.rvFieldsOverview.adapter as FieldsDashboardAdapter
+
         viewLifecycleOwner.lifecycleScope.launch {
             userViewModel.userProfile.collectLatest { user ->
                 val placeholderId = R.drawable.placeholder_64
@@ -302,13 +343,63 @@ class HomeFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            weatherViewModel.weatherData.collectLatest {
-                weather ->
+            weatherViewModel.weatherState.collectLatest { weather ->
                 weather?.let {
-                    updateWeatherUI(it)
+                    //
                 }
             }
         }
+
+    //        viewLifecycleOwner.lifecycleScope.launch {
+//            userViewModel.userProfile.collectLatest { user ->
+//                val placeholderId = R.drawable.placeholder_64
+//                if (user != null) {
+//                    binding.tvFullName.text = user.fullName
+//                    loadProfilePicture(
+//                        user.profilePhotoLocalPath,
+//                        user.profilePhotoBase64,
+//                        placeholderId,
+//                        onCacheSuccess = { newLocalPath ->
+//                            userViewModel.updateImageLocalPath(newLocalPath)
+//                        }
+//                    )
+//                } else {
+//                    binding.tvFullName.text = "User"
+//                    binding.civDashboardProfilePicture.setImageResource(placeholderId)
+//                }
+//            }
+//        }
+//
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            fieldViewModel.fieldsData.collectLatest { fields ->
+//                val dashboardList = fields.take(2)
+//                val finalDashboardList = if (dashboardList.size < 2) {
+//                    dashboardList + Field.ADD_PLACEHOLDER
+//                } else {
+//                    dashboardList
+//                }
+//
+//                val wasEmptyBefore = adapter.currentList.isEmpty() && fields.isNotEmpty()
+//
+//                adapter.submitList(finalDashboardList) {
+//                    if (dashboardList.isNotEmpty()) {
+//                        binding.rvFieldsOverview.scrollToPosition(0)
+//                    }
+//                    if (wasEmptyBefore) {
+//                        binding.rvFieldsOverview.requestLayout()
+//                    }
+//                }
+//                binding.rvFieldsOverview.visibility = View.VISIBLE
+//            }
+//        }
+//
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            weatherViewModel.weatherData.collectLatest { weather ->
+//                weather?.let {
+//                    updateWeatherUI(it)
+//                }
+//            }
+//        }
     }
 
     private fun loadProfilePicture(

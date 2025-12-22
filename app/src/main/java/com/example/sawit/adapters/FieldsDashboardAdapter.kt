@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.sawit.R
 import com.example.sawit.models.Field
+import com.example.sawit.utils.ImageCacheManager
 import com.example.sawit.utils.formatFieldArea
 import com.example.sawit.utils.formatOilPalmAge
 import java.io.File
@@ -43,19 +44,31 @@ class FieldsDashboardAdapter(
             tvFieldAreaBadge.text = field.fieldArea.formatFieldArea()
             tvFieldAgeBadge.text = field.avgOilPalmAgeInMonths.formatOilPalmAge()
             tvFieldDesc.text = field.fieldDesc
-            if (field.fieldPhotoPath != null) {
-                val imageFile = File(field.fieldPhotoPath)
-                Log.d("FieldsDashboardAdapter", "imageFile path: ${imageFile.absolutePath}")
-                Glide.with(itemView.context).load(imageFile)
-                    .override(800,400)
+            if (field.fieldPhotoPath != null && File(field.fieldPhotoPath!!).exists()) {
+                Glide.with(itemView.context)
+                    .load(File(field.fieldPhotoPath!!))
+                    .override(800, 400)
                     .centerCrop()
                     .placeholder(R.drawable.placeholder_200x100)
-                    .error(R.drawable.placeholder_200x100)
                     .into(ivFieldPhoto)
+            } else if (!field.fieldPhotoBase64.isNullOrEmpty()) {
+                val newLocalPath = ImageCacheManager.base64ToLocalCache(itemView.context, field.fieldPhotoBase64)
+
+                if (newLocalPath != null) {
+                    field.fieldPhotoPath = newLocalPath
+
+                    Glide.with(itemView.context)
+                        .load(File(newLocalPath))
+                        .override(800, 400)
+                        .centerCrop()
+                        .placeholder(R.drawable.placeholder_200x100)
+                        .into(ivFieldPhoto)
+                } else {
+                    Glide.with(itemView.context).load(R.drawable.placeholder_200x100).into(ivFieldPhoto)
+                }
+
             } else {
-                Glide.with(itemView.context)
-                    .load(R.drawable.placeholder_200x100)
-                    .into(ivFieldPhoto)
+                Glide.with(itemView.context).load(R.drawable.placeholder_200x100).into(ivFieldPhoto)
             }
             itemView.setOnClickListener { onClick(field) }
         }
@@ -64,25 +77,12 @@ class FieldsDashboardAdapter(
     inner class AddFieldViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind() {
             val params = itemView.layoutParams
-//            if (isListEmpty){
-//                params.width = ViewGroup.LayoutParams.MATCH_PARENT
-//            } else {
-//                val widthInPx = TypedValue.applyDimension(
-//                    TypedValue.COMPLEX_UNIT_DIP,
-//                    180f,
-//                    itemView.resources.displayMetrics
-//                ).toInt()
-//                params.width = widthInPx
-//            }
-//            itemView.layoutParams = params
-//            itemView.setOnClickListener { onAddClick() }
             val widthInPx = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 180f,
                 itemView.resources.displayMetrics
             ).toInt()
 
-            // Set width only if needed, or leave it defined in XML as match_parent/fixed.
             params.width = widthInPx
 
             itemView.layoutParams = params
@@ -93,27 +93,6 @@ class FieldsDashboardAdapter(
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
         return if (item.fieldId == ADD_FIELD_ID) VIEW_TYPE_ADD else VIEW_TYPE_FIELD
-        ////        val count = currentList.size.coerceAtMost(2)
-//////        if (currentList.isEmpty()) return VIEW_TYPE_ADD
-//////        return if (position < currentList.size) VIEW_TYPE_FIELD else VIEW_TYPE_ADD
-////        return if (position < count) VIEW_TYPE_FIELD else VIEW_TYPE_ADD
-//        if (position >= currentList.size) {
-//            // If position is out of bounds, this indicates an inconsistency.
-//            // Fallback to a safe type or throw a controlled error.
-//            // For a ListAdapter, the framework should NOT call getItemViewType
-//            // if position >= currentList.size. Since it is, we return a safe default.
-//            return VIEW_TYPE_FIELD
-//        }
-//
-//        // Proceed if the position is within bounds (which should be true if getItemCount > 0)
-//        val item = getItem(position)
-//
-//        // Check if the item is our special placeholder
-//        return if (item.fieldId == ADD_FIELD_ID) {
-//            VIEW_TYPE_ADD
-//        } else {
-//            VIEW_TYPE_FIELD
-//        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -128,16 +107,6 @@ class FieldsDashboardAdapter(
         }
     }
 
-//    override fun onCreateViewHolder(
-//        parent: ViewGroup,
-//        viewType: Int
-//    ): RecyclerView.ViewHolder {
-//        val view =
-//            LayoutInflater.from(parent.context)
-//                .inflate(R.layout.fields_card_item_dashboard, parent, false)
-//        return ViewHolder(view)
-//    }
-
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int
@@ -148,21 +117,7 @@ class FieldsDashboardAdapter(
         } else if (holder is AddFieldViewHolder) {
             holder.bind()
         }
-        //        if (holder is ViewHolder) {
-//            holder.bind(getItem(position))
-//        } else if (holder is AddFieldViewHolder) {
-//            holder.bind()
-//        }
     }
-
-//    override fun getItemCount(): Int {
-//        val count = currentList.size
-//        val fieldCardsToShow = count.coerceAtMost(2)
-//        val addCard = 1
-////        if (count == 0) return 1
-////        return if (count > 2) 2 else 2
-//        return fieldCardsToShow + addCard
-//    }
 
     class FieldDiffCallback : DiffUtil.ItemCallback<Field>() {
         override fun areItemsTheSame(oldItem: Field, newItem: Field): Boolean {

@@ -19,6 +19,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -141,11 +142,11 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setupSearchView() {
         binding.searchViewLocation.setOnQueryTextListener(object :
-            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (!query.isNullOrBlank()) {
                     searchLocation(query)
-                    binding.searchViewLocation.clearFocus() // Hide keyboard
+                    binding.searchViewLocation.clearFocus()
                 }
                 return true
             }
@@ -192,6 +193,23 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun bitmapToBase64(bitmap: android.graphics.Bitmap): String {
+        val byteArrayOutputStream = java.io.ByteArrayOutputStream()
+        bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return android.util.Base64.encodeToString(byteArray, android.util.Base64.DEFAULT)
+    }
+
+    private fun uriToBase64(uri: Uri): String? {
+        return try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+            bitmapToBase64(bitmap)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     private fun captureMapSnapshot(onComplete: (String?) -> Unit) {
         mMap.snapshot { bitmap ->
             if (bitmap != null) {
@@ -220,10 +238,6 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setupUI() {
         binding.tvHeaderTitle.text = if (isEditMode) "Edit Field" else "New Field"
         binding.buttonSave.text = if (isEditMode) "SAVE" else "CREATE"
-
-        if (isEditMode) {
-            currentField?.let { populateForm(it) }
-        }
     }
 
     private fun populateForm(field: Field) {
@@ -290,13 +304,14 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        mMap.uiSettings.isZoomControlsEnabled = true
-        mMap.uiSettings.isCompassEnabled = true
-        mMap.uiSettings.isRotateGesturesEnabled = true
-        mMap.uiSettings.isZoomGesturesEnabled = true
-        mMap.uiSettings.isScrollGesturesEnabled = true
-        mMap.uiSettings.isScrollGesturesEnabledDuringRotateOrZoom = true
+        mMap.uiSettings.apply {
+            isZoomControlsEnabled = true
+            isCompassEnabled = true
+            isRotateGesturesEnabled = true
+            isZoomGesturesEnabled = true
+            isScrollGesturesEnabled = true
+            isScrollGesturesEnabledDuringRotateOrZoom = true
+        }
 
         mMap.setOnMapClickListener { latLng ->
             placeMarker(latLng)
@@ -338,51 +353,47 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
         if (ActivityCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
-        ) {
+            || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            ) {
             return
         }
 
-        fusedLocationClient.getCurrentLocation(
-            Priority.PRIORITY_HIGH_ACCURACY, CancellationTokenSource().token
-        ).addOnSuccessListener { location: Location? ->
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
-                val currentLatLng = LatLng(location.latitude, location.longitude)
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
-                placeMarker(currentLatLng)
+                moveMapToLocation(location)
             } else {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 10f))
-                placeMarker(DEFAULT_LOCATION)
+                fusedLocationClient.getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    CancellationTokenSource().token
+                ).addOnSuccessListener { freshLocation ->
+                    freshLocation?.let { moveMapToLocation(it) }
+                }
             }
         }.addOnFailureListener {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 10f))
-            placeMarker(DEFAULT_LOCATION)
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray
-    ) {
+    private fun moveMapToLocation(location: Location) {
+        val latLng = LatLng(location.latitude, location.longitude)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+        placeMarker(latLng)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 checkLocationPermissionAndCenterMap()
             } else {
-                Toast.makeText(
-                    this,
-                    "Location permission denied. Using default map location.",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(this, "Permission denied. Using default map location.", Toast.LENGTH_LONG).show()
             }
         }
     }
 
     private fun placeMarker(latLng: LatLng) {
         locationMarker?.remove()
-
-        locationMarker = mMap.addMarker(
-            MarkerOptions().position(latLng).title("Field Location")
-        )
-
+        locationMarker = mMap.addMarker(MarkerOptions().position(latLng).title("Field Location"))
         selectedLatLng = latLng
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
 
@@ -393,12 +404,9 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
                 launch(Dispatchers.Main) {
                     if (!addresses.isNullOrEmpty()) {
                         val address = addresses[0]
-                        val fullAddress = address.getAddressLine(0)
-
-                        selectedAddress = fullAddress
+                        selectedAddress = address.getAddressLine(0)
                         binding.tvSelectedFieldLocation.text = selectedAddress
-
-                        binding.searchViewLocation.setQuery(fullAddress, false)
+                        binding.searchViewLocation.setQuery(selectedAddress, false)
                     }
                 }
             } catch (e: Exception) {
@@ -475,12 +483,30 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
         showLoading(true)
 
+        val isLocationChanged = if (isEditMode && currentField != null && selectedLatLng != null) {
+            val oldLat = currentField!!.fieldLocation.latitude
+            val oldLng = currentField!!.fieldLocation.longitude
+            selectedLatLng!!.latitude != oldLat || selectedLatLng!!.longitude != oldLng
+        } else {
+            false
+        }
+
+        val isPreviousImageSnapshot = currentField?.fieldPhotoPath?.contains("map_placeholder") == true
+        val hasNoPreviousImage = currentField?.fieldPhotoPath.isNullOrEmpty()
+
         when {
             selectedImageUri != null -> {
                 val path = saveImageLocally(this, selectedImageUri!!)
                 proceedToSave(path)
             }
-            isEditMode && !currentField?.fieldPhotoPath.isNullOrEmpty() -> {
+            isEditMode && isLocationChanged && (isPreviousImageSnapshot || hasNoPreviousImage) -> {
+                Log.d("CreateEditField", "Location changed, regenerating map snapshot...")
+                captureMapSnapshot { mapPath ->
+                    proceedToSave(mapPath)
+                }
+            }
+
+            isEditMode && !hasNoPreviousImage -> {
                 proceedToSave(currentField?.fieldPhotoPath)
             }
             else -> {
@@ -504,6 +530,17 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             address = selectedAddress!!
         )
 
+        val base64String = if (selectedImageUri != null) {
+            uriToBase64(selectedImageUri!!)
+        } else if (imagePath != null) {
+            try {
+                val bitmap = android.graphics.BitmapFactory.decodeFile(imagePath)
+                bitmapToBase64(bitmap)
+            } catch (e: Exception) { null }
+        } else {
+            currentField?.fieldPhotoBase64
+        }
+
         val fieldToSave = Field(
             fieldId = if (isEditMode) currentField!!.fieldId else "",
             fieldName = fieldName,
@@ -513,6 +550,7 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             oilPalmType = oilPalmType,
             fieldDesc = fieldDesc,
             fieldPhotoPath = imagePath,
+            fieldPhotoBase64 = base64String,
             userId = if (isEditMode) currentField!!.userId else currentUserId
         )
 
@@ -544,8 +582,10 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
                             is FieldViewModel.Event.UpdateSuccess -> {
                                 val newName = binding.tietFieldNameField.text.toString()
-                                val fieldId = intent.getStringExtra("fieldId") ?: ""
-                                activityViewModel.updateActivitiesFieldName(fieldId, newName)
+                                val fieldId = currentField?.fieldId ?: ""
+                                if(fieldId.isNotEmpty()) {
+                                    activityViewModel.updateActivitiesFieldName(fieldId, newName)
+                                }
                             }
 
                             is FieldViewModel.Event.FinishActivity -> {

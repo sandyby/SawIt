@@ -67,6 +67,36 @@
         <item name="boxCornerRadiusBottomEnd">12dp</item>
     </style>
 
+    <style name="CustomDatePickerTheme" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <item name="colorPrimary">@color/bg_primary_500</item>
+
+        <item name="colorOnPrimary">@color/white</item>
+
+        <item name="colorAccent">@color/bg_primary_500</item>
+
+        <item name="buttonBarPositiveButtonStyle">@style/DatePickerButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DatePickerButtonStyle</item>
+    </style>
+
+    <style name="DatePickerButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/bg_primary_500</item>
+    </style>
+
+
+    <style name="CustomAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorSurface">@color/white</item>
+
+        <item name="android:textColorPrimary">@color/text_primary_900</item>
+
+        <item name="colorPrimary">@color/bg_primary_500</item>
+
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeDialogButtonStyle</item>
+    </style>
+
+    <style name="NegativeDialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/text_700</item>
+    </style>
+
     <style name="DeleteDialogTheme" parent="Theme.Material3.DayNight.Dialog">
         <item name="android:textColorPrimary">@color/text_primary_900</item>
         <item name="android:textColorSecondary">@color/text_900</item>

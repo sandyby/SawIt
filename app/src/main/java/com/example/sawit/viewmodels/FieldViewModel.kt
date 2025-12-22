@@ -103,6 +103,7 @@ class FieldViewModel : ViewModel() {
         if (isListenerInitialized) {
             val fieldsByUserQuery = databaseRef.orderByChild("userId").equalTo(currentUserId)
             fieldsByUserQuery.removeEventListener(fieldListener)
+            isListenerInitialized = false
             Log.d("FieldViewModel", "Firebase listener for fields was removed.")
         }
     }
@@ -151,52 +152,23 @@ class FieldViewModel : ViewModel() {
         if (fieldId.isNotEmpty()) {
             databaseRef.child(fieldId).setValue(field)
                 .addOnSuccessListener {
-                    _isLoading.value = false
                     viewModelScope.launch {
-                        _eventChannel.send(Event.ShowMessage("Successfully updated the field!"))
-                        delay(1000)
+                        _eventChannel.send(Event.ShowMessage("Successfully updated field!"))
                         _eventChannel.send(Event.UpdateSuccess)
+                        delay(1000)
                         _eventChannel.send(Event.FinishActivity)
-                        _isLoading.value = false
                     }
+                    _isLoading.value = false
                 }
                 .addOnFailureListener { e ->
-                    _isLoading.value = false
                     viewModelScope.launch {
                         _eventChannel.send(Event.ShowMessage("Update failed: ${e.message}"))
                     }
+                    _isLoading.value = false
                 }
         } else {
             _isLoading.value = false
         }
-
-    //        if (field.userId != currentUserId) {
-//            Log.d("FieldViewModel", "updateField: ${field.userId}")
-//            Log.d("FieldViewModel", "updateField: ${currentUserId}")
-//            viewModelScope.launch { _eventChannel.send(Event.ShowMessage("You don't have access to this field!")) }
-//            return
-//        }
-//
-//        _isLoading.value = true
-//        val fieldId = field.fieldId
-//
-//        if (fieldId != "") {
-//            databaseRef.child(fieldId).setValue(field)
-//                .addOnSuccessListener {
-//                    viewModelScope.launch {
-//                        _eventChannel.send(FieldViewModel.Event.ShowMessage("Successfully updated the field!"))
-//                    }
-//                    _isLoading.value = false
-//                }
-//                .addOnFailureListener { e ->
-//                    viewModelScope.launch {
-//                        _eventChannel.send(FieldViewModel.Event.ShowMessage("Something went wrong while trying to update the field!"))
-//                    }
-//                    _isLoading.value = false
-//                }
-//        } else {
-//            _isLoading.value = false
-//        }
     }
 
     fun deleteField(field: Field, context: Context) {
@@ -207,7 +179,7 @@ class FieldViewModel : ViewModel() {
 
         _isLoading.value = true
 
-        databaseRef.child(field.fieldId.toString()).removeValue()
+        databaseRef.child(field.fieldId).removeValue()
             .addOnSuccessListener {
                 deleteLocalImageFile(field.fieldPhotoPath, context)
                 viewModelScope.launch {
@@ -226,7 +198,7 @@ class FieldViewModel : ViewModel() {
             }
     }
 
-    private fun deleteLocalImageFile(path: String?, context: Context) {
+    fun deleteLocalImageFile(path: String?, context: Context) {
         if (path == null) return
 
         try {
