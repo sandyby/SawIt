@@ -70,8 +70,8 @@ Dalam pengembangan terbaru, kami berfokus pada stabilitas aplikasi:
 ## 🚀 Tautan Proyek
 
 - **💻 GitHub Repository:** [sandyby/uts-map](https://github.com/sandyby/uts-map)
-- **📽️ Demo Video:** [Google Drive](https://drive.google.com/drive/folders/1ZZc1Zq13pow0m5pneXKxi_iob-QIInyi?usp=sharing](https://drive.google.com/file/d/1moYgpT3f-gIHQQXMgb7aXMbdWd6IsuWN/view?usp=sharing)
-
+- **📽️ Demo Video:** [Google Drive](https://drive.google.com/file/d/1moYgpT3f-gIHQQXMgb7aXMbdWd6IsuWN/view?usp=drive_link)
+- **Google Drive:** [Google Drive](https://drive.google.com/drive/folders/1BEDI1ySwo5we8OBokl64_J-g6ID1t-1C?usp=drive_link)
 ---
 
 **SawIt** — *Langkah nyata menuju transformasi digital agrikultur Indonesia.*
