@@ -82,6 +82,12 @@ class FieldLogsFragment : Fragment(R.layout.fragment_field_logs) {
             val predictionFragment = PredictionFragment.newInstance(fieldId, fieldName)
 
             requireActivity().supportFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_in_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_in_right
+                )
                 .replace(R.id.fl_scroll_view_content, predictionFragment)
                 .addToBackStack(null)
                 .commit()

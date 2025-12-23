@@ -1,6 +1,7 @@
 package com.example.sawit.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.sawit.R
 import com.example.sawit.databinding.FragmentPredictionYieldBinding
+import com.example.sawit.models.Field
 import com.example.sawit.viewmodels.FieldViewModel
 import com.example.sawit.viewmodels.PredictionViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -26,7 +28,8 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
     private val fieldViewModel: FieldViewModel by viewModels()
     private val predictionViewModel: PredictionViewModel by viewModels()
 
-    private var fieldIdMap: Map<String, String> = emptyMap()
+    //    private var fieldIdMap: Map<String, String> = emptyMap()
+    private var fieldsList: List<Field> = emptyList()
 
     companion object {
         const val ARG_PREDICTED_YIELD = "predicted_yield"
@@ -89,7 +92,12 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 fieldViewModel.fieldsData.collectLatest { fields ->
-                    fieldIdMap = fields.associate { it.fieldName to it.fieldId }
+//                    fieldIdMap = fields.associate { it.fieldName to it.fieldId }
+
+                    if (fields.isEmpty()) return@collectLatest
+
+                    fieldsList = fields
+
                     val fieldNames = mutableListOf(FIELD_PLACEHOLDER)
                     fieldNames.addAll(fields.map { it.fieldName })
 
@@ -111,6 +119,15 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
                         if (text.toString().isEmpty()) {
                             setText(FIELD_PLACEHOLDER, false)
                         }
+
+                        setOnItemClickListener { _, _, position, _ ->
+                            val selectedName = adapter.getItem(position) as String
+                            val field = fieldsList.find { it.fieldName == selectedName }
+                            field?.let {
+                                binding.tilHarvestArea.helperText = "Max harvest area: ${it.fieldArea} ha"
+                                binding.tilHarvestArea.error = null
+                            }
+                        }
                     }
                 }
             }
@@ -130,9 +147,12 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
         val tmin = binding.tietMinTemperature.text.toString().toFloatOrNull()
         val tmax = binding.tietMaxTemperature.text.toString().toFloatOrNull()
 
+        val selectedField = fieldsList.find { it.fieldName == fieldName }
+        val maxFieldArea = selectedField?.fieldArea?.toFloat() ?: 5000f
+
         var isValid = true
 
-        if (fieldName.isEmpty() || !fieldIdMap.containsKey(fieldName)) {
+        if (fieldName.isEmpty() || fieldName == FIELD_PLACEHOLDER || selectedField == null) {
             binding.tilField.error = "Please select a field!"
             isValid = false
         } else {
@@ -142,8 +162,11 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
         if (area == null) {
             binding.tilHarvestArea.error = "Harvest area is required!"
             isValid = false
-        } else if (area <= 0 || area > 5000) {
-            binding.tilHarvestArea.error = "Harvest must be greater than 0 and at most 5000 ha!"
+        } else if (area <= 0) {
+            binding.tilHarvestArea.error = "Harvest area must be greater than 0!"
+            isValid = false
+        } else if (area > maxFieldArea) {
+            binding.tilHarvestArea.error = "Harvest area must not exceed $maxFieldArea ha!"
             isValid = false
         } else {
             binding.tilHarvestArea.error = null
@@ -186,19 +209,19 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
 
         if (!isValid) return
 
-        val selectedFieldId = fieldIdMap[fieldName]
-
-        android.util.Log.d("SAWIT_ML_DEBUG", """
+        Log.d(
+            "SAWIT_ML_DEBUG", """
         [SENDING TO VM]
-        Field: $fieldName ($selectedFieldId)
+        Field: $fieldName (${selectedField!!.fieldId})
         TMin: $tmin
         TMax: $tmax
         Rainfall: $rainfall
         Area: $area
-    """.trimIndent())
+    """.trimIndent()
+        )
 
         predictionViewModel.predictTotalYield(
-            selectedFieldId!!,
+            selectedField.fieldId,
             fieldName,
             tmin!!,
             tmax!!,
@@ -216,16 +239,31 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
                     predictionViewModel.predictionResult.collect { result ->
                         result?.let {
                             val area = binding.tietHarvestArea.text.toString().toFloatOrNull() ?: 0f
-                            val rainfall = binding.tietRainfall.text.toString().toFloatOrNull() ?: 0f
-                            val tmin = binding.tietMinTemperature.text.toString().toFloatOrNull() ?: 0f
-                            val tmax = binding.tietMaxTemperature.text.toString().toFloatOrNull() ?: 0f
+                            val rainfall =
+                                binding.tietRainfall.text.toString().toFloatOrNull() ?: 0f
+                            val tmin =
+                                binding.tietMinTemperature.text.toString().toFloatOrNull() ?: 0f
+                            val tmax =
+                                binding.tietMaxTemperature.text.toString().toFloatOrNull() ?: 0f
 
                             // === LOG DEBUG UNTUK MEMBUKTIKAN ML BEKERJA ===
-                            android.util.Log.d("SAWIT_ML_DEBUG", "--------------------------------------------")
+                            android.util.Log.d(
+                                "SAWIT_ML_DEBUG",
+                                "--------------------------------------------"
+                            )
                             android.util.Log.d("SAWIT_ML_DEBUG", "HASIL PREDIKSI DITERIMA")
-                            android.util.Log.d("SAWIT_ML_DEBUG", "Model Output (Yield): ${it.predictedYield} kg/Ha")
-                            android.util.Log.d("SAWIT_ML_DEBUG", "Data Input UI - Tmin: $tmin, Tmax: $tmax, Rain: $rainfall, Area: $area")
-                            android.util.Log.d("SAWIT_ML_DEBUG", "--------------------------------------------")
+                            android.util.Log.d(
+                                "SAWIT_ML_DEBUG",
+                                "Model Output (Yield): ${it.predictedYield} kg/Ha"
+                            )
+                            android.util.Log.d(
+                                "SAWIT_ML_DEBUG",
+                                "Data Input UI - Tmin: $tmin, Tmax: $tmax, Rain: $rainfall, Area: $area"
+                            )
+                            android.util.Log.d(
+                                "SAWIT_ML_DEBUG",
+                                "--------------------------------------------"
+                            )
 
                             val resultFragment = PredictionYieldResultFragment().apply {
                                 arguments = Bundle().apply {
@@ -248,16 +286,25 @@ class PredictionYieldFragment : Fragment(R.layout.fragment_prediction_yield) {
                     predictionViewModel.events.collect { event ->
                         when (event) {
                             is PredictionViewModel.Event.ShowError -> {
-                                android.util.Log.e("SAWIT_ML_DEBUG", "EVENT ERROR: ${event.message}")
+                                android.util.Log.e(
+                                    "SAWIT_ML_DEBUG",
+                                    "EVENT ERROR: ${event.message}"
+                                )
                                 Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                             }
 
                             is PredictionViewModel.Event.PredictionSaved -> {
-                                android.util.Log.i("SAWIT_ML_DEBUG", "EVENT: Prediction successfully saved to database")
+                                android.util.Log.i(
+                                    "SAWIT_ML_DEBUG",
+                                    "EVENT: Prediction successfully saved to database"
+                                )
                             }
 
                             is PredictionViewModel.Event.ShowMessage -> {
-                                android.util.Log.i("SAWIT_ML_DEBUG", "EVENT MESSAGE: ${event.message}")
+                                android.util.Log.i(
+                                    "SAWIT_ML_DEBUG",
+                                    "EVENT MESSAGE: ${event.message}"
+                                )
                                 Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                             }
                         }

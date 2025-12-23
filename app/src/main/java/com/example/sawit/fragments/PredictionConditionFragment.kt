@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.sawit.R
 import com.example.sawit.databinding.FragmentPredictionConditionBinding
+import com.example.sawit.models.Field
 import com.example.sawit.models.PredictionHistory
 import com.example.sawit.viewmodels.FieldViewModel
 import com.example.sawit.viewmodels.PredictionViewModel
@@ -30,6 +31,7 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
     private val predictionViewModel: PredictionViewModel by viewModels()
     private var fieldIdMap: Map<String, String> = emptyMap()
     private var hasAutoSelected = false
+    private var fieldsList: List<Field> = emptyList()
 
     companion object {
         private const val TAG = "SAWIT_ML_DEBUG"
@@ -97,6 +99,8 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
                 fieldViewModel.fieldsData.collectLatest { fields ->
                     if (fields.isEmpty()) return@collectLatest
 
+                    fieldsList = fields
+
                     fieldIdMap = fields.associate { it.fieldName to it.fieldId }
                     val fieldNames = mutableListOf(FIELD_PLACEHOLDER)
                     fieldNames.addAll(fields.map { it.fieldName })
@@ -115,11 +119,22 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
                             )
                         )
                         setAdapter(adapter)
+
+                        setOnItemClickListener { _, _, position, _ ->
+                            val selectedName = binding.actvField.adapter.getItem(position) as String
+                            val field = fieldsList.find { it.fieldName == selectedName }
+
+                            field?.let {
+                                binding.tilHarvestArea.helperText = "Max harvest area: ${it.fieldArea} ha"
+                            }
+                        }
                     }
+
                     if (targetFieldId != null && !hasAutoSelected) {
                         val selectedField = fields.find { it.fieldId == targetFieldId }
                         selectedField?.let {
                             binding.actvField.setText(it.fieldName, false)
+                            binding.tilHarvestArea.helperText = "Max harvest area: ${it.fieldArea} ha"
                             hasAutoSelected = true
                         }
                     } else if (!hasAutoSelected) {
@@ -144,6 +159,9 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
         val tempMin = binding.tietMinTemperature.text.toString().toFloatOrNull()
         val tempMax = binding.tietMaxTemperature.text.toString().toFloatOrNull()
 
+        val selectedField = fieldsList.find { it.fieldName == fieldName }
+        val maxHarvestArea = selectedField?.fieldArea?.toFloat() ?: 5000f
+
         var isValid = true
 
         if (fieldName.isEmpty() || fieldName == FIELD_PLACEHOLDER || !fieldIdMap.containsKey(
@@ -159,9 +177,11 @@ class PredictionConditionFragment : Fragment(R.layout.fragment_prediction_condit
         if (harvestArea == null) {
             binding.tilHarvestArea.error = "Harvest area is required!"
             isValid = false
-        } else if (harvestArea <= 0 || harvestArea > 5000) {
-            binding.tilHarvestArea.error =
-                "Harvest area must be greater than 0 and at most 5000 ha!"
+        } else if (harvestArea <= 0) {
+            binding.tilHarvestArea.error = "Harvest area must be greater than 0!"
+            isValid = false
+        } else if (harvestArea > maxHarvestArea) {
+            binding.tilHarvestArea.error = "Harvest area must not exceed ${maxHarvestArea} ha!"
             isValid = false
         } else {
             binding.tilHarvestArea.error = null

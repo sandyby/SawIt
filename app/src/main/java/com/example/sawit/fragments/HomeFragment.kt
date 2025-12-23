@@ -4,8 +4,10 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,10 +17,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -32,12 +32,10 @@ import com.example.sawit.activities.CreateEditFieldActivity
 import com.example.sawit.activities.DetailBottomSheetActivity
 import com.example.sawit.activities.MainActivity
 import com.example.sawit.adapters.FieldsDashboardAdapter
-import com.example.sawit.databinding.ActivityDetailBottomSheetBinding
 import com.example.sawit.databinding.FragmentHomeBinding
 import com.example.sawit.models.ActivityStatus
 import com.example.sawit.models.ActivityTimelineItem
 import com.example.sawit.models.Field
-import com.example.sawit.ui.NotificationIconWithBadge
 import com.example.sawit.ui.WeatherCard
 import com.example.sawit.ui.components.ActivityTimelineList
 import com.example.sawit.utils.HorizontalSpaceItemDecoration
@@ -70,7 +68,7 @@ class HomeFragment : Fragment() {
     private var wasLocationPermissionGranted = false
     private var lastManualRefreshTime: Long = 0
     private val MANUAL_REFRESH_COOLDOWN = 30000L
-    private lateinit var requestLocationPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestLocationPermissionLauncher: ActivityResultLauncher<Array<String>>
     private val requestNotificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -86,6 +84,7 @@ class HomeFragment : Fragment() {
         notificationViewModel.listenForNotifications()
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         wasLocationPermissionGranted = hasLocationPermission()
@@ -98,22 +97,35 @@ class HomeFragment : Fragment() {
             }
         }
 
-        requestLocationPermissionLauncher =  registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                fetchLocationAndWeather()
+        requestLocationPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+            val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+
+            if (fineGranted || coarseGranted) {
+                fetchLocationAndWeather(forceRefresh = true)
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Location denied. Showing default weather and location!",
-                    Toast.LENGTH_SHORT
-                ).show()
-                weatherViewModel.fetchWeather(-6.2088, 106.8456)
+                handlePermissionDeniedPermanently()
             }
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private fun checkLocationPermissionsAndStart() {
+        when {
+            hasLocationPermission() -> fetchLocationAndWeather()
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) -> showLocationRationale()
+            else -> requestLocationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onResume() {
         super.onResume()
         val isCurrentlyGranted = hasLocationPermission()
@@ -163,6 +175,8 @@ class HomeFragment : Fragment() {
         setupTimeline()
         setupClickListeners()
         setupComposables()
+
+        checkLocationPermissionsAndStart()
 
         if (weatherViewModel.isWeatherStale()) {
             fetchLocationAndWeather()
@@ -275,7 +289,10 @@ class HomeFragment : Fragment() {
                                     .show()
                             } else {
                                 val bottomSheet = DetailBottomSheetActivity(originalActivity)
-                                bottomSheet.show(parentFragmentManager, "ActivityDetailBottomSheet")
+                                bottomSheet.show(
+                                    parentFragmentManager,
+                                    "ActivityDetailBottomSheet"
+                                )
                             }
                         }
                     }
@@ -291,41 +308,72 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun handlePermissionDeniedPermanently() {
+        Toast.makeText(
+            requireContext(),
+            "Location denied! You are currently using a default location",
+            Toast.LENGTH_SHORT
+        ).show()
+        weatherViewModel.fetchWeather(-6.2088, 106.8456)
+    }
+
     private fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
+        val fine = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        val coarse = ContextCompat.checkSelfPermission(
             requireContext(),
             Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+        )
+        return fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun fetchLocationAndWeather(forceRefresh: Boolean = false) {
-        if (hasLocationPermission()) {
-            val fusedLocationClient =
-                LocationServices.getFusedLocationProviderClient(requireActivity())
+        if (!hasLocationPermission()) {
+            binding.srlHomeRefresh.isRefreshing = false
 
-            if (forceRefresh) {
-                requestFreshLocation(fusedLocationClient, forceRefresh)
+            if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                showLocationRationale()
+            } else if (forceRefresh) {
+                showLocationRationale()
             } else {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    if (location != null) {
-                        weatherViewModel.fetchWeather(location.latitude, location.longitude, forceRefresh)
-                    } else {
-                        requestFreshLocation(fusedLocationClient, forceRefresh)
-                    }
-                }
+                weatherViewModel.fetchWeather(-6.2088, 106.8456, false)
             }
-        } else {
-            if (forceRefresh) {
-                requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-                binding.srlHomeRefresh.isRefreshing = false
+            return
+        }
+
+        val fusedClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        fusedClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null && !forceRefresh) {
+                weatherViewModel.fetchWeather(location.latitude, location.longitude, false)
             } else {
-                weatherViewModel.fetchWeather(-6.2088   , 106.8456, false)
+                val request = CurrentLocationRequest.Builder()
+                    .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+                    .build()
+                fusedClient.getCurrentLocation(request, null).addOnSuccessListener { fresh ->
+                    val lat = fresh?.latitude ?: -6.2088
+                    val lon = fresh?.longitude ?: 106.8456
+                    weatherViewModel.fetchWeather(lat, lon, forceRefresh)
+                }
             }
         }
     }
 
-    private fun requestFreshLocation(client: FusedLocationProviderClient, forceRefresh: Boolean) {
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireContext().packageName, null)
+        }
+        startActivity(intent)
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private fun requestFreshLocation(
+        client: FusedLocationProviderClient,
+        forceRefresh: Boolean
+    ) {
         val currentRequestBuilder = CurrentLocationRequest.Builder()
             .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
             .setDurationMillis(5000)
@@ -334,11 +382,42 @@ class HomeFragment : Fragment() {
         client.getCurrentLocation(currentRequestBuilder, null)
             .addOnSuccessListener { freshLocation ->
                 if (freshLocation != null) {
-                    weatherViewModel.fetchWeather(freshLocation.latitude, freshLocation.longitude, forceRefresh)
+                    weatherViewModel.fetchWeather(
+                        freshLocation.latitude,
+                        freshLocation.longitude,
+                        forceRefresh
+                    )
                 } else {
                     weatherViewModel.fetchWeather(-6.2088, 106.8456, forceRefresh)
                 }
             }
+    }
+
+    private fun showLocationRationale() {
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.CustomAlertDialogTheme)
+            .setTitle("Location Access Required")
+            .setMessage("Weather data requires location access. If you've denied this before, please enable it in Settings.")
+            .setPositiveButton("Got It") { _, _ ->
+                requestLocationPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
+            .setNeutralButton("Open Settings") { _, _ ->
+                openAppSettings()
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            ?.setTextColor(resources.getColor(R.color.text_primary_500, null))
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEUTRAL)
+            ?.setTextColor(resources.getColor(R.color.text_primary_900, null))
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+            ?.setTextColor(resources.getColor(R.color.text_400, null))
     }
 
     private fun checkAndRequestNotificationPermission() {
@@ -407,7 +486,7 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             weatherViewModel.weatherState.collectLatest { weather ->
                 weather?.let {
-                    //
+                    Log.d("HomeFragment", "weather: $weather ")
                 }
             }
         }
@@ -426,7 +505,8 @@ class HomeFragment : Fragment() {
                 .error(placeholderId)
                 .into(binding.civDashboardProfilePicture)
         } else if (!base64String.isNullOrEmpty()) {
-            val newLocalPath = ImageCacheManager.base64ToLocalCache(requireContext(), base64String)
+            val newLocalPath =
+                ImageCacheManager.base64ToLocalCache(requireContext(), base64String)
 
             if (newLocalPath != null) {
                 Glide.with(this)

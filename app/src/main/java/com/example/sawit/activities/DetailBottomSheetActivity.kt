@@ -89,9 +89,9 @@ class DetailBottomSheetActivity(val activity: Activity) : BottomSheetDialogFragm
                     val isCompleted = activity.status.equals("completed", ignoreCase = true)
 
                     val message =
-                        if (isCompleted) "Activity Completed" else "Activity timeframe has passed"
+                        if (isCompleted) "Activity Completed" else "Activity is overdue!"
                     val color =
-                        if (isCompleted) colorResource(R.color.bg_primary_500) else colorResource(R.color.bg_primary_overlay_2)
+                        if (isCompleted) colorResource(R.color.bg_primary_500) else colorResource(R.color.text_500)
 
                     val icon = if (isCompleted) {
                         R.drawable.ic_filled_task_list_48_black

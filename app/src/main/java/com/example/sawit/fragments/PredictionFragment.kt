@@ -2,17 +2,21 @@ package com.example.sawit.fragments
 
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.example.sawit.R
+import com.example.sawit.activities.MainActivity
 import com.example.sawit.adapters.PredictionsPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import nl.joery.animatedbottombar.AnimatedBottomBar
 
 class PredictionFragment : Fragment(R.layout.fragment_predictions) {
 
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
+    private lateinit var topHeaderFragment: TopHeaderFragment
 
     companion object {
         fun newInstance(fieldId: String? = null, fieldName: String? = null) =
@@ -22,6 +26,12 @@ class PredictionFragment : Fragment(R.layout.fragment_predictions) {
                     putString("fieldName", fieldName)
                 }
             }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        topHeaderFragment = TopHeaderFragment()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

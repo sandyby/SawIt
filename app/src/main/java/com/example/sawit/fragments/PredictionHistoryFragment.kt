@@ -1,6 +1,8 @@
 package com.example.sawit.fragments
 
+import android.content.res.ColorStateList
 import android.graphics.Canvas
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,10 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.compose.ui.text.font.Typeface
+import androidx.compose.ui.Alignment
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.alpha
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -88,6 +88,14 @@ class PredictionHistoryFragment : Fragment(R.layout.fragment_prediction_history)
 
                 snackbarView.background =
                     ContextCompat.getDrawable(requireContext(), R.drawable.bg_snackbar_rounded)
+
+                snackbarView.background.setTint(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.bg_primary_500
+                    )
+                )
+
                 snackbar.setActionTextColor(
                     ContextCompat.getColor(
                         requireContext(),
@@ -98,6 +106,7 @@ class PredictionHistoryFragment : Fragment(R.layout.fragment_prediction_history)
                 val tvText =
                     snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                 tvText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                tvText.setTypeface(tvText.typeface, Typeface.BOLD)
                 tvText.textSize = 14f
 
                 tvText.setCompoundDrawablesWithIntrinsicBounds(
@@ -106,6 +115,7 @@ class PredictionHistoryFragment : Fragment(R.layout.fragment_prediction_history)
                     0,
                     0
                 )
+                tvText.compoundDrawableTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 tvText.compoundDrawablePadding = 16
 
                 val tvAction =

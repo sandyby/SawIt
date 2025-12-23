@@ -31,7 +31,7 @@ class FieldsPredictionHistoryAdapter :
                 binding.tvCondition.text = item.conditionLabel
 
                 val color = when (item.conditionLabel?.lowercase()) {
-                    "good" -> R.color.bg_primary_overlay_3
+                    "good" -> R.color.bg_primary_500
                     "bad" -> R.color.text_fiery_red_sunset_600
                     else -> R.color.text_400
                 }

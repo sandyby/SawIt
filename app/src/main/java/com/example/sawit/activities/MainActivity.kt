@@ -147,6 +147,7 @@ class MainActivity : AppCompatActivity() {
                 //
             }
         })
+
         handleNotificationIntent(intent)
     }
 

@@ -113,9 +113,9 @@ class FieldsDetailFragment : Fragment(R.layout.fragment_fields_detail) {
         }
 
         binding.btnEditField.setOnClickListener {
-            val fieldToEdit = currentField ?: return@setOnClickListener
+            val fieldId = currentField?.fieldId ?: return@setOnClickListener
             val intent = Intent(requireContext(), CreateEditFieldActivity::class.java).apply {
-                putExtra(CreateEditFieldActivity.EXTRA_FIELD, fieldToEdit)
+                putExtra("EXTRA_FIELD_ID", fieldId)
             }
             startActivity(intent)
         }

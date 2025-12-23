@@ -55,6 +55,7 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
@@ -70,6 +71,7 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
     private val activityViewModel: ActivityViewModel by viewModels()
 
     private var currentField: Field? = null
+    private var currentFieldId: String? = null
     private var isEditMode = false
     private var selectedLatLng: LatLng? = null
     private var selectedAddress: String? = null
@@ -79,6 +81,7 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         const val EXTRA_FIELD = "EXTRA_FIELD"
+        const val EXTRA_FIELD_ID = "EXTRA_FIELD_ID"
         private val DEFAULT_LOCATION = LatLng(-0.789275, 113.921327)
         private const val LOCATION_PERMISSION_REQUEST_CODE = 100
     }
@@ -112,13 +115,18 @@ class CreateEditFieldActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        if (intent.hasExtra(EXTRA_FIELD)) {
-            currentField = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra(EXTRA_FIELD, Field::class.java)
-            } else {
-                @Suppress("DEPRECATION") intent.getParcelableExtra(EXTRA_FIELD)
+        val fieldId = intent.getStringExtra("EXTRA_FIELD_ID")
+        if (fieldId != null) {
+            lifecycleScope.launch {
+                fieldViewModel.fieldsData.collect { fields ->
+                    val field = fields.find { it.fieldId == fieldId }
+                    if (field != null) {
+                        currentField = field
+                        isEditMode = true
+                        populateForm(field)
+                    }
+                }
             }
-            isEditMode = currentField != null
         }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)

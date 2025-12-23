@@ -45,11 +45,6 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun fetchWeather(lat: Double, lon: Double, forceRefresh: Boolean = false) {
-//        if (!isWeatherStale()) {
-//            Log.d("WeatherViewModel", "Using cached data. Skipping API call.")
-//            return
-//        }
-
         if (!forceRefresh && !isWeatherStale()) {
             Log.d("WeatherViewModel", "Using cached data. Skipping API call.")
             return

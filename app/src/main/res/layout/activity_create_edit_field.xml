@@ -188,12 +188,11 @@
                             android:id="@+id/fab_map_type"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|start"
                             android:layout_margin="16dp"
                             android:src="@drawable/ic_outline_satelite_24_black"
-                            app:backgroundTint="@color/text_primary_900"
+                            app:backgroundTint="@color/white"
                             app:fabSize="mini"
-                            app:layout_anchor="@id/map_fragment_container"
-                            app:layout_anchorGravity="end|center_vertical"
                             app:tint="@color/white" />
                     </fragment>
 
