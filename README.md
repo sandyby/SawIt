@@ -1,117 +1,77 @@
 # 🌴 SawIt — Smart Palm Plantation Management App
 
-**SawIt** adalah aplikasi mobile cerdas yang dirancang untuk membantu petani dan pengelola perkebunan kelapa sawit dalam mengelola, memantau, dan memprediksi hasil kebun mereka secara efisien.  
-Dengan memanfaatkan **teknologi Android Native** dan **Machine Learning (ML)**, SawIt menghadirkan solusi digital terintegrasi untuk mengatasi tantangan operasional di lapangan.
+**SawIt** adalah aplikasi Android Native cerdas yang dirancang untuk modernisasi manajemen perkebunan kelapa sawit. Dengan mengintegrasikan **Machine Learning (ML)** dan fitur **Geospasial**, SawIt membantu petani memantau kondisi kebun, mencatat aktivitas secara terstruktur, dan memprediksi hasil panen dengan akurasi tinggi.
 
 ---
 
-## 🌾 Latar Belakang
-Indonesia merupakan **produsen minyak kelapa sawit terbesar di dunia**, menjadikan sektor ini sangat penting bagi perekonomian nasional.  
-Namun, banyak petani masih bergantung pada pencatatan manual dan observasi tradisional yang rawan kesalahan. Tantangan seperti:
-- Pemantauan kondisi kebun yang belum terotomatisasi,
-- Pencatatan aktivitas yang tidak terstruktur, dan
-- Kesulitan memprediksi hasil panen,
-
-sering kali menurunkan efisiensi dan produktivitas.
-
-Melalui kemajuan **mobile technology** dan **machine learning**, SawIt hadir sebagai solusi digital yang **cerdas, praktis, dan berbasis data** — membantu petani mengambil keputusan lebih tepat dan meningkatkan hasil panen mereka.
+## 🌾 Latar Belakang & Tantangan
+Sebagai produsen kelapa sawit terbesar di dunia, Indonesia membutuhkan digitalisasi di sektor agrikultur. SawIt hadir untuk menjawab tantangan utama:
+- **Data Tidak Terstruktur:** Mengganti pencatatan manual tradisional dengan database cloud yang aman.
+- **Ketidakpastian Hasil:** Memberikan estimasi panen berdasarkan data historis cuaca dan kondisi lahan.
+- **Presisi Lokasi:** Pemetaan area kebun yang akurat menggunakan koordinat GPS real-time.
 
 ---
 
-## 🎯 Tujuan Proyek
+## ✨ Fitur Utama
 
-1. **Membangun Aplikasi Android Native:**  
-   Merancang dan mengimplementasikan antarmuka pengguna (UI) menggunakan **Kotlin** dan **Android Studio**.
+### 1. 🗺️ Manajemen Lahan (Field Management)
+- **Pemetaan Interaktif:** Integrasi Google Maps SDK untuk menentukan titik koordinat kebun secara presisi.
+- **Snapshot Otomatis:** Sistem secara otomatis mengambil gambar peta sebagai *placeholder* visual lahan jika pengguna tidak mengunggah foto profil kebun.
+- **Optimasi Memori:** Implementasi penyimpanan foto berbasis *Local File Path* untuk mencegah error `TransactionTooLargeException`.
 
-2. **Menyediakan Fitur Manajemen Perkebunan:**
-    - Pengelolaan data kebun (*Fields*)
-    - Pencatatan aktivitas harian (pemupukan, panen, dll.)
-    - Pemantauan cuaca secara real-time
+### 2. 🌦️ Integrasi Cuaca Real-time
+- Pengambilan data cuaca otomatis berdasarkan lokasi GPS terkini menggunakan **OpenWeather API**.
+- **Smart Permission Handling:** Sistem permintaan izin lokasi yang intuitif dengan *Rationale Dialog* untuk mengedukasi pengguna.
 
-3. **Integrasi Machine Learning:**  
-   Menghubungkan model ML dari mata kuliah *IF441* untuk memberikan:
-    - Prediksi hasil panen
-    - Analisis kondisi pohon sawit
+### 3. 🤖 Prediksi Berbasis Machine Learning
+- **Prediction Yield:** Menghitung estimasi total panen (kg) berdasarkan variabel curah hujan, suhu, dan luas lahan.
+- **Prediction Condition:** Menganalisis kesehatan pohon sawit untuk langkah preventif.
+- **Synchronized Validation:** Validasi pintar yang mencegah input "Luas Panen" melebihi total "Luas Lahan" yang terdaftar di database.
 
-4. **Pemanfaatan Fitur Native Android & Cloud Database:**
-    - **Geolokasi:** untuk pemetaan kebun
-    - **Local Storage:** untuk penyimpanan sementara
-    - **Firebase Firestore:** untuk sinkronisasi data real-time
-
----
-
-## 💡 Manfaat Aplikasi
-
-- **⚙️ Efisiensi Operasional:**  
-  Petani dapat merencanakan dan memantau aktivitas harian melalui kalender digital interaktif.
-
-- **📊 Pengambilan Keputusan Berbasis Data:**  
-  Informasi cuaca, statistik kebun, dan hasil prediksi ML ditampilkan secara visual dalam bentuk grafik dan ringkasan.
-
-- **🌱 Optimalisasi Hasil Panen:**  
-  Estimasi hasil panen dan analisis kondisi kebun membantu petani mengambil langkah preventif dan meningkatkan produktivitas.
-
-- **📱 Modernisasi Manajemen:**  
-  Mengubah pengelolaan kebun dari cara tradisional menjadi digital, terstruktur, dan mudah diakses.
+### 4. 📅 Timeline & Aktivitas
+- Pelacakan aktivitas harian (Pemupukan, Panen, Perawatan) dalam bentuk *Activity Timeline* yang informatif.
+- Sistem notifikasi untuk pengingat jadwal perawatan kebun.
 
 ---
 
-## 🧠 Tema Aplikasi
-> **“Asisten Cerdas untuk Manajemen Perkebunan Kelapa Sawit Berbasis Mobile dan Machine Learning.”**
+## 🏗️ Arsitektur & Teknologi
 
-SawIt bukan sekadar aplikasi, tetapi asisten digital yang membantu petani sawit modern mengelola kebun secara efisien, informatif, dan prediktif.
-
----
-
-## 🏗️ Arsitektur Sistem
-
-SawIt terdiri dari **tiga komponen utama**:
-
-1. **📱 Aplikasi Mobile (Client-side):**  
-   Dibangun menggunakan **Kotlin**, menjadi antarmuka utama bagi pengguna untuk menginput data dan menerima hasil prediksi.
-
-2. **☁️ Backend & Database (Server-side):**  
-   Menggunakan **Firebase Firestore (NoSQL)** untuk menyimpan data pengguna, kebun, dan aktivitas.  
-   Menyediakan sinkronisasi data secara **real-time** antar perangkat.
-
-3. **🤖 Model Machine Learning:**  
-   Dikembangkan secara terpisah menggunakan **Python & Scikit-learn**, kemudian di-*deploy* ke **Firebase ML** atau API custom untuk melakukan prediksi hasil panen.
-
----
-
-## 🛠️ Teknologi yang Digunakan
+Aplikasi ini dibangun menggunakan arsitektur **MVVM (Model-View-ViewModel)** untuk memastikan kode yang bersih (*Clean Code*), mudah diuji, dan skalabel.
 
 | Komponen | Teknologi |
 |-----------|------------|
-| **Bahasa Pemrograman** | Kotlin |
-| **IDE** | Android Studio |
-| **Desain UI/UX** | Figma |
-| **Database** | Google Firebase Firestore |
-| **Geolokasi & Peta** | Google Maps SDK / Mapbox SDK |
-| **API Cuaca** | OpenWeather API |
+| **Bahasa** | Kotlin |
+| **UI Framework** | XML (View Binding) & Jetpack Compose (Hybrid) |
+| **Database** | Firebase (Real-time Cloud Database) |
+| **Authentication** | Firebase (Authenticator) |
+| **Location Services** | Google Maps SDK & Fused Location Provider |
+| **Image Loading** | Glide (dengan Disk Caching) |
+| **API** | Retrofit & OpenWeatherMap API |
 
 ---
 
-## Anggota Kelompok
-
-1. Maureen Alexandria (00000107632)
-2. Steven Lee (00000105886)
-3. Dewangga Vito Smaradhana (00000107630)
-4. Sandy Bonfilio Yuvens (00000106442)
-
----
-
-## 🚀 Kesimpulan
-SawIt menghadirkan pendekatan modern dalam manajemen perkebunan kelapa sawit melalui integrasi antara **Android Native App** dan **Machine Learning**.  
-Dengan antarmuka yang ramah pengguna, fitur komprehensif, dan dukungan data real-time, SawIt menjadi langkah nyata menuju **transformasi digital sektor agrikultur Indonesia**.
+## 🛠️ Detail Teknis & Optimasi
+Dalam pengembangan terbaru, kami berfokus pada stabilitas aplikasi:
+- **Memory Management:** Menghapus penggunaan *Base64 String* pada model data untuk menjaga stabilitas transaksi antar fragment.
+- **UI State Persistence:** Sinkronisasi *Bottom Bar* kustom dan Toolbar *Header* saat navigasi mendalam (Field → Logs → Prediction).
+- **Safe Data Flow:** Penggunaan `StateFlow` dan `SharedViewModel` untuk sinkronisasi data antar fragment secara real-time.
 
 ---
 
-## Lampiran
+## 👥 Anggota Kelompok
 
-#### Figma
-https://www.figma.com/design/ZAeIfQnTV99H8YtGrfyJlM/Contact-List-App?node-id=0-1&t=ryPZTb2faFNI474t-1
-#### Github Repository
-https://github.com/sandyby/uts-map
-#### Google Drive Video
-https://drive.google.com/drive/folders/1ZZc1Zq13pow0m5pneXKxi_iob-QIInyi?usp=sharing
+1. **Maureen Alexandria** (00000107632)
+2. **Steven Lee** (00000105886)
+3. **Dewangga Vito Smaradhana** (00000107630)
+4. **Sandy Bonfilio Yuvens** (00000106442)
+
+---
+
+## 🚀 Tautan Proyek
+
+- **💻 GitHub Repository:** [sandyby/uts-map](https://github.com/sandyby/uts-map)
+- **📽️ Demo Video:** [Google Drive]([https://drive.google.com/drive/folders/1ZZc1Zq13pow0m5pneXKxi_iob-QIInyi?usp=sharing](https://drive.google.com/file/d/1moYgpT3f-gIHQQXMgb7aXMbdWd6IsuWN/view?usp=sharing))
+
+---
+
+**SawIt** — *Langkah nyata menuju transformasi digital agrikultur Indonesia.*
