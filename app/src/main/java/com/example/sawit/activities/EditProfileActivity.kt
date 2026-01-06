@@ -98,7 +98,7 @@ class EditProfileActivity : AppCompatActivity() {
         } else if (newName.length > 30) {
             binding.tilFullNameField.error = "Full name must be at most 30 characters long!"
             return
-        } else if (newName.matches(Regex("^[a-zA-Z]{3,}(?: [a-zA-Z]+){0,2}$"))) {
+        } else if (!newName.matches(Regex("^[a-zA-Z]{3,}(?: [a-zA-Z]+){0,2}$"))) {
             binding.tilFullNameField.error = "Full name must not contain invalid symbols!"
             return
         } else {
