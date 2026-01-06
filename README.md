@@ -1,14 +1,13 @@
 # 🌴 SawIt — Smart Palm Plantation Management App
 
-**SawIt** adalah aplikasi Android Native cerdas yang dirancang untuk modernisasi manajemen perkebunan kelapa sawit. Dengan mengintegrasikan **Machine Learning (ML)** dan fitur **Geospasial**, SawIt membantu petani memantau kondisi kebun, mencatat aktivitas secara terstruktur, dan memprediksi hasil panen dengan akurasi tinggi.
+**SawIt** adalah aplikasi Android Native cerdas yang dirancang untuk modernisasi manajemen perkebunan kelapa sawit. Dengan mengintegrasikan **Machine Learning (ML)**, SawIt membantu petani memantau kondisi kebun, mencatat aktivitas secara terstruktur, dan memprediksi hasil panen dengan akurasi tinggi.
 
 ---
 
 ## 🌾 Latar Belakang & Tantangan
 Sebagai produsen kelapa sawit terbesar di dunia, Indonesia membutuhkan digitalisasi di sektor agrikultur. SawIt hadir untuk menjawab tantangan utama:
-- **Data Tidak Terstruktur:** Mengganti pencatatan manual tradisional dengan database cloud yang aman.
+- **Data Tidak Terstruktur:** Mengganti pencatatan manual tradisional dengan database yang aman.
 - **Ketidakpastian Hasil:** Memberikan estimasi panen berdasarkan data historis cuaca dan kondisi lahan.
-- **Presisi Lokasi:** Pemetaan area kebun yang akurat menggunakan koordinat GPS real-time.
 
 ---
 
@@ -20,17 +19,17 @@ Sebagai produsen kelapa sawit terbesar di dunia, Indonesia membutuhkan digitalis
 - **Optimasi Memori:** Implementasi penyimpanan foto berbasis *Local File Path* untuk mencegah error `TransactionTooLargeException`.
 
 ### 2. 🌦️ Integrasi Cuaca Real-time
-- Pengambilan data cuaca otomatis berdasarkan lokasi GPS terkini menggunakan **OpenWeather API**.
+- Pengambilan data cuaca otomatis berdasarkan lokasi GPS terkini menggunakan **OpenWeatherMap API**.
 - **Smart Permission Handling:** Sistem permintaan izin lokasi yang intuitif dengan *Rationale Dialog* untuk mengedukasi pengguna.
 
 ### 3. 🤖 Prediksi Berbasis Machine Learning
 - **Prediction Yield:** Menghitung estimasi total panen (kg) berdasarkan variabel curah hujan, suhu, dan luas lahan.
-- **Prediction Condition:** Menganalisis kesehatan pohon sawit untuk langkah preventif.
-- **Synchronized Validation:** Validasi pintar yang mencegah input "Luas Panen" melebihi total "Luas Lahan" yang terdaftar di database.
+- **Prediction Condition:** Menganalisis kondisi lahan sawit berdasarkan hasil panen.
+- **Synchronized Validation:** Validasi pintar yang mencegah input yang tidak valid.
 
 ### 4. 📅 Timeline & Aktivitas
 - Pelacakan aktivitas harian (Pemupukan, Panen, Perawatan) dalam bentuk *Activity Timeline* yang informatif.
-- Sistem notifikasi untuk pengingat jadwal perawatan kebun.
+- Sistem notifikasi untuk pengingat jadwal aktivitas yang sudah direncanakan.
 
 ---
 
